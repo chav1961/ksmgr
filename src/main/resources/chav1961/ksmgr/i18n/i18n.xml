@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<localization xmlns="http://www.i18n.purelib.chav1961.ru/">
+	<lang name="en">
+<!-- Localization for application --> 
+		<key name="application.title">(c) 2020, A.V.Chernomyrdin, Key store manager V.R.=1.0</key>
+		<key name="application.help.title">About...</key>
+		<key name="application.help">uri(aboutApplication.cre)</key>
+
+<!-- Localization for application menu --> 
+		<key name="menu.file">File</key>
+		<key name="menu.file.tt">File</key>
+		<key name="menu.file.newKeyStore">New keystore</key>
+		<key name="menu.file.newKeyStore.tt">Create new keystore and open it</key>
+		<key name="menu.file.openKeyStore">Open keystore</key>
+		<key name="menu.file.openKeyStore.tt">Open existent keystore</key>
+		<key name="menu.file.openKeyStorePKCS12">Open PKCS12 keystore</key>
+		<key name="menu.file.openKeyStorePKCS12.tt">Open existent PKCS12 keystore</key>
+		<key name="menu.file.lru">Open last used...</key>
+		<key name="menu.file.lru.tt">Open last recently used repositories</key>
+		<key name="menu.file.saveKeyStore">Save keystore</key>
+		<key name="menu.file.saveKeyStore.tt">Save keystore</key>
+		<key name="menu.file.saveKeyStoreAs">Save keystore as...</key>
+		<key name="menu.file.saveKeyStoreAs.tt">Save keystore with different name</key>
+		<key name="menu.file.changePassword">Change password</key>
+		<key name="menu.file.changePassword.tt">Change keystore password</key>
+		<key name="menu.file.exit">Exit</key>
+		<key name="menu.exit.tt">Exit application</key>
+		<key name="menu.edit">Edit</key>
+		<key name="menu.edit.tt">Manipulate keystore content</key>
+		<key name="menu.edit.copy">Copy to...</key>
+		<key name="menu.edit.copy.tt">Copy keystore content to...</key>
+		<key name="menu.edit.move">Move to...</key>
+		<key name="menu.edit.move.tt">Move keystore content to...</key>
+		<key name="menu.edit.delete">Delete</key>
+		<key name="menu.edit.delete.tt">Delete keystore content</key>
+		<key name="menu.edit.rename">Rename</key>
+		<key name="menu.edit.rename.tt">Change keystore item alias</key>
+		<key name="menu.settings">Settings</key>
+		<key name="menu.settings.tt">Application settings</key>
+		<key name="menu.settings.view">Right panel</key>
+		<key name="menu.settings.view.tt">Change right panel view format</key>
+		<key name="menu.settings.view.keystore">...as keystore</key>
+		<key name="menu.settings.view.keystore.tt">Use right panel as keystore content</key>
+		<key name="menu.settings.view.properties">...as properties</key>
+		<key name="menu.settings.view.properties.tt">Use right panel as detailed description of keystore item</key>
+		<key name="menu.settings.view.filesystem">...as file system</key>
+		<key name="menu.settings.view.filesystem.tt">Use right panel as file system navigator</key>
+		<key name="menu.settings.languages">Languages</key>
+		<key name="menu.settings.languages.tt">Select language for application</key>		
+		<key name="menu.settings.settings">Parameters</key>
+		<key name="menu.settings.settings.tt">Change application parameters</key>
+		<key name="menu.tasks">Tasks</key>
+		<key name="menu.tasks.tt">Execute typical tasks with keystore</key>
+		<key name="menu.tasks.keypairs">Key pairs</key>
+		<key name="menu.tasks.keypairs.tt">Key pairs manipulation</key>
+		<key name="menu.tasks.keypairs.generate">Create</key>
+		<key name="menu.tasks.keypairs.generate.tt">Create key pairs</key>
+		<key name="menu.tasks.keypairs.export">Export</key>
+		<key name="menu.tasks.keypairs.export.tt">Export key pairs from keystore</key>
+		<key name="menu.tasks.keypairs.import">Import</key>
+		<key name="menu.tasks.keypairs.import.tt">Import key paits into keystore</key>
+		<key name="menu.tasks.keypairs.generateandexport">Create &amp; Export</key>
+		<key name="menu.tasks.keypairs.generateandexport.tt">Create key pairs and export it</key>
+		<key name="menu.tasks.certificates">Certificates</key>
+		<key name="menu.tasks.certificates.tt">Certiticates manipulation</key>
+		<key name="menu.tasks.certificates.export">Export</key>
+		<key name="menu.tasks.certificates.export.tt">Export certificates</key>
+		<key name="menu.tasks.certificates.loadtrusted">Load trusted</key>
+		<key name="menu.tasks.certificates.loadtrusted.tt">Load trusted certificates into keystore</key>
+		<key name="menu.tasks.certificates.importfromserver">Import from server</key>
+		<key name="menu.tasks.certificates.importfromserver.tt">Import certificated from the given server URL</key>
+		<key name="menu.tasks.certificates.preparerequest">Prepare request</key>
+		<key name="menu.tasks.certificates.preparerequest.tt">Prepare certificate request</key>
+		<key name="menu.tasks.certificates.receive">Receive</key>
+		<key name="menu.tasks.certificates.receive.tt">Receive signed certificate</key>
+		<key name="menu.tasks.certificates.signclient">Sign client</key>
+		<key name="menu.tasks.certificates.signclient.tt">Sign client certificate</key>
+		<key name="menu.tasks.certificates.signserver">Sign server</key>
+		<key name="menu.tasks.certificates.signserver.tt">Sign server certificate</key>
+		<key name="menu.tasks.3DESkeys">3DES keys</key>
+		<key name="menu.tasks.3DESkeys.tt">3DES keys manipulation</key>
+		<key name="menu.tasks.3DESkeys.generate">Create</key>
+		<key name="menu.tasks.3DESkeys.generate.tt">Create 3DES keys</key>
+		<key name="menu.tasks.3DESkeys.import">Import</key>
+		<key name="menu.tasks.3DESkeys.import.tt">Import 3DES keys</key>
+		<key name="menu.help">Help</key>
+		<key name="menu.help.tt">Application help</key>
+		<key name="menu.help.overview">Overview</key>
+		<key name="menu.help.overview.tt">Start browser for full-functional help</key>
+		<key name="menu.help.about">About</key>
+		<key name="menu.help.about.tt">Help about application</key>
+		
+<!-- Localization for enumerations -->		
+		<key name="chav1961.ksmgr.interfaces.keystoretype.pkcs12">PKCS12</key>
+		<key name="chav1961.ksmgr.interfaces.keystoretype.pkcs12.tt">PKCS12 keystore type</key>
+		
+<!-- Localization for 'create keystore' dialog -->		
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Create key store</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.tt">Create new key store with the given type and password</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type">Keystore type</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt">Type of the key store</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password">Password</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password.tt">Password of the keystore</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype">Retype password</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype.tt">Retype password to check</key>
+
+<!-- Localization for 'ask password' dialog -->		
+		<key name="chav1961.ksmgr.dialogs.askpassworddialog">Ask password</key>
+		<key name="chav1961.ksmgr.dialogs.askpassworddialog.tt">Ask password for keystore</key>
+		<key name="chav1961.ksmgr.dialogs.askpassworddialog.password">Keystore password</key>
+		<key name="chav1961.ksmgr.dialogs.askpassworddialog.password.tt">Type keystore password</key>
+		
+<!-- Localization for 'change password password' dialog -->		
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog">Change password</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.tt">Change password for keystore opened</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.password">Old password</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.password.tt">Type old password for repository</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype">Retype old password</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype.tt">Repeat old password for repository for checking</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword">New password</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword.tt">Type new password for repository</key>
+
+<!-- Localization for 'settings' dialog -->		
+		<key name="chav1961.ksmgr.dialogs.settingsdialog">Application settings</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.tt">Application settings</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords">Keep passwords</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords.tt">Keep passwords for current session to exclude password typing on every password request</key>
+		
+	</lang>
+	<lang name="ru">
+<!-- Локализация приложения --> 
+		<key name="application.title">(c) 2020, А.В.Черномырдин, Менеджер репозитариев ключей V.R.=1.0</key>
+		<key name="application.help.title">О программе...</key>
+		<key name="application.help">uri(aboutApplication.cre)</key>
+
+<!-- Локализация меню приложения --> 
+		<key name="menu.file">Файл</key>
+		<key name="menu.file.tt">Файл</key>
+		<key name="menu.file.newKeyStore">Новый репозитарий</key>
+		<key name="menu.file.newKeyStore.tt">Создать новый репозитарий и открыть его</key>
+		<key name="menu.file.openKeyStore">Открыть репозитарий</key>
+		<key name="menu.file.openKeyStore.tt">Открыть существующий репозитарий</key>
+		<key name="menu.file.openKeyStorePKCS12">Открыть PKCS12 репозитарий</key>
+		<key name="menu.file.openKeyStorePKCS12.tt">Открыть существующий репозитарий формата PKCS12</key>
+		<key name="menu.file.lru">Открыть последние...</key>
+		<key name="menu.file.lru.tt">Открыть последние использованные репозитарии</key>
+		<key name="menu.file.saveKeyStore">Сохранить репозитарий</key>
+		<key name="menu.file.saveKeyStore.tt">Сохранить изменения в репозитарии</key>
+		<key name="menu.file.saveKeyStoreAs">Сохранить как...</key>
+		<key name="menu.file.saveKeyStoreAs.tt">Сохранить измененный репозитарий под новым именем</key>
+		<key name="menu.file.changePassword">Смена пароля</key>
+		<key name="menu.file.changePassword.tt">Изменить пароль репозитария</key>
+		<key name="menu.file.exit">Выход</key>
+		<key name="menu.exit.tt">Завершение работы приложения</key>
+		<key name="menu.edit">Правка</key>
+		<key name="menu.edit.tt">Манипуляции содержимым репозитария</key>
+		<key name="menu.edit.copy">Скопировать в...</key>
+		<key name="menu.edit.copy.tt">Копировать содержимое репозитария</key>
+		<key name="menu.edit.move">Перенести в...</key>
+		<key name="menu.edit.move.tt">Переместить содержимое репозитария</key>
+		<key name="menu.edit.delete">Удалить</key>
+		<key name="menu.edit.delete.tt">Удалить содержимое репозитария</key>
+		<key name="menu.edit.rename">Переименовать</key>
+		<key name="menu.edit.rename.tt">Изменить имя компонента в репозитарии</key>
+		<key name="menu.settings">Настройки</key>
+		<key name="menu.settings.tt">Настройки приложения</key>
+		<key name="menu.settings.view">Правая панель</key>
+		<key name="menu.settings.view.tt">Изменить формат правой панели</key>
+		<key name="menu.settings.view.keystore">...в виде репозитария</key>
+		<key name="menu.settings.view.keystore.tt">Представить правую панель в виде содержимого репозитария</key>
+		<key name="menu.settings.view.properties">...в виде описания</key>
+		<key name="menu.settings.view.properties.tt">Представить правую панель как детальное описание текущего элемента на левой панели</key>
+		<key name="menu.settings.view.filesystem">...в виде файловой системы</key>
+		<key name="menu.settings.view.filesystem.tt">Представить правую панель в виде навигатора по файловой системе</key>
+		<key name="menu.settings.settings">Параметры</key>
+		<key name="menu.settings.settings.tt">Изменить настройки приложения</key>
+		<key name="menu.settings.languages">Язык</key>
+		<key name="menu.settings.languages.tt">Выбрать язык приложения</key>		
+		<key name="menu.tasks">Задачи</key>
+		<key name="menu.tasks.tt">Выполнение типовых задач по манипуляции ключами и репозитарием</key>
+		<key name="menu.tasks.keypairs">Пары ключей</key>
+		<key name="menu.tasks.keypairs.tt">Манипуляция парами ключей</key>
+		<key name="menu.tasks.keypairs.generate">Создать</key>
+		<key name="menu.tasks.keypairs.generate.tt">Сгенерировать новую пару ключей</key>
+		<key name="menu.tasks.keypairs.export">Экспорт</key>
+		<key name="menu.tasks.keypairs.export.tt">Выгрузить пару ключей из репозитария</key>
+		<key name="menu.tasks.keypairs.import">Импорт</key>
+		<key name="menu.tasks.keypairs.import.tt">Загрузить пару ключей в репозитарий</key>
+		<key name="menu.tasks.keypairs.generateandexport">Создать и Выгрузить</key>
+		<key name="menu.tasks.keypairs.generateandexport.tt">Сгенерировать и выгрузить новую пару ключей</key>
+		<key name="menu.tasks.certificates">Сертификаты</key>
+		<key name="menu.tasks.certificates.tt">Манипуляция сертификатами</key>
+		<key name="menu.tasks.certificates.export">Экспорт</key>
+		<key name="menu.tasks.certificates.export.tt">Экспорт сертификата</key>
+		<key name="menu.tasks.certificates.loadtrusted">Загрузка подтверждающего</key>
+		<key name="menu.tasks.certificates.loadtrusted.tt">Загрузка подтверждающего сертификата</key>
+		<key name="menu.tasks.certificates.importfromserver">Импорт с сервера</key>
+		<key name="menu.tasks.certificates.importfromserver.tt">Импорт сертификатов с сервера по указанному URL</key>
+		<key name="menu.tasks.certificates.preparerequest">Создать запрос</key>
+		<key name="menu.tasks.certificates.preparerequest.tt">Сгенерировать запрос сертификата</key>
+		<key name="menu.tasks.certificates.receive">Принять</key>
+		<key name="menu.tasks.certificates.receive.tt">Принять подтверждение сертификата</key>
+		<key name="menu.tasks.certificates.signclient">Подписать клиента</key>
+		<key name="menu.tasks.certificates.signclient.tt">Подписать клиентский сертификат</key>
+		<key name="menu.tasks.certificates.signserver">Подсисать сервер</key>
+		<key name="menu.tasks.certificates.signserver.tt">Подписать серверный сертификат</key>
+		<key name="menu.tasks.3DESkeys">3DES ключи</key>
+		<key name="menu.tasks.3DESkeys.tt">Манипуляция 3DES ключами</key>
+		<key name="menu.tasks.3DESkeys.generate">Создать</key>
+		<key name="menu.tasks.3DESkeys.generate.tt">Сгенерировать 3DES ключи</key>
+		<key name="menu.tasks.3DESkeys.import">Импорт</key>
+		<key name="menu.tasks.3DESkeys.import.tt">Импорт 3DES ключей</key>
+		<key name="menu.help">Справка</key>
+		<key name="menu.help.tt">Справка по приложению</key>
+		<key name="menu.help.overview">Обзор</key>
+		<key name="menu.help.overview.tt">Запуск браузера для функционального обзора приложения</key>
+		<key name="menu.help.about">О программа</key>
+		<key name="menu.help.about.tt">Справка о программе</key>
+	
+<!-- Локализация нумераций -->		
+		<key name="chav1961.ksmgr.interfaces.keystoretype.pkcs12">PKCS12</key>
+		<key name="chav1961.ksmgr.interfaces.keystoretype.pkcs12.tt">тип репозитария PKCS12</key>
+		
+<!-- Локализация для диалога 'create keystore' -->		
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Создать репозитарий ключей</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.tt">Создать репозитарий ключей с указанным типом и паролем</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type">Тип репозитария</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt">Тип репозитария</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password">Пароль</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password.tt">Пароль репозитария</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype">Повторите пароль</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype.tt">Повторно введите пароль для целей контроля</key>
+	
+<!-- Локализация для диалога 'ask password' -->		
+		<key name="chav1961.ksmgr.dialogs.askpassworddialog">Укажите пароль</key>
+		<key name="chav1961.ksmgr.dialogs.askpassworddialog.tt">Ввести пароль для репозитарий ключей</key>
+		<key name="chav1961.ksmgr.dialogs.askpassworddialog.password">Пароль репозитария</key>
+		<key name="chav1961.ksmgr.dialogs.askpassworddialog.password.tt">Введите пароль репозитария</key>
+	
+<!-- Локализация для диалога 'change password password' -->		
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog">Изменить пароль</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.tt">Изменить пароль открытого репозитария</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.password">Старый пароль</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.password.tt">Укажите прежний пароль репозитария</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype">Повторите старый пароль</key>
+		<key name="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype.tt">Повторно укажите прежний пароль репозитария для проверки</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword">Новый пароль</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword.tt">Задайте новый пароль репозитария</key>
+	
+<!-- Локализация для диалога 'settings' -->		
+		<key name="chav1961.ksmgr.dialogs.settingsdialog">Настройки приложения</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.tt">Настройки приложения</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords">Запоминать пароли</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords.tt">Зпоминать пароли на время работы приложения, чтобы не вводить их каждый раз, когда они требуются</key>
+	
+	</lang>
+</localization>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<app:root xmlns:app="http://ui.purelib.chav1961/">
+	<app:i18n location="i18n:xml:root://chav1961.ksmgr.Application/chav1961/ksmgr/i18n/i18n.xml"/>
+	<app:menu id="mainmenu">
+		<app:submenu name="menu.file" caption="menu.file" tooltip="menu.file.tt">
+			<app:item name="menu.file.newkeystore" caption="menu.file.newKeyStore" tooltip="menu.file.newKeyStore.tt" action="newKeyStore"/>
+			<app:item name="menu.file.openkeystore" caption="menu.file.openKeyStore" tooltip="menu.file.openKeyStore.tt" action="openKeyStore"/>
+			<app:item name="menu.file.openkeystorePKCS12" caption="menu.file.openKeyStorePKCS12" tooltip="menu.file.openKeyStorePKCS12.tt" action="openKeyStorePKCS12"/>
+			<app:submenu name="menu.file.lru" caption="menu.file.lru" tooltip="menu.file.lru.tt">
+				<app:placeholder/>
+			</app:submenu>
+			<app:separator/>
+			<app:item name="menu.file.savekeystore" caption="menu.file.saveKeyStore" tooltip="menu.file.saveKeyStore.tt" action="saveKeyStore"/>
+			<app:item name="menu.file.savekeystoreas" caption="menu.file.saveKeyStoreAs" tooltip="menu.file.saveKeyStoreAs.tt" action="saveKeyStoreAs"/>
+			<app:separator/>
+			<app:item name="menu.file.changePassword" caption="menu.file.changePassword" tooltip="menu.file.changePassword.tt" action="changePassword"/>
+			<app:separator/>
+			<app:item name="menu.file.exit" caption="menu.file.exit" tooltip="menu.exit.tt" action="exit"/>
+		</app:submenu>
+		<app:submenu name="menu.edit" caption="menu.edit" tooltip="menu.edit.tt">
+			<app:item name="menu.edit.copy" caption="menu.edit.copy" tooltip="menu.edit.copy.tt" action="copy"/>
+			<app:item name="menu.edit.move" caption="menu.edit.move" tooltip="menu.edit.move.tt" action="move"/>
+			<app:item name="menu.edit.delete" caption="menu.edit.delete" tooltip="menu.edit.delete.tt" action="delete"/>
+			<app:item name="menu.edit.rename" caption="menu.edit.rename" tooltip="menu.edit.rename.tt" action="rename"/>
+		</app:submenu>
+		<app:submenu name="menu.tasks" caption="menu.tasks" tooltip="menu.tasks.tt">
+			<app:submenu name="menu.tasks.keypairs" caption="menu.tasks.keypairs" tooltip="menu.tasks.keypairs.tt">
+				<app:item name="menu.tasks.keypairs.generate" caption="menu.tasks.keypairs.generate" tooltip="menu.tasks.keypairs.generate.tt" action="keyPairsGenerate"/>
+				<app:item name="menu.tasks.keypairs.export" caption="menu.tasks.keypairs.export" tooltip="menu.tasks.keypairs.export.tt" action="keyPairsExport"/>
+				<app:item name="menu.tasks.keypairs.import" caption="menu.tasks.keypairs.import" tooltip="menu.tasks.keypairs.import.tt" action="keyPairsImport"/>
+				<app:separator/>
+				<app:item name="menu.tasks.keypairs.generateandexport" caption="menu.tasks.keypairs.generateandexport" tooltip="menu.tasks.keypairs.generateandexport.tt" action="keyPairsGenerateAndExport"/>
+			</app:submenu>
+			<app:submenu name="menu.tasks.certificates" caption="menu.tasks.certificates" tooltip="menu.tasks.certificates.tt">
+				<app:item name="menu.tasks.certificates.export" caption="menu.tasks.certificates.export" tooltip="menu.tasks.certificates.export.tt" action="certificatesExport"/>
+				<app:item name="menu.tasks.certificates.loadtrusted" caption="menu.tasks.certificates.loadtrusted" tooltip="menu.tasks.certificates.loadtrusted.tt" action="certificatesLoadTrusted"/>
+				<app:item name="menu.tasks.certificates.importfromserver" caption="menu.tasks.certificates.importfromserver" tooltip="menu.tasks.certificates.importfromserver.tt" action="certificatesImportFromServer"/>
+				<app:separator/>
+				<app:item name="menu.tasks.certificates.preparerequest" caption="menu.tasks.certificates.preparerequest" tooltip="menu.tasks.certificates.preparerequest.tt" action="certificatesPrepareRequest"/>
+				<app:item name="menu.tasks.certificates.receive" caption="menu.tasks.certificates.receive" tooltip="menu.tasks.certificates.receive.tt" action="certificatesReceive"/>
+				<app:item name="menu.tasks.certificates.signclient" caption="menu.tasks.certificates.signclient" tooltip="menu.tasks.certificates.signclient.tt" action="certificatesSignClient"/>
+				<app:item name="menu.tasks.certificates.signserver" caption="menu.tasks.certificates.signserver" tooltip="menu.tasks.certificates.signserver.tt" action="certificatesSignServer"/>
+			</app:submenu>
+			<app:submenu name="menu.tasks.3DESkeys" caption="menu.tasks.3DESkeys" tooltip="menu.tasks.3DESkeys.tt">
+				<app:item name="menu.tasks.3DESkeys.generate" caption="menu.tasks.3DESkeys.generate" tooltip="menu.tasks.3DESkeys.generate.tt" action="3DESGenerate"/>
+				<app:item name="menu.tasks.3DESkeys.import" caption="menu.tasks.3DESkeys.import" tooltip="menu.tasks.3DESkeys.import.tt" action="3DESImport"/>
+			</app:submenu>
+		</app:submenu>
+		<app:submenu name="menu.settings" caption="menu.settings" tooltip="menu.settings.tt">
+			<app:submenu name="menu.settings.view" caption="menu.settings.view" tooltip="menu.settings.view.tt">
+				<app:item name="menu.settings.view.keystore" caption="menu.settings.view.keystore" tooltip="menu.settings.view.keystore.tt" group="view" action="asKeyStore"/>
+				<app:item name="menu.settings.view.properties" caption="menu.settings.view.properties" tooltip="menu.settings.view.properties.tt" group="view" action="asProperties"/>
+				<app:item name="menu.settings.view.filesystem" caption="menu.settings.view.filesystem" tooltip="menu.settings.view.filesystem.tt" group="view" action="asFileSystem"/>
+			</app:submenu>
+			<app:builtinSubmenu name="builtin.languages" caption="menu.settings.languages" tooltip="menu.settings.languages.tt"/>
+			<app:separator/>
+			<app:item name="menu.settings.settings" caption="menu.settings.settings" tooltip="menu.settings.settings.tt" action="settings"/>
+		</app:submenu>
+		<app:submenu name="menu.help" caption="menu.help" tooltip="menu.help.tt">
+			<app:item name="menu.help.overview" caption="menu.help.overview" tooltip="menu.help.overview.tt" action="helpOverview"/>
+			<app:separator/>
+			<app:item name="menu.help.about" caption="menu.help.about" tooltip="menu.help.about.tt" action="helpAbout"/>
+		</app:submenu>
+	</app:menu>
+	<app:keyset id="mainmenu.keyset">
+		<app:key code="N" ctrl="true" action="newKeyStore"/>
+		<app:key code="O" ctrl="true" action="openKeyStore"/>
+		<app:key code="S" ctrl="true" action="saveKeyStore"/>
+		<app:key code="Q" ctrl="true" action="exit"/>
+		<app:key code="F1" action="helpOverview"/>
+	</app:keyset>
+	<app:menu id="desktopToolbar">
+		<app:item name="desktop.toolbar.closeAll" caption="desktop.toolbar.closeAll" tooltip="desktop.toolbar.closeAllTT" icon="root://chav1961.calc.Application/chav1961/calc/closeAll.png" action="closeAll"/>
+		<app:item name="menu.tools.find" caption="menu.find" tooltip="menu.ttFind" icon="root://chav1961.calc.Application/chav1961/calc/find.png" action="find"/>
+	</app:menu>
+</app:root>
