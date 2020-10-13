@@ -38,8 +38,11 @@
 				<app:separator/>
 				<app:item name="menu.tasks.certificates.preparerequest" caption="menu.tasks.certificates.preparerequest" tooltip="menu.tasks.certificates.preparerequest.tt" action="certificatesPrepareRequest"/>
 				<app:item name="menu.tasks.certificates.receive" caption="menu.tasks.certificates.receive" tooltip="menu.tasks.certificates.receive.tt" action="certificatesReceive"/>
+				<app:separator/>
 				<app:item name="menu.tasks.certificates.signclient" caption="menu.tasks.certificates.signclient" tooltip="menu.tasks.certificates.signclient.tt" action="certificatesSignClient"/>
 				<app:item name="menu.tasks.certificates.signserver" caption="menu.tasks.certificates.signserver" tooltip="menu.tasks.certificates.signserver.tt" action="certificatesSignServer"/>
+				<app:separator/>
+				<app:item name="menu.tasks.certificates.selfsigned" caption="menu.tasks.certificates.selfsigned" tooltip="menu.tasks.certificates.selfsigned.tt" action="certificatesCreateSelfsigned"/>
 			</app:submenu>
 			<app:submenu name="menu.tasks.3DESkeys" caption="menu.tasks.3DESkeys" tooltip="menu.tasks.3DESkeys.tt">
 				<app:item name="menu.tasks.3DESkeys.generate" caption="menu.tasks.3DESkeys.generate" tooltip="menu.tasks.3DESkeys.generate.tt" action="3DESGenerate"/>

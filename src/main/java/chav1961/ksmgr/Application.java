@@ -13,17 +13,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -47,8 +55,12 @@ import javax.swing.event.HyperlinkListener;
 
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSEnvelopedData;
 import org.bouncycastle.cms.CMSEnvelopedDataGenerator;
@@ -69,6 +81,7 @@ import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
@@ -79,6 +92,9 @@ import chav1961.ksmgr.dialogs.AskPasswordDialog;
 import chav1961.ksmgr.dialogs.ChangePasswordDialog;
 import chav1961.ksmgr.dialogs.CreateKeystoreDialog;
 import chav1961.ksmgr.dialogs.CurrentSettingsDialog;
+import chav1961.ksmgr.dialogs.KeyPairCreateDialog;
+import chav1961.ksmgr.dialogs.OpenKeystoreDialog;
+import chav1961.ksmgr.dialogs.SelfSignedCertificateCreateDialog;
 import chav1961.ksmgr.interfaces.KeyStoreType;
 import chav1961.ksmgr.internal.KeyStoreViewer;
 import chav1961.ksmgr.internal.PureLibClient;
@@ -94,13 +110,14 @@ import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.exceptions.MimeParseException;
 import chav1961.purelib.basic.exceptions.PreparationException;
 import chav1961.purelib.basic.exceptions.SyntaxException;
-import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
+import chav1961.purelib.fsys.FileSystemFactory;
 import chav1961.purelib.fsys.FileSystemOnFile;
+import chav1961.purelib.fsys.interfaces.FileSystemInterface;
 import chav1961.purelib.i18n.LocalizerFactory;
 import chav1961.purelib.i18n.interfaces.Localizer;
-import chav1961.purelib.i18n.interfaces.SupportedLanguages;
 import chav1961.purelib.i18n.interfaces.Localizer.LocaleChangeListener;
+import chav1961.purelib.i18n.interfaces.SupportedLanguages;
 import chav1961.purelib.model.ContentModelFactory;
 import chav1961.purelib.model.interfaces.ContentMetadataInterface;
 import chav1961.purelib.nanoservice.NanoServiceFactory;
@@ -111,6 +128,7 @@ import chav1961.purelib.ui.swing.interfaces.OnAction;
 import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
 import chav1961.purelib.ui.swing.useful.JFileContentManipulator.FileContentChangeListener;
 import chav1961.purelib.ui.swing.useful.JFileContentManipulator.FileContentChangedEvent;
+import chav1961.purelib.ui.swing.useful.JFileList;
 import chav1961.purelib.ui.swing.useful.JStateString;
 
 
@@ -130,17 +148,18 @@ public class Application extends JFrame implements LocaleChangeListener {
 	private final CountDownLatch			latch;
 	private final JMenuBar					menu;
 	private final JStateString				state;
-	private final JFileContentManipulator	contentManipulator;
+	private final JFileContentManipulator	contentManipulator, rightContentManipulator;
 	private final JSplitPane				split = new JSplitPane();
 	private final CurrentSettingsDialog		settings;
 	private final FileContentChangeListener	listener = (e)->SwingUtilities.invokeLater(()->changeState(e));
 	private final ActionListener			lruListener = (e)->openLRUKeystore(e.getActionCommand());
+	private final FileSystemInterface		fsi = FileSystemFactory.createFileSystem(URI.create("fsys:file:/"));
 
 	private KeyStoreViewer					leftPanel = null;
-	private	KeyStore						current = null;
-	private char[]							currentPassword = null;
+	private	KeyStore						current = null, right = null;
+	private char[]							currentPassword = null, rightPassword = null;
 	
-	public Application(final ContentMetadataInterface xda, final Localizer parent, final int helpPort, final String configFile, final LoggerFacade logger, final CountDownLatch latch) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
+	public Application(final ContentMetadataInterface xda, final Localizer parent, final int helpPort, final String configFile, final CountDownLatch latch) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
 //		try{final CertificateFactory certFactory = CertificateFactory.getInstance("X.509", "BC");
 //		
 //			final X509Certificate 		certificate = (X509Certificate) certFactory.generateCertificate(new FileInputStream("Baeldung.cer"));
@@ -165,9 +184,6 @@ public class Application extends JFrame implements LocaleChangeListener {
 		else if (configFile == null || configFile.isEmpty()) {
 			throw new IllegalArgumentException("Config file can't be null or empty");
 		}
-		else if (logger == null) {
-			throw new NullPointerException("Logger can't be null");
-		}
 		else if (latch == null) {
 			throw new NullPointerException("Latch to notify closure can't be null");
 		}
@@ -190,10 +206,16 @@ public class Application extends JFrame implements LocaleChangeListener {
 												,()->{return new OutputStream() {@Override public void write(int b) throws IOException {}};}
 												,this.settings);
 			this.contentManipulator.addFileContentChangeListener(listener);
+			this.rightContentManipulator = new JFileContentManipulator(new FileSystemOnFile(URI.create("file://./")),this.localizer
+								,()->{return new InputStream() {@Override public int read() throws IOException {return -1;}};}
+								,()->{return new OutputStream() {@Override public void write(int b) throws IOException {}};}
+								,this.settings);
+			this.rightContentManipulator.addFileContentChangeListener(listener);
 
 			state.setAutomaticClearTime(Severity.error,1,TimeUnit.MINUTES);
 			state.setAutomaticClearTime(Severity.warning,15,TimeUnit.SECONDS);
 			state.setAutomaticClearTime(Severity.info,5,TimeUnit.SECONDS);
+			((JMenu)SwingUtils.findComponentByName(menu, "menu.tasks")).setEnabled(false);
 			((JMenuItem)SwingUtils.findComponentByName(menu, "menu.file.savekeystore")).setEnabled(false);
 			((JMenuItem)SwingUtils.findComponentByName(menu, "menu.file.savekeystoreas")).setEnabled(false);
 
@@ -227,11 +249,10 @@ public class Application extends JFrame implements LocaleChangeListener {
 			try{contentManipulator.newFile();
 				contentManipulator.setModificationFlag();
 				
-				current = KeyStore.getInstance(cks.type.name());
+				final KeyStore	ks = KeyStore.getInstance(cks.type.name());
 				current.load(null,cks.password);
-				currentPassword = settings.keepPasswords ? cks.password : null;
 				
-				split.setLeftComponent(new JScrollPane(leftPanel = new KeyStoreViewer(current)));
+				refreshLeftPanel(ks,cks.password);
 				state.message(Severity.info,"["+cks.type+"] key store created");
 			} catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException e) {
 				state.message(Severity.error,"Error creating keystore: "+e.getLocalizedMessage());
@@ -260,8 +281,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 					final KeyStore	temp = KeyStore.getInstance(from,apd.password); 
 					
 					if (KeyStoreType.PKCS12.name().equalsIgnoreCase(temp.getType())) {
-						current = temp; 
-						currentPassword = settings.keepPasswords ? apd.password : null;
+						refreshLeftPanel(temp,apd.password);
 						state.message(Severity.info,"Keystore ["+file+"] loaded successfully, repository type type is "+current.getType());
 					}
 					else {
@@ -336,6 +356,135 @@ public class Application extends JFrame implements LocaleChangeListener {
 		}
 	}
 
+	
+	@OnAction("action:/keyPairsGenerate")
+	private void keyPairsGenerate() {
+		final KeyPairCreateDialog	kpcd = new KeyPairCreateDialog(state,current);
+		final AskPasswordDialog	apd = new AskPasswordDialog(state);
+		
+		if (ask(kpcd,300,150) && askPassword(apd)) {
+			try{final KeyPair			pair = kpcd.generate();
+				final Certificate		cert = createSelfSigned(pair);
+				
+				current.setKeyEntry(kpcd.alias, pair.getPrivate(), apd.password, new Certificate[] {cert});
+				state.message(Severity.info,"Key pair for alias ["+kpcd.alias+"] placed into the current keystore successfully");
+				leftPanel.refresh();
+			} catch (KeyStoreException | NoSuchAlgorithmException | OperatorCreationException | CertIOException | CertificateException e) {
+				state.message(Severity.error,"Error creating key pair for alias ["+kpcd.alias+"]: "+e.getLocalizedMessage());
+			}
+		}
+	}
+		
+	@OnAction("action:/certificatesCreateSelfsigned")
+	private void createSelfSignedCeritificate() {
+		final SelfSignedCertificateCreateDialog	ssscd = new SelfSignedCertificateCreateDialog(state,current);
+		
+		if (ask(ssscd,350,300)) {
+			try{final Certificate	cert = ssscd.generate();
+				current.setCertificateEntry(ssscd.alias,cert);
+				state.message(Severity.info,"Certificate for alias ["+ssscd.alias+"] placed into the current keystore successfully");
+				leftPanel.refresh();
+			} catch (CertificateEncodingException | InvalidKeyException | NoSuchProviderException | NoSuchAlgorithmException | SignatureException | KeyStoreException e) {
+				state.message(Severity.error,"Error creating certificate for alias ["+ssscd.alias+"]: "+e.getLocalizedMessage());
+			}
+		}
+	}
+	
+	
+	private Certificate createSelfSigned(final KeyPair pair)  throws OperatorCreationException, CertIOException, CertificateException {
+	        X500Name dnName = new X500Name("CN=publickeystorageonly");
+	        BigInteger certSerialNumber = BigInteger.ONE;
+
+	        Date startDate = new Date(); // now
+
+	        Calendar calendar = Calendar.getInstance();
+	        calendar.setTime(startDate);
+	        calendar.add(Calendar.YEAR, 1);
+	        Date endDate = calendar.getTime();
+
+	        ContentSigner contentSigner = new JcaContentSignerBuilder("SHA256WithRSA").build(pair.getPrivate());
+	        JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(dnName, certSerialNumber, startDate, endDate, dnName, pair.getPublic());
+
+	        return new JcaX509CertificateConverter().getCertificate(certBuilder.build(contentSigner));
+	    }
+
+	@OnAction("action:/asKeyStore")
+	private void asKeyStore() {
+		final JMenu			edit = (JMenu)SwingUtils.findComponentByName(menu, "menu.edit");
+		
+		edit.setEnabled(true);
+		if (right == null) {
+			try{if (rightContentManipulator.openFile()) {
+					final String			file = rightContentManipulator.getCurrentPathOfTheFile();
+					final File				from = new File(file).getAbsoluteFile();
+					final AskPasswordDialog	apd = new AskPasswordDialog(state);
+					
+					if (askPassword(apd)) {
+						final KeyStore	temp = KeyStore.getInstance(from,apd.password); 
+						
+						if (KeyStoreType.PKCS12.name().equalsIgnoreCase(temp.getType())) {
+							right = temp;
+							rightPassword = settings.keepPasswords ? apd.password : null;
+							state.message(Severity.info,"Keystore ["+file+"] loaded successfully, repository type type is "+current.getType());
+						}
+						else {
+							state.message(Severity.error,"Error opening keystore: reystore type is "+current.getType()+", not PKCS12.");
+							return;
+						}
+					}
+					else {
+						return;
+					}
+				}
+				else {
+					return;
+				}
+			} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+				state.message(Severity.error,"Error opening key store: "+e.getLocalizedMessage());
+				return;
+			}		
+		}
+		split.setRightComponent(new JScrollPane(new KeyStoreViewer(right)));		
+	}
+
+	@OnAction("action:/asProperties")
+	private void asProperties() {
+		final JMenu			edit = (JMenu)SwingUtils.findComponentByName(menu, "menu.edit");
+		
+		edit.setEnabled(false);
+	}
+	
+	@OnAction("action:/asFileSystem")
+	private void asFileSystem() throws IOException {
+		final JMenu			edit = (JMenu)SwingUtils.findComponentByName(menu, "menu.edit");
+		final JFileList		l = new JFileList(state,fsi,true,false,true) {
+								private static final long serialVersionUID = -138848126883302434L;
+								@Override
+								protected void selectAndAccept(final String path) {
+									final OpenKeystoreDialog	oks = new OpenKeystoreDialog(state);
+									
+									oks.file = path;
+									if (ask(oks,300,100)) {
+										try{final KeyStore	ks = KeyStore.getInstance(new File(oks.file),oks.password);
+											if (leftPanel == null) {
+												refreshLeftPanel(ks,oks.password);
+											}
+											else {
+												right = ks;
+												rightPassword = settings.keepPasswords ? oks.password : null;
+												((JMenuItem)SwingUtils.findComponentByName(menu, "menu.settings.view.keystore")).doClick();
+											}
+										} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+											state.message(Severity.error,"Error opening key store ["+oks.file+"]: "+e.getLocalizedMessage());
+										}
+									}
+								}
+							};
+							
+		edit.setEnabled(true);
+		split.setRightComponent(new JScrollPane(l));
+	}
+	
 	@OnAction("action:/builtin.languages")
 	private void selectLang(final Hashtable<String,String[]> langs) throws LocalizationException {
 		final SupportedLanguages	newLang = SupportedLanguages.valueOf(langs.get("lang")[0]);
@@ -420,8 +569,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 		final AskPasswordDialog	apd = new AskPasswordDialog(state);
 		
 		if (askPassword(apd)) {
-			current = KeyStore.getInstance(from,apd.password);
-			currentPassword = settings.keepPasswords ? apd.password : null;
+			refreshLeftPanel(KeyStore.getInstance(from,apd.password),apd.password);
 			state.message(Severity.info,"Keystore ["+file+"] loaded successfully, repository type type is "+current.getType());
 		}
 	}	
@@ -540,18 +688,22 @@ public class Application extends JFrame implements LocaleChangeListener {
 		} 
 	}
 
-	private void refreshLeftPanel(final KeyStore ks) {
-		// TODO Auto-generated method stub
+	private void refreshLeftPanel(final KeyStore ks, final char[] password) {
+		current = ks; 
+		currentPassword = settings.keepPasswords ? password : null;
+		split.setLeftComponent(new JScrollPane(leftPanel = new KeyStoreViewer(current)));
 	}
 
 	private void changeState(final FileContentChangedEvent event) {
 		final JMenuItem		save = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.file.savekeystore");
 		final JMenuItem		saveAs = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.file.savekeystoreas");
+		final JMenu			tasks = (JMenu)SwingUtils.findComponentByName(menu, "menu.tasks");
 		
 		switch (event.getChangeType()) {
 			case FILE_LOADED		:
 				save.setEnabled(false);
 				saveAs.setEnabled(true);
+				tasks.setEnabled(true);
 			case FILE_STORED_AS		:
 				fillLRUSubmenu();
 				break;
@@ -563,6 +715,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 				break;
 			case NEW_FILE_CREATED	:
 				saveAs.setEnabled(true);
+				tasks.setEnabled(true);
 				break;
 			case FILE_STORED		:
 				break;
@@ -602,13 +755,12 @@ public class Application extends JFrame implements LocaleChangeListener {
 											));
 		
 		try(final InputStream				is = Application.class.getResourceAsStream("application.xml");
-			final NanoServiceFactory		service = new NanoServiceFactory(PureLibSettings.CURRENT_LOGGER,props);
-			final LoggerFacade				logger = PureLibSettings.CURRENT_LOGGER) {
+			final NanoServiceFactory		service = new NanoServiceFactory(PureLibSettings.CURRENT_LOGGER,props)) {
 			final ContentMetadataInterface	xda = ContentModelFactory.forXmlDescription(is);
 			final CountDownLatch			latch = new CountDownLatch(1);
 			
 			PureLibClient.registerInPureLib();
-			new Application(xda,PureLibSettings.PURELIB_LOCALIZER,parser.getValue(ARG_HELP_PORT,int.class), parser.isTyped(ARG_LOCAL_CONFIG) ? parser.getValue(ARG_LOCAL_CONFIG,String.class) : ARG_LOCAL_CONFIG_DEFAULT, logger, latch).setVisible(true);
+			new Application(xda,PureLibSettings.PURELIB_LOCALIZER,parser.getValue(ARG_HELP_PORT,int.class), parser.isTyped(ARG_LOCAL_CONFIG) ? parser.getValue(ARG_LOCAL_CONFIG,String.class) : ARG_LOCAL_CONFIG_DEFAULT, latch).setVisible(true);
 			service.start();
 			latch.await();
 			service.stop();

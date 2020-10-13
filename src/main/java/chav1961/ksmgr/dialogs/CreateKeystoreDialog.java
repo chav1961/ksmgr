@@ -3,7 +3,6 @@ package chav1961.ksmgr.dialogs;
 import java.util.Arrays;
 
 import chav1961.ksmgr.interfaces.KeyStoreType;
-import chav1961.purelib.basic.PureLibSettings;
 import chav1961.purelib.basic.exceptions.FlowException;
 import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
@@ -20,15 +19,15 @@ public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreD
 	private final LoggerFacade	facade;
 	
 	@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog.type",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt")
-	@Format("9.2pzs")
+	@Format("30m")
 	public KeyStoreType			type = KeyStoreType.PKCS12;
 
 	@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog.password",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.password.tt")
-	@Format("9.2pzs")
+	@Format("30ms")
 	public char[]				password = null;
 
 	@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype.tt")
-	@Format("9.2pzs")
+	@Format("30ms")
 	public char[]				passwordRetype = null;
 
 	public CreateKeystoreDialog(final LoggerFacade facade) {

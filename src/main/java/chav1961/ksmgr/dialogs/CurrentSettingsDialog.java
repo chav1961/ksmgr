@@ -31,7 +31,7 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 	private final LoggerFacade	facade;
 	
 	@LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords",tooltip="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords.tt")
-	@Format("9.2pzs")
+	@Format("1m")
 	public boolean				keepPasswords = true;
 
 	public String				currentLang;

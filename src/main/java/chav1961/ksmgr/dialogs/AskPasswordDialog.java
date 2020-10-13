@@ -15,7 +15,7 @@ public class AskPasswordDialog implements FormManager<Object, AskPasswordDialog>
 	private final LoggerFacade	facade;
 	
 	@LocaleResource(value="chav1961.ksmgr.dialogs.askpassworddialog.password",tooltip="chav1961.ksmgr.dialogs.askpassworddialog.password.tt")
-	@Format("9.2pzs")
+	@Format("30s")
 	public char[]				password = null;
 
 	public AskPasswordDialog(final LoggerFacade facade) {

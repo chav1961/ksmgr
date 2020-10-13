@@ -19,15 +19,15 @@ public class ChangePasswordDialog implements FormManager<Object, ChangePasswordD
 	private final LoggerFacade	facade;
 	
 	@LocaleResource(value="chav1961.ksmgr.dialogs.changepassworddialog.password",tooltip="chav1961.ksmgr.dialogs.changepassworddialog.password.tt")
-	@Format("9.2pzs")
+	@Format("30ms")
 	public char[]				password = null;
 
 	@LocaleResource(value="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype",tooltip="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype.tt")
-	@Format("9.2pzs")
+	@Format("30ms")
 	public char[]				passwordRetype = null;
 
 	@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword.tt")
-	@Format("9.2pzs")
+	@Format("30ms")
 	public char[]				newPassword = null;
 	
 	public ChangePasswordDialog(final LoggerFacade facade) {
