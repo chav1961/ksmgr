@@ -82,7 +82,7 @@ public class SelfSignedCertificateCreateDialog implements FormManager<Object, Se
 
 	@LocaleResource(value="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.alias",tooltip="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.alias.tt")
 	@Format("30ms")
-	public String		alias = "myAlias";
+	public String		alias = "myCertificate";
 	
 	
 	public SelfSignedCertificateCreateDialog(final LoggerFacade facade, final KeyStore ks) {
@@ -135,7 +135,7 @@ public class SelfSignedCertificateCreateDialog implements FormManager<Object, Se
 	}
 	
 	
-	public Certificate generate() throws CertificateEncodingException, InvalidKeyException, IllegalStateException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
+	public Certificate generate(final String principalName) throws CertificateEncodingException, InvalidKeyException, IllegalStateException, NoSuchProviderException, NoSuchAlgorithmException, SignatureException {
 		  // generate a key pair
 	    final KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BC");
 	    
@@ -144,7 +144,7 @@ public class SelfSignedCertificateCreateDialog implements FormManager<Object, Se
 	
 	    
 	    X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-	    X500Principal dnName = new X500Principal("cn=example");
+	    X500Principal dnName = new X500Principal("cn="+principalName);
 	
 	    // add some options
 	    certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));

@@ -5,6 +5,7 @@
 		<key name="application.title">(c) 2020, A.V.Chernomyrdin, Key store manager V.R.=1.0</key>
 		<key name="application.help.title">About...</key>
 		<key name="application.help">uri(aboutApplication.cre)</key>
+		<key name="application.placeholder.left">Open or create key store for left panel...\nYou can also drag key store file from the right panel to left one</key>		
 
 <!-- Localization for application menu --> 
 		<key name="menu.file">File</key>
@@ -39,12 +40,10 @@
 		<key name="menu.settings.tt">Application settings</key>
 		<key name="menu.settings.view">Right panel</key>
 		<key name="menu.settings.view.tt">Change right panel view format</key>
-		<key name="menu.settings.view.keystore">...as keystore</key>
-		<key name="menu.settings.view.keystore.tt">Use right panel as keystore content</key>
-		<key name="menu.settings.view.properties">...as properties</key>
-		<key name="menu.settings.view.properties.tt">Use right panel as detailed description of keystore item</key>
 		<key name="menu.settings.view.filesystem">...as file system</key>
 		<key name="menu.settings.view.filesystem.tt">Use right panel as file system navigator</key>
+		<key name="menu.settings.view.keystore">...as keystore</key>
+		<key name="menu.settings.view.keystore.tt">Use right panel as keystore content</key>
 		<key name="menu.settings.languages">Languages</key>
 		<key name="menu.settings.languages.tt">Select language for application</key>		
 		<key name="menu.settings.settings">Parameters</key>
@@ -141,6 +140,11 @@
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.tt">Application settings</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords">Keep passwords</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords.tt">Keep passwords for current session to exclude password typing on every password request</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider">Preferred provider</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider.tt">Select preferred security provider from available list</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname">Principal name</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt">Default principal name (used in self-signed certificates, certificate requests etc...)</key>
+		
 
 <!-- Localization for 'key pair/generate' dialog -->		
 		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog">Key pair generation</key>
@@ -183,6 +187,11 @@
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.file.tt">Key store file name</key>
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password">Password</key>
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password.tt">password to access key store selected</key>
+
+<!-- Localization for KeyStoreViewer keys -->		
+		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Confirm deletion...</key>
+		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.message">You wish to delete following entries in the repo:\n%1$s</key>
+
 		
 	</lang>
 	<lang name="ru">
@@ -190,6 +199,7 @@
 		<key name="application.title">(c) 2020, А.В.Черномырдин, Менеджер репозитариев ключей V.R.=1.0</key>
 		<key name="application.help.title">О программе...</key>
 		<key name="application.help">uri(aboutApplication.cre)</key>
+		<key name="application.placeholder.left">Создайте или откройте репозитарий ключей для левой панели\n Можно также перетащить сюда файл репозитария с правой панели</key>		
 
 <!-- Локализация меню приложения --> 
 		<key name="menu.file">Файл</key>
@@ -224,12 +234,10 @@
 		<key name="menu.settings.tt">Настройки приложения</key>
 		<key name="menu.settings.view">Правая панель</key>
 		<key name="menu.settings.view.tt">Изменить формат правой панели</key>
-		<key name="menu.settings.view.keystore">...в виде репозитария</key>
-		<key name="menu.settings.view.keystore.tt">Представить правую панель в виде содержимого репозитария</key>
-		<key name="menu.settings.view.properties">...в виде описания</key>
-		<key name="menu.settings.view.properties.tt">Представить правую панель как детальное описание текущего элемента на левой панели</key>
 		<key name="menu.settings.view.filesystem">...в виде файловой системы</key>
 		<key name="menu.settings.view.filesystem.tt">Представить правую панель в виде навигатора по файловой системе</key>
+		<key name="menu.settings.view.keystore">...в виде репозитария</key>
+		<key name="menu.settings.view.keystore.tt">Представить правую панель в виде содержимого репозитария</key>
 		<key name="menu.settings.settings">Параметры</key>
 		<key name="menu.settings.settings.tt">Изменить настройки приложения</key>
 		<key name="menu.settings.languages">Язык</key>
@@ -327,6 +335,10 @@
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.tt">Настройки приложения</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords">Запоминать пароли</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords.tt">Зпоминать пароли на время работы приложения, чтобы не вводить их каждый раз, когда они требуются</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider">Предпочитаемый провайдер</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider.tt">Выбрать предпочитаемого провайдера безопасности из имеющегося списка</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname">Имя принципала</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt">Имя принципала по умолчанию (используется в самоподписанных сертификатах, запросах сертификатов и т.д.)</key>
 	
 <!-- Локализация для диалога 'key pair/generate' -->		
 		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog">Генерация пары ключей</key>
@@ -369,6 +381,10 @@
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.file.tt">Имя файла репозитария</key>
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password">Пароль</key>
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password.tt">Пароль для доступа к файлу репозитария</key>
+	
+<!-- локализация для ключей KeyStoreViewer -->		
+		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Подтвердить удаление...</key>
+		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.message">Вы собираетесь удалить следующие ключи из репозитария:\n%1$s</key>
 	
 	</lang>
 </localization>

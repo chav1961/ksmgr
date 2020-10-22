@@ -1,15 +1,8 @@
 package chav1961.ksmgr.internal;
 
-import java.net.URI;
 import java.security.Security;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import chav1961.purelib.basic.PureLibSettings;
-import chav1961.purelib.basic.exceptions.LocalizationException;
-import chav1961.purelib.basic.exceptions.PreparationException;
-import chav1961.purelib.i18n.LocalizerFactory;
-import chav1961.purelib.i18n.interfaces.Localizer;
 
 public class PureLibClient {
 //	public static final Localizer	ROOT_LOCALIZER;

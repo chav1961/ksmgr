@@ -5,9 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
+import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.purelib.basic.SubstitutableProperties;
 import chav1961.purelib.basic.Utils;
 import chav1961.purelib.basic.exceptions.FlowException;
@@ -34,23 +37,36 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 	@Format("1m")
 	public boolean				keepPasswords = true;
 
+	@LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider",tooltip="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider.tt")
+	@Format("30smd")
+	public String				preferredProvider = "BC";
+
+	@LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog.principalname",tooltip="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt")
+	@Format("30sm")
+	public String				principalName = "Self-signed principal";
+	
 	public String				currentLang;
 	
 	public final String			configFile;
 	public final SubstitutableProperties	props;
+	private final AlgorithmRepo	repo;
 	
-	public CurrentSettingsDialog(final LoggerFacade facade, final String configFile) throws NullPointerException, IllegalArgumentException, IOException {
+	public CurrentSettingsDialog(final LoggerFacade facade, final String configFile, final AlgorithmRepo repo) throws NullPointerException, IllegalArgumentException, IOException {
 		if (facade == null) {
 			throw new NullPointerException("Logger facade can't be null"); 
 		}
 		else if (configFile == null || configFile.isEmpty()) {
 			throw new IllegalArgumentException("Config file can't be null or empty"); 
 		}
+		else if (repo == null) {
+			throw new NullPointerException("Algorithm repo can't be null"); 
+		}
 		else {
 			final File		content = new File(configFile);
 			
 			this.facade = facade;
 			this.configFile = configFile;
+			this.repo = repo;
 			this.props = content.exists() && content.isFile() && content.canRead() ? Utils.mkProps(content) : new SubstitutableProperties();
 			this.keepPasswords = props.getProperty(KEY_KEEP_PASSWORDS, boolean.class, "true");
 			this.currentLang = props.getProperty(KEY_CURRENT_LANG, String.class, Locale.getDefault().getLanguage());
@@ -82,6 +98,16 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 	}
 
 	@Override
+	public String[] getForEditorContent(final CurrentSettingsDialog inst, final Object id, final String fieldName, final Object... parameters) throws FlowException {
+		final Set<String>	providers = new HashSet<>();
+		
+		for (String item : repo.getProviders()) {
+			providers.add(item);
+		}
+		return providers.toArray(new String[providers.size()]);
+	} 
+	
+	@Override
 	public LoggerFacade getLogger() {
 		return facade;
 	}
@@ -105,7 +131,7 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 			
 			sb.append(File.pathSeparatorChar).append(path.charAt(0) == '/' ? path : "/"+path);
 		}
-		props.setProperty(KEY_LRU_LIST, sb.substring(1));
+		props.setProperty(KEY_LRU_LIST, sb.length() == 0 ? "" : sb.substring(1));
 		store();
 	}
 }

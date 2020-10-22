@@ -20,8 +20,8 @@
 		<app:submenu name="menu.edit" caption="menu.edit" tooltip="menu.edit.tt">
 			<app:item name="menu.edit.copy" caption="menu.edit.copy" tooltip="menu.edit.copy.tt" action="copy"/>
 			<app:item name="menu.edit.move" caption="menu.edit.move" tooltip="menu.edit.move.tt" action="move"/>
-			<app:item name="menu.edit.delete" caption="menu.edit.delete" tooltip="menu.edit.delete.tt" action="delete"/>
 			<app:item name="menu.edit.rename" caption="menu.edit.rename" tooltip="menu.edit.rename.tt" action="rename"/>
+			<app:item name="menu.edit.delete" caption="menu.edit.delete" tooltip="menu.edit.delete.tt" action="delete"/>
 		</app:submenu>
 		<app:submenu name="menu.tasks" caption="menu.tasks" tooltip="menu.tasks.tt">
 			<app:submenu name="menu.tasks.keypairs" caption="menu.tasks.keypairs" tooltip="menu.tasks.keypairs.tt">
@@ -51,9 +51,8 @@
 		</app:submenu>
 		<app:submenu name="menu.settings" caption="menu.settings" tooltip="menu.settings.tt">
 			<app:submenu name="menu.settings.view" caption="menu.settings.view" tooltip="menu.settings.view.tt">
-				<app:item name="menu.settings.view.keystore" caption="menu.settings.view.keystore" tooltip="menu.settings.view.keystore.tt" group="view" action="asKeyStore"/>
-				<app:item name="menu.settings.view.properties" caption="menu.settings.view.properties" tooltip="menu.settings.view.properties.tt" group="view" action="asProperties"/>
 				<app:item name="menu.settings.view.filesystem" caption="menu.settings.view.filesystem" tooltip="menu.settings.view.filesystem.tt" group="view" action="asFileSystem"/>
+				<app:item name="menu.settings.view.keystore" caption="menu.settings.view.keystore" tooltip="menu.settings.view.keystore.tt" group="view" action="asKeyStore"/>
 			</app:submenu>
 			<app:builtinSubmenu name="builtin.languages" caption="menu.settings.languages" tooltip="menu.settings.languages.tt"/>
 			<app:separator/>
@@ -75,5 +74,18 @@
 	<app:menu id="desktopToolbar">
 		<app:item name="desktop.toolbar.closeAll" caption="desktop.toolbar.closeAll" tooltip="desktop.toolbar.closeAllTT" icon="root://chav1961.calc.Application/chav1961/calc/closeAll.png" action="closeAll"/>
 		<app:item name="menu.tools.find" caption="menu.find" tooltip="menu.ttFind" icon="root://chav1961.calc.Application/chav1961/calc/find.png" action="find"/>
+	</app:menu>
+	<app:menu id="keystoreActions">
+		<app:submenuref name="popup.tasks.keypairs" ref="menu.tasks.keypairs">
+			<app:itemref name="popup.tasks.keypairs.export" ref="menu.tasks.keypairs.export"/>
+		</app:submenuref>
+		<app:submenuref name="popup.tasks.certificates" ref="menu.tasks.certificates">
+			<app:itemref name="popup.tasks.certificates.export" ref="menu.tasks.certificates.export"/>
+		</app:submenuref>
+		<app:separator/>
+		<app:itemref name="popup.edit.copy" ref="menu.edit.copy"/>
+		<app:itemref name="popup.edit.move" ref="menu.edit.move"/>
+		<app:itemref name="popup.edit.rename" ref="menu.edit.rename"/>
+		<app:itemref name="popup.edit.delete" ref="menu.edit.delete"/>
 	</app:menu>
 </app:root>
