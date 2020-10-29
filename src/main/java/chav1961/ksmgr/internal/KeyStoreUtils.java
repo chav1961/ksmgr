@@ -1,7 +1,7 @@
 package chav1961.ksmgr.internal;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.math.BigInteger;
@@ -13,16 +13,34 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.CMSTypedData;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.openssl.PEMDecryptorProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
@@ -31,11 +49,16 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.bouncycastle.util.encoders.Base64;
 
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
@@ -46,7 +69,7 @@ public class KeyStoreUtils {
 	
 	public static String keyPairsImport(final FileSystemInterface fsi, final LoggerFacade logger, final String from, final KeyStore to, final char[] password) {
 		final String	file = from;
-		final String	alias = file.substring(file.lastIndexOf('/')+1);
+		final String	alias = file.substring(file.lastIndexOf('/')+1,file.lastIndexOf('.'));
 		
 		try(final FileSystemInterface	in = fsi.clone().open(file);
 			final Reader				rdr = in.charRead(DEFAULT_ENCODING);
@@ -162,7 +185,7 @@ public class KeyStoreUtils {
 			final ContentSigner 					signer = csBuilder.build((PrivateKey) privK);
 			final PKCS10CertificationRequest 		csr = p10Builder.build(signer);
 			final String							targetDir = to;
-			final String							exportFileName = item+".cer";
+			final String							exportFileName = item+".csr";
 			
 			if (privK != null && cert != null) {
 				try(final FileSystemInterface	out = fsi.clone().open(targetDir+"/"+exportFileName).create();
@@ -185,6 +208,55 @@ public class KeyStoreUtils {
 			return false;
 		}
 	}
+
+	public static boolean certificateRequestSign(final FileSystemInterface fsi, final LoggerFacade logger, final KeyStore repo, final String item, final String fileName, final String algorithm, final BigInteger serial, final Date dateFrom, final Date dateTo, final char[] password) {
+		try{final PrivateKey 		signerKey = (PrivateKey)repo.getKey(item, password);
+		    final X509Certificate 	signerCert = (X509Certificate)repo.getCertificate(item);
+		    final String			fromFile = fileName, toFile = fromFile.substring(0,fromFile.lastIndexOf('.'))+".crs";
+	    
+		    try(final FileSystemInterface	fs = fsi.clone().open(fromFile);
+		    	final Reader				rdr = fs.charRead("UTF-8");
+		    	final PEMParser 			reader = new PEMParser(rdr)) {
+		    	final PKCS10CertificationRequest csr = (PKCS10CertificationRequest)reader.readObject();
+			    
+			    final AlgorithmIdentifier 	sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find(algorithm);
+			    final AlgorithmIdentifier 	digAlgId = new DefaultDigestAlgorithmIdentifierFinder().find(sigAlgId);
+			    final X500Name 				issuer = new X500Name(signerCert.getSubjectX500Principal().getName());
+	
+			    final X509v3CertificateBuilder	certgen = new X509v3CertificateBuilder(issuer, serial, dateFrom, dateTo, csr.getSubject(), csr.getSubjectPublicKeyInfo());
+			    
+			    certgen.addExtension(Extension.basicConstraints, false, new BasicConstraints(false));
+			    certgen.addExtension(Extension.subjectKeyIdentifier, false, new SubjectKeyIdentifier(csr.getSubjectPublicKeyInfo().getEncoded()));
+			    certgen.addExtension(Extension.authorityKeyIdentifier, false, new AuthorityKeyIdentifier(new GeneralNames(new GeneralName(new X500Name(signerCert.getSubjectX500Principal().getName()))), signerCert.getSerialNumber()));
+	
+			    ContentSigner signer = new BcRSAContentSignerBuilder(sigAlgId, digAlgId).build(PrivateKeyFactory.createKey(signerKey.getEncoded()));
+			    X509CertificateHolder holder = certgen.build(signer);
+			    byte[] certencoded = holder.toASN1Structure().getEncoded();
+	
+			    CMSSignedDataGenerator generator = new CMSSignedDataGenerator();
+			    signer = new JcaContentSignerBuilder(algorithm).build(signerKey);
+			    generator.addSignerInfoGenerator(new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().build()).build(signer, signerCert));
+			    generator.addCertificate(new X509CertificateHolder(certencoded));
+			    generator.addCertificate(new X509CertificateHolder(signerCert.getEncoded()));
+			    CMSTypedData content = new CMSProcessableByteArray(certencoded);
+			    CMSSignedData signeddata = generator.generate(content, true);
+
+			    try(final FileSystemInterface	fsw = fsi.clone().open(toFile).create();
+				    final Writer				wr = fsw.charWrite("UTF-8")) {
+
+			    	writeContent(wr, "PKCS #7 SIGNED DATA", signeddata.getEncoded());
+			    }
+				logger.message(Severity.info,"Certificate sign was exported to ["+toFile+"]");
+			    return true;
+			} catch (IOException | OperatorCreationException | CertificateEncodingException | CMSException e) {
+				logger.message(Severity.error,"Sign certificate failed: "+e.getLocalizedMessage());
+				return false;
+			}
+		} catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e) {
+			logger.message(Severity.error,e,"Key pair alias ["+item+"] doesn't read");
+			return false;
+		}
+	}
 	
 	public static Certificate createSelfSigned(final KeyPair pair)  throws OperatorCreationException, CertIOException, CertificateException {
         final X500Name 		dnName = new X500Name("CN=publickeystorageonly");
@@ -201,4 +273,52 @@ public class KeyStoreUtils {
 
         return new JcaX509CertificateConverter().getCertificate(certBuilder.build(contentSigner));
     }
+	
+	public static void writeContent(final Writer wr, final String contentType, final byte[] content) throws IOException {
+		if (wr == null) {
+			throw new NullPointerException("Writer can't be null");
+		}
+		else if (contentType == null || contentType.isEmpty()) {
+			throw new IllegalArgumentException("Content type can't be null or empty");
+		}
+		else if (content == null) {
+			throw new NullPointerException("Content can't be null");
+		}
+		else {
+		    wr.write("-----BEGIN "+contentType+"-----\n");
+		    wr.write(new String(Base64.encode(content)));
+		    wr.write("\n-----END "+contentType+"-----\n");
+			wr.flush();
+		}
+	}
+
+	public static byte[] readContent(final Reader rdr, final String contentType) throws IOException {
+		if (rdr == null) {
+			throw new NullPointerException("Writer can't be null");
+		}
+		else if (contentType == null || contentType.isEmpty()) {
+			throw new IllegalArgumentException("Content type can't be null or empty");
+		}
+		else {
+			final BufferedReader	brdr = new BufferedReader(rdr);
+		    final StringBuilder		sb = new StringBuilder();
+		    
+			String		line;
+		    
+		    while ((line = brdr.readLine()) != null) {
+		    	if (line.startsWith("-----BEGIN ")) {
+		    		if (!line.contains(contentType)) {
+		    			throw new IOException("Illegal stream content: ["+contentType+"] awaited");
+		    		}
+		    	}
+		    	else if (line.startsWith("-----END ")) {
+		    		break;
+		    	}
+		    	else {
+		    		sb.append(line);
+		    	}
+		    }
+		    return Base64.decode(sb.toString());
+		}
+	}
 }

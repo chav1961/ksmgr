@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.security.Key;
 import java.security.KeyStore;
@@ -18,7 +19,9 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultCellEditor;
@@ -30,12 +33,14 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import chav1961.ksmgr.Application;
 import chav1961.ksmgr.dialogs.AskPasswordDialog;
+import chav1961.ksmgr.internal.KeyStoreViewer.ItemDescriptor.ItemType;
 import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
@@ -49,6 +54,15 @@ import chav1961.purelib.ui.swing.useful.LocalizedFormatter;
 public class KeyStoreViewer extends JTable {
 	private static final long 			serialVersionUID = -7656534471231370440L;
 	public static final int				PREFERRED_WIDTH = 300;
+	
+	public enum KeyStoreViewerSelectionType {
+		NONE,
+		EXACTLY_ONE_KEY,
+		EXACTLY_ONE_CERTIFICATE,
+		KEYS_ONLY,
+		CERTIFICATES_ONLY,
+		MIX
+	}
 	
 	private static final String			KEY_CONFIRM_DELETION_TITLE = "chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title";
 	private static final String			KEY_CONFIRM_DELETION_MESSAGE = "chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.message";
@@ -96,14 +110,17 @@ public class KeyStoreViewer extends JTable {
 				
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					// TODO Auto-generated method stub
 					if (e.getButton() == MouseEvent.BUTTON3) {
 						final int			row = rowAtPoint(e.getPoint());
-						final JPopupMenu	pm = SwingUtils.toJComponent(meta.getOwner().byUIPath(URI.create("ui:/model/navigation.top.keystoreActions")), JPopupMenu.class);
 						
-						getSelectionModel().setSelectionInterval(row,row);
-						SwingUtils.assignActionListeners(pm,KeyStoreViewer.this);
-						pm.show(KeyStoreViewer.this, e.getX(), e.getY());
+						getSelectionModel().setSelectionInterval(row,row);						
+						KeyStoreViewer.this.requestFocusInWindow();
+						
+						SwingUtilities.invokeLater(()->{
+							final JPopupMenu	pm = SwingUtils.toJComponent(meta.getOwner().byUIPath(URI.create("ui:/model/navigation.top.keystoreActions")), JPopupMenu.class);
+
+							pm.show(KeyStoreViewer.this, e.getX(), e.getY());
+						});
 					}
 				}
 			});
@@ -154,21 +171,6 @@ public class KeyStoreViewer extends JTable {
 		}
 	}
 	
-	
-	private void callPopup() {
-		final int				row = getSelectionModel().getMinSelectionIndex();
-		
-		if (row >= 0) {
-			final JPopupMenu	pm = SwingUtils.toJComponent(meta.getOwner().byUIPath(URI.create("ui:/model/navigation.top.keystoreActions")), JPopupMenu.class);
-			final Rectangle		rect = getCellRect(row, 0, false);
-			
-			getSelectionModel().setSelectionInterval(row,row);
-			SwingUtils.assignActionListeners(pm,KeyStoreViewer.this);
-			pm.show(KeyStoreViewer.this, rect.x+rect.width/2, rect.y+rect.height/2);
-		}
-	}
-
-
 	@Override
 	public String getToolTipText(final MouseEvent event) {
 		final int	row = this.rowAtPoint(event.getPoint());
@@ -212,8 +214,51 @@ public class KeyStoreViewer extends JTable {
 		((KeyStoreModel)getModel()).refreshContent();
 	}
 
-	@OnAction("action:/delete")
-	private void deleteItems() {
+	public KeyStoreViewerSelectionType getSelectionType() {
+		final int[]	selection = getSelectedRows();
+		
+		if (selection == null || selection.length == 0) {
+			return KeyStoreViewerSelectionType.NONE;
+		}
+		else if (selection.length == 1) {
+			final ItemDescriptor	desc = (ItemDescriptor) getModel().getValueAt(selection[0],0);
+			
+			switch (desc.type) {
+				case CERTIFICATE	:
+					return KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE;
+				case KEY_PAIR		:
+					return KeyStoreViewerSelectionType.EXACTLY_ONE_KEY;
+				case UNKNOWN		:
+					return KeyStoreViewerSelectionType.NONE;
+				default	:
+					throw new UnsupportedOperationException("Description type ["+desc.type+"] is not supported yet"); 
+			}
+		}
+		else {
+			final Set<ItemType>	types = new HashSet<>();
+			
+			for (int item : selection) {
+				types.add(((ItemDescriptor) getModel().getValueAt(item,0)).type);
+			}
+			if (types.size() == 1) {
+				if (types.contains(ItemType.CERTIFICATE)) {
+					return KeyStoreViewerSelectionType.CERTIFICATES_ONLY;
+				}
+				else if (types.contains(ItemType.KEY_PAIR)) {
+					return KeyStoreViewerSelectionType.KEYS_ONLY;
+				}
+				else {
+					return KeyStoreViewerSelectionType.NONE;
+				}
+			}
+			else {
+				return KeyStoreViewerSelectionType.MIX;
+			}
+		}
+	}
+	
+//	@OnAction("action:/delete")
+	public void deleteItems() {
 		final int[]	indices = getSelectionModel().getSelectedIndices();
 		
 		if (indices != null && indices.length > 0) {
@@ -247,11 +292,24 @@ public class KeyStoreViewer extends JTable {
 		}
 	}
 
-	@OnAction("action:/rename")
-	private void rename() {
+//	@OnAction("action:/rename")
+	public void rename() {
 		editCellAt(getSelectionModel().getMinSelectionIndex(),0);
 	}
-	
+
+	private void callPopup() {
+		final int				row = getSelectionModel().getMinSelectionIndex();
+		
+		if (row >= 0) {
+			final JPopupMenu	pm = SwingUtils.toJComponent(meta.getOwner().byUIPath(URI.create("ui:/model/navigation.top.keystoreActions")), JPopupMenu.class);
+			final Rectangle		rect = getCellRect(row, 0, false);
+			
+			getSelectionModel().setSelectionInterval(row,row);
+			SwingUtils.assignActionListeners(pm,KeyStoreViewer.this);
+			pm.show(KeyStoreViewer.this, rect.x+rect.width/2, rect.y+rect.height/2);
+		}
+	}
+
 	public static class KeyStoreModel extends DefaultTableModel {
 		private static final long serialVersionUID = -3488066941423522586L;
 		

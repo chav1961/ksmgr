@@ -8,6 +8,8 @@ import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,19 +25,20 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
 import java.security.SignatureException;
+import java.security.cert.CertPath;
+import java.security.cert.CertPathValidator;
+import java.security.cert.CertPathValidatorResult;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.PKIXParameters;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -48,8 +51,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -58,36 +60,12 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.cms.ContentInfo;
+import org.bouncycastle.asn1.pkcs.SignedData;
 import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaCertStore;
-import org.bouncycastle.cms.CMSAlgorithm;
-import org.bouncycastle.cms.CMSEnvelopedData;
-import org.bouncycastle.cms.CMSEnvelopedDataGenerator;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
-import org.bouncycastle.cms.CMSTypedData;
-import org.bouncycastle.cms.KeyTransRecipientInformation;
-import org.bouncycastle.cms.RecipientInfoGenerator;
-import org.bouncycastle.cms.RecipientInformation;
-import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationStore;
-import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
-import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
-import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
-import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
-import org.bouncycastle.cms.jcajce.JceKeyTransRecipient;
-import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
-import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.OutputEncryptor;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
-import org.bouncycastle.util.CollectionStore;
-import org.bouncycastle.util.Store;
 
 import chav1961.ksmgr.dialogs.AskPasswordDialog;
 import chav1961.ksmgr.dialogs.ChangePasswordDialog;
@@ -96,15 +74,16 @@ import chav1961.ksmgr.dialogs.CurrentSettingsDialog;
 import chav1961.ksmgr.dialogs.KeyPairCreateDialog;
 import chav1961.ksmgr.dialogs.OpenKeystoreDialog;
 import chav1961.ksmgr.dialogs.SelfSignedCertificateCreateDialog;
+import chav1961.ksmgr.dialogs.SignCertificateDialog;
 import chav1961.ksmgr.interfaces.KeyStoreType;
 import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.ksmgr.internal.KeyStoreUtils;
 import chav1961.ksmgr.internal.KeyStoreViewer;
 import chav1961.ksmgr.internal.KeyStoreViewer.ItemDescriptor;
 import chav1961.ksmgr.internal.KeyStoreViewer.KeyStoreModel;
+import chav1961.ksmgr.internal.PanelAndMenuManager;
 import chav1961.ksmgr.internal.PasswordsRepo;
 import chav1961.ksmgr.internal.PureLibClient;
-import chav1961.ksmgr.internal.RightPanelContainer;
 import chav1961.ksmgr.internal.RightPanelContainer.RightPanelType;
 import chav1961.purelib.basic.ArgParser;
 import chav1961.purelib.basic.MimeType;
@@ -156,7 +135,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 	private static final String				KEYSTORE_TARGET = "keystore.target";
 
 	private static Application				application;
-	
+
 	private final ContentMetadataInterface 	app;
 	private final Localizer					localizer;
 	private final int 						localHelpPort;
@@ -169,31 +148,15 @@ public class Application extends JFrame implements LocaleChangeListener {
 	private final FileContentChangeListener	listener = (e)->SwingUtilities.invokeLater(()->changeState(e));
 	private final ActionListener			lruListener = (e)->openLRUKeystore(e.getActionCommand());
 	private final FileSystemInterface		fsi = FileSystemFactory.createFileSystem(URI.create("fsys:file:/"));
-	private final RightPanelContainer		rightPanel;
 	private final DnDManager				dnd;
 	private final AlgorithmRepo				algo = new AlgorithmRepo();
 	private final PasswordsRepo				passwords;
+	private final PanelAndMenuManager		pamm;
 
-	private KeyStoreViewer					leftPanel = null;
 	private	KeyStore						current = null, right = null;
 	private char[]							currentPassword = null, rightPassword = null;
 
 	public Application(final ContentMetadataInterface xda, final Localizer parent, final int helpPort, final String configFile, final CountDownLatch latch) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
-//		try{final CertificateFactory certFactory = CertificateFactory.getInstance("X.509", "BC");
-//		
-//			final X509Certificate 		certificate = (X509Certificate) certFactory.generateCertificate(new FileInputStream("Baeldung.cer"));
-//			 
-//			final char[] 				keystorePassword = "password".toCharArray();
-//			final char[] 				keyPassword = "password".toCharArray();
-//					 
-//			final KeyStore 				keystore = KeyStore.getInstance("PKCS12");
-//			
-//			keystore.load(new FileInputStream("Baeldung.p12"), keystorePassword);
-//			final PrivateKey 			key = (PrivateKey) keystore.getKey("baeldung", keyPassword);	
-//		} catch (CertificateException | NoSuchProviderException | KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		if (xda == null) {
 			throw new NullPointerException("Application descriptor can't be null");
 		}
@@ -228,9 +191,9 @@ public class Application extends JFrame implements LocaleChangeListener {
 			((JMenuItem)SwingUtils.findComponentByName(menu, "menu.file.savekeystore")).setEnabled(false);
 			((JMenuItem)SwingUtils.findComponentByName(menu, "menu.file.savekeystoreas")).setEnabled(false);
 			((JMenuItem)SwingUtils.findComponentByName(menu, "menu.file.changePassword")).setEnabled(false);
+			this.pamm = new PanelAndMenuManager(this, menu, parent, state, fsi.clone(), split);
 			SwingUtils.assignActionListeners(menu,this);
 
-			this.rightPanel = new RightPanelContainer(this,localizer,state,fsi.clone(),split);
 			asFileSystem();
 			
 			this.contentManipulator = new JFileContentManipulator(fsi.clone(),this.localizer
@@ -247,8 +210,6 @@ public class Application extends JFrame implements LocaleChangeListener {
 			state.setAutomaticClearTime(Severity.error,1,TimeUnit.MINUTES);
 			state.setAutomaticClearTime(Severity.warning,15,TimeUnit.SECONDS);
 			state.setAutomaticClearTime(Severity.info,5,TimeUnit.SECONDS);
-			((JMenuItem)SwingUtils.findComponentByName(menu, "menu.file.savekeystore")).setEnabled(false);
-			((JMenuItem)SwingUtils.findComponentByName(menu, "menu.file.savekeystoreas")).setEnabled(false);
 
 			((JMenu)SwingUtils.findComponentByName(menu, "menu.file.lru")).setEnabled(!contentManipulator.getLastUsed().isEmpty());
 			fillLRUSubmenu();
@@ -274,7 +235,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 						}
 					}
 					else if (component instanceof KeyStoreViewer) {
-						final int	index = leftPanel.rowAtPoint(new Point(x,y));
+						final int	index = pamm.getLeftComponent().rowAtPoint(new Point(x,y));
 						
 						if (index >= 0) {
 							return FromKeyStore.class;
@@ -295,10 +256,10 @@ public class Application extends JFrame implements LocaleChangeListener {
 						}
 					}
 					else if (from instanceof KeyStoreViewer) {
-						final int	index = leftPanel.rowAtPoint(new Point(xFrom,yFrom));
+						final int	index = pamm.getLeftComponent().rowAtPoint(new Point(xFrom,yFrom));
 						
 						if (index >= 0) {
-							final ItemDescriptor	item = (ItemDescriptor) ((KeyStoreModel)leftPanel.getModel()).getValueAt(index,0);
+							final ItemDescriptor	item = (ItemDescriptor) ((KeyStoreModel)pamm.getLeftComponent().getModel()).getValueAt(index,0);
 							
 							return new FromKeyStore(item.alias,current);
 						}
@@ -320,7 +281,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 					else if ((from instanceof JFileList) && (to instanceof JLabel) && (KEYSTORE_TARGET.equals(to.getName()))) {	// Open keystore after start
 						return true;
 					}
-					else if ((from instanceof JFileList) && (to instanceof JViewport) && leftPanel != null) {	// Append content into keystore
+					else if ((from instanceof JFileList) && (to instanceof JViewport) && pamm.getLeftComponent() != null) {	// Append content into keystore
 						return true;
 					}
 					else {
@@ -343,8 +304,10 @@ public class Application extends JFrame implements LocaleChangeListener {
 						final AskPasswordDialog	apd = new AskPasswordDialog(state);
 						
 						if (askPassword(apd,null)) {
-							KeyStoreUtils.keyPairsImport(fsi,state,((FromFileSystem)content).name,current,apd.password);
-							leftPanel.refresh();
+							final String 	item = KeyStoreUtils.keyPairsImport(fsi,state,((FromFileSystem)content).name,current,apd.password);
+							
+							passwords.storePasswordFor(item,apd.password);
+							pamm.getLeftComponent().refresh();
 						}
 					}
 					else if ((from instanceof KeyStoreViewer) && (to instanceof JFileList)) {
@@ -355,13 +318,13 @@ public class Application extends JFrame implements LocaleChangeListener {
 								final AskPasswordDialog	apd = new AskPasswordDialog(state);
 								
 								if (askPassword(apd,((FromKeyStore)content).name)) {
-									KeyStoreUtils.keyPairsExport(fsi,state,((FromKeyStore)content).ks,((FromKeyStore)content).name,rightPanel.getCurrentFileSystemPath(),apd.password);
-									rightPanel.refresh();
+									KeyStoreUtils.keyPairsExport(fsi,state,((FromKeyStore)content).ks,((FromKeyStore)content).name,pamm.getRightContainer().getCurrentFileSystemPath(),apd.password);
+									pamm.refreshRightComponent();
 								}
 							}
 							else if (fks.ks.isCertificateEntry(fks.name)) {
-								KeyStoreUtils.certificateExport(fsi,state,((FromKeyStore)content).ks,((FromKeyStore)content).name,rightPanel.getCurrentFileSystemPath());
-								rightPanel.refresh();
+								KeyStoreUtils.certificateExport(fsi,state,((FromKeyStore)content).ks,((FromKeyStore)content).name,pamm.getRightContainer().getCurrentFileSystemPath());
+								pamm.refreshRightComponent();
 							}
 						} catch (KeyStoreException e) {
 							state.message(Severity.error,"Error exporting keystore: "+e.getLocalizedMessage());
@@ -385,6 +348,10 @@ public class Application extends JFrame implements LocaleChangeListener {
 		SwingUtils.refreshLocale(menu,oldLocale,newLocale);
 	}
 
+	//
+	//		File submenu processing
+	//
+	
 	@OnAction("action:/newKeyStore")
 	private void newKeystore() {
 		final CreateKeystoreDialog	cks = new CreateKeystoreDialog(state);
@@ -495,11 +462,58 @@ public class Application extends JFrame implements LocaleChangeListener {
 		final ChangePasswordDialog	cpd = new ChangePasswordDialog(state);
 	
 		if (ask(cpd,300,100)) {
-			currentPassword = cpd.newPassword;
+			if (pamm.isLeftPanelFocused()) {
+				currentPassword = cpd.newPassword;
+			}
+			else if (pamm.isRightPanelFocused() && pamm.getRightContainer().getPanelType() == RightPanelType.AS_KEYSTORE) {
+				rightPassword = cpd.newPassword;
+			}
 			state.message(Severity.info,"Password was changed successfully");
 		}
 	}
 
+	@OnAction("action:/exit")
+	private void exitApplication () {
+		try{contentManipulator.removeFileContentChangeListener(listener);
+			contentManipulator.close();
+			settings.store();
+			setVisible(false);
+			dispose();
+			latch.countDown();
+		} catch (IOException e) {
+			state.message(Severity.error,"Error saving content: "+e.getLocalizedMessage());
+		}
+	}
+
+	//
+	//		Edit submenu processing
+	//
+	
+	@OnAction("action:/copy")
+	private void copyItem() {
+	}	
+
+	@OnAction("action:/move")
+	private void moveItem() {
+	}	
+	
+	@OnAction("action:/rename")
+	private void renameItem() {
+		if (pamm.isLeftPanelFocused()) {
+			pamm.getLeftComponent().rename();
+		}
+	}
+	
+	@OnAction("action:/delete")
+	private void deleteItems() {
+		if (pamm.isLeftPanelFocused()) {
+			pamm.getLeftComponent().deleteItems();
+		}
+	}
+
+	//
+	//		Task submenu processing
+	//
 	
 	@OnAction("action:/keyPairsGenerate")
 	private void keyPairsGenerate() {
@@ -513,7 +527,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 				current.setKeyEntry(kpcd.alias, pair.getPrivate(), apd.password, new Certificate[] {cert});
 				passwords.storePasswordFor(kpcd.alias, apd.password);
 				state.message(Severity.info,"Key pair for alias ["+kpcd.alias+"] placed into the current keystore successfully");
-				leftPanel.refresh();
+				pamm.getLeftComponent().refresh();
 			} catch (KeyStoreException | NoSuchAlgorithmException | OperatorCreationException | CertIOException | CertificateException e) {
 				state.message(Severity.error,"Error creating key pair for alias ["+kpcd.alias+"]: "+e.getLocalizedMessage());
 			}
@@ -522,25 +536,25 @@ public class Application extends JFrame implements LocaleChangeListener {
 
 	@OnAction("action:/keyPairsExport")
 	private void keyPairsExport() {
-		final int[]		indices = leftPanel.getSelectionModel().getSelectedIndices();
+		final int[]		indices = pamm.getLeftComponent().getSelectionModel().getSelectedIndices();
 		
 		if (indices.length > 0) {
 			final AskPasswordDialog	apd = new AskPasswordDialog(state);
 			int						count = 0;
 			
 			for (int index = 0; index < indices.length; index++) {
-				final ItemDescriptor	desc = (ItemDescriptor) leftPanel.getModel().getValueAt(indices[index],0);
+				final ItemDescriptor	desc = (ItemDescriptor) pamm.getLeftComponent().getModel().getValueAt(indices[index],0);
 				
 				try{state.message(Severity.info,"Export ["+desc.alias+"]...");
 					if (current.isKeyEntry(desc.alias) && askPassword(apd,desc.alias)) {
-						KeyStoreUtils.keyPairsExport(fsi, state, current, desc.alias, rightPanel.getCurrentFileSystemPath(), apd.password);
+						KeyStoreUtils.keyPairsExport(fsi, state, current, desc.alias, pamm.getRightContainer().getCurrentFileSystemPath(), apd.password);
 						count++;
 					}
 				} catch (KeyStoreException e) {
 					state.message(Severity.error,"Error exporting key pair for alias ["+desc.alias+"]: "+e.getLocalizedMessage());
 				}
 			}
-			rightPanel.refresh();
+			pamm.refreshRightComponent();
 			state.message(Severity.info,"Key pairs export completed, ["+count+"] item(s) exported");
 		}
 	}
@@ -550,11 +564,11 @@ public class Application extends JFrame implements LocaleChangeListener {
 		final AskPasswordDialog	apd = new AskPasswordDialog(state);
 		
 		if (askPassword(apd,null)) {
-			final String	item = KeyStoreUtils.keyPairsImport(fsi,state,rightPanel.getCurrentFileSystemFile(),current,apd.password);
+			final String	item = KeyStoreUtils.keyPairsImport(fsi,state,pamm.getRightContainer().getCurrentFileSystemFile(),current,apd.password);
 			
 			passwords.storePasswordFor(item, apd.password);
-			state.message(Severity.info,"Key pairs import completed, ["+rightPanel.getCurrentFileSystemFile()+"] item imported");
-			leftPanel.refresh();
+			state.message(Severity.info,"Key pairs import completed, ["+pamm.getRightContainer().getCurrentFileSystemFile()+"] item imported");
+			pamm.getLeftComponent().refresh();
 		}
 	}	
 
@@ -569,11 +583,11 @@ public class Application extends JFrame implements LocaleChangeListener {
 				
 				current.setKeyEntry(kpcd.alias, pair.getPrivate(), apd.password, new Certificate[] {cert});
 				passwords.storePasswordFor(kpcd.alias, apd.password);
-				KeyStoreUtils.keyPairsExport(fsi, state, current, kpcd.alias, rightPanel.getCurrentFileSystemPath(), apd.password);
+				KeyStoreUtils.keyPairsExport(fsi, state, current, kpcd.alias, pamm.getRightContainer().getCurrentFileSystemPath(), apd.password);
 				
-				state.message(Severity.info,"Key pair for alias ["+kpcd.alias+"] placed into the current keystore and exported to ["+rightPanel.getCurrentFileSystemPath()+"] successfully");
-				leftPanel.refresh();
-				rightPanel.refresh();
+				state.message(Severity.info,"Key pair for alias ["+kpcd.alias+"] placed into the current keystore and exported to ["+pamm.getRightContainer().getCurrentFileSystemPath()+"] successfully");
+				pamm.getLeftComponent().refresh();
+				pamm.refreshRightComponent();
 			} catch (KeyStoreException | NoSuchAlgorithmException | OperatorCreationException | CertIOException | CertificateException e) {
 				state.message(Severity.error,"Error creating key pair for alias ["+kpcd.alias+"]: "+e.getLocalizedMessage());
 			}
@@ -582,65 +596,168 @@ public class Application extends JFrame implements LocaleChangeListener {
 	
 	@OnAction("action:/certificatesExport")
 	private void certificatesExport() {
-		final int[]		indices = leftPanel.getSelectionModel().getSelectedIndices();
+		final int[]		indices = pamm.getLeftComponent().getSelectionModel().getSelectedIndices();
 		int				count = 0;
 		
 		if (indices.length > 0) {
 			for (int index = 0; index < indices.length; index++) {
-				final ItemDescriptor	desc = (ItemDescriptor) leftPanel.getModel().getValueAt(indices[index],0);
+				final ItemDescriptor	desc = (ItemDescriptor) pamm.getLeftComponent().getModel().getValueAt(indices[index],0);
 				
 				try{if (current.isCertificateEntry(desc.alias)) {
-						KeyStoreUtils.certificateExport(fsi, state, current, desc.alias, rightPanel.getCurrentFileSystemPath());
+						KeyStoreUtils.certificateExport(fsi, state, current, desc.alias, pamm.getRightContainer().getCurrentFileSystemPath());
 						count++;
 					}
 				} catch (KeyStoreException e) {
 					state.message(Severity.error,"Error exporting certificate for alias ["+desc.alias+"]: "+e.getLocalizedMessage());
 				}
 			}
-			rightPanel.refresh();
+			pamm.refreshRightComponent();
 			state.message(Severity.info,"Certificate export completed, ["+count+"] item(s) exported");
 		}
 	}
 
+	@OnAction("action:/certificatesLoadTrusted")
+	private void certificatesLoadTrusted() {
+	}
+	
+	@OnAction("action:/certificatesImportFromServer")
+	private void certificatesImportFromServer() {
+	}
+	
 	@OnAction("action:/certificatesPrepareRequest")
 	private void certificatesPrepareRequest() {
-		final int[]		indices = leftPanel.getSelectionModel().getSelectedIndices();
+		final int[]		indices = pamm.getLeftComponent().getSelectionModel().getSelectedIndices();
 		int				count = 0;
 		
 		if (indices.length > 0) {
 			final AskPasswordDialog	apd = new AskPasswordDialog(state);
 			
 			for (int index = 0; index < indices.length; index++) {
-				final ItemDescriptor	desc = (ItemDescriptor) leftPanel.getModel().getValueAt(indices[index],0);
+				final ItemDescriptor	desc = (ItemDescriptor) pamm.getLeftComponent().getModel().getValueAt(indices[index],0);
 				
 				try{state.message(Severity.info,"Export ["+desc.alias+"]...");
 					if (current.isKeyEntry(desc.alias) && askPassword(apd,desc.alias)) {
-						KeyStoreUtils.certificateRequestExport(fsi, state, current, desc.alias, settings.principalName, rightPanel.getCurrentFileSystemPath(), apd.password);
+						KeyStoreUtils.certificateRequestExport(fsi, state, current, desc.alias, settings.principalName, pamm.getRightContainer().getCurrentFileSystemPath(), apd.password);
 						count++;
 					}
 				} catch (KeyStoreException e) {
 					state.message(Severity.error,"Error creating certificate request for alias ["+desc.alias+"]: "+e.getLocalizedMessage());
 				}
 			}
-			rightPanel.refresh();
+			pamm.refreshRightComponent();
 			state.message(Severity.info,"Certificate requests export completed, ["+count+"] item(s) created and exported");
 		}
 	}
+
+	@OnAction("action:/certificatesSignRequest")
+	private void certificatesSignRequest() throws Exception {
+		final int[]	indices = pamm.getLeftComponent().getSelectedRows();
+		
+		if (indices.length == 1) {
+			final ItemDescriptor	desc = (ItemDescriptor) pamm.getLeftComponent().getModel().getValueAt(indices[0],0);
+			final AskPasswordDialog	apd = new AskPasswordDialog(state);
+			
+			if (current.isKeyEntry(desc.alias) && askPassword(apd, desc.alias)) {
+			    final SignCertificateDialog	scd = new SignCertificateDialog(state, current);
+			    
+			    if (ask(scd,300,120)) {
+					KeyStoreUtils.certificateRequestSign(fsi, state, current, desc.alias, pamm.getRightContainer().getCurrentFileSystemFile()
+							, scd.algorithm.getAlgorithm(), scd.serialNumber, scd.dateFrom, scd.dateTo, apd.password);
+			    }				
+			}	
+		}
+	}
+
+	// https://stackoverrun.com/ru/q/5251389
+	@OnAction("action:/certificatesSignClient")
+	private void certificatesValidation() throws Exception {
+		try(final FileSystemInterface	fs = fsi.clone().open(pamm.getRightContainer().getCurrentFileSystemFile());
+			final Reader				rdr = fs.charRead();
+			final PEMParser				parser = new PEMParser(rdr)) {
+			final Object 				pair = parser.readObject();
+		}
+		
+		
+		CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+		// Get ContentInfo
+		//byte[] signature = ... // PKCS#7 signature bytes
+		InputStream signatureIn = new ByteArrayInputStream(new byte[0]);
+		ASN1Primitive obj = new ASN1InputStream(signatureIn).readObject();
+		ContentInfo contentInfo = ContentInfo.getInstance(obj);
+
+		// Extract certificates
+		SignedData signedData = SignedData.getInstance(contentInfo.getContent());
+		Enumeration certificates = signedData.getCertificates().getObjects();
+
+		// Build certificate path
+		List certList = new ArrayList();
+		while (certificates.hasMoreElements()) {
+			ASN1Primitive certObj = (ASN1Primitive) certificates.nextElement();
+		    InputStream in = new ByteArrayInputStream(certObj.getEncoded());
+		    certList.add(cf.generateCertificate(in));
+		}
+		CertPath certPath = cf.generateCertPath(certList);
+
+
+		// Set validation parameters
+		PKIXParameters params = new PKIXParameters(current);
+		params.setRevocationEnabled(false); // to avoid exception on empty CRL
+
+		// Validate certificate path
+		CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+		CertPathValidatorResult result = validator.validate(certPath, params);
+	
+		
+	}
+
+	@OnAction("action:/certificatesSignServer")
+	private void certificatesSignServer() throws Exception {
+	}	
 	
 	@OnAction("action:/certificatesCreateSelfsigned")
 	private void createSelfSignedCeritificate() {
 		final SelfSignedCertificateCreateDialog	ssscd = new SelfSignedCertificateCreateDialog(state,current);
 		
+		ssscd.principalName = settings.principalName;
 		if (ask(ssscd,350,300)) {
-			try{final Certificate	cert = ssscd.generate(settings.principalName);
+			try{final Certificate	cert = ssscd.generate(ssscd.principalName);
 				current.setCertificateEntry(ssscd.alias,cert);
 				state.message(Severity.info,"Certificate for alias ["+ssscd.alias+"] created successfully");
-				leftPanel.refresh();
+				pamm.getLeftComponent().refresh();
 			} catch (CertificateEncodingException | InvalidKeyException | NoSuchProviderException | NoSuchAlgorithmException | SignatureException | KeyStoreException e) {
 				state.message(Severity.error,"Error creating certificate for alias ["+ssscd.alias+"]: "+e.getLocalizedMessage());
 			}
 		}
 	}
+
+	@OnAction("action:/3DESGenerate")
+	private void desGenerate() {
+	}	
+
+	@OnAction("action:/3DESImport")
+	private void desImport() {
+	}	
+	
+	@OnAction("action:/encrypt")
+	private void encrypt() {
+	}	
+	
+	@OnAction("action:/decrypt")
+	private void decrypt() {
+	}
+	
+	@OnAction("action:/createDigest")
+	private void createDigest() {
+	}
+	
+	@OnAction("action:/validateDigest")
+	private void validateDigest() {
+	}
+	
+	//
+	//		Settings submenu processing
+	//
 	
 	@OnAction("action:/asKeyStore")
 	private void asKeyStore() {
@@ -657,8 +774,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 							right = temp;
 							rightPassword = settings.keepPasswords ? apd.password : null;
 							state.message(Severity.info,"Keystore ["+file+"] loaded successfully, repository type type is "+current.getType());
-							rightPanel.setPanelTypeAsKeystore(app.getRoot(),file,right);
-							setRightPanel(RightPanelType.AS_KEYSTORE);
+							pamm.getRightContainer().setPanelTypeAsKeystore(app.getRoot(),file,right);
 						}
 						else {
 							state.message(Severity.error,"Error opening keystore: reystore type is "+current.getType()+", not PKCS12.");
@@ -690,7 +806,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 									oks.file = path;
 									if (ask(oks,300,100)) {
 										try{final KeyStore	ks = KeyStore.getInstance(new File(oks.file),oks.password);
-											if (leftPanel == null) {
+											if (pamm.getLeftComponent() == null) {
 												refreshLeftPanel(oks.file,ks,oks.password);
 											}
 											else {
@@ -705,24 +821,26 @@ public class Application extends JFrame implements LocaleChangeListener {
 								}
 							};
 							
-		rightPanel.setPanelTypeAsFileSystem(l);
-		setRightPanel(RightPanelType.AS_FILESYSTEM);
-	}
-	
-	private void setRightPanel(final RightPanelType type) {
-		switch (type) {
-			case AS_FILESYSTEM	:
-				((JRadioButtonMenuItem)SwingUtils.findComponentByName(menu, "menu.settings.view.filesystem")).setSelected(true);
-				break;
-			case AS_KEYSTORE	:
-				((JRadioButtonMenuItem)SwingUtils.findComponentByName(menu, "menu.settings.view.keystore")).setSelected(true);
-				break;
-			case UNKNOWN		:
-				break;
-			default	:
-				throw new UnsupportedOperationException("Right panel type ["+type+"] is not supported yet");
-		}
-		refreshMenuState();
+		l.addMouseListener(new MouseListener() {
+			@Override public void mouseReleased(MouseEvent e) {}
+			@Override public void mousePressed(MouseEvent e) {}
+			@Override public void mouseExited(MouseEvent e) {}
+			@Override public void mouseEntered(MouseEvent e) {}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON3) {
+					l.requestFocusInWindow();
+					
+					SwingUtilities.invokeLater(()->{
+						final JPopupMenu	pm = SwingUtils.toJComponent(app.byUIPath(URI.create("ui:/model/navigation.top.fileSystemActions")), JPopupMenu.class);
+
+						pm.show(l, e.getX(), e.getY());
+					});
+				}
+			}
+		});
+		pamm.setRightComponent(l);
 	}
 	
 	@OnAction("action:/builtin.languages")
@@ -735,19 +853,6 @@ public class Application extends JFrame implements LocaleChangeListener {
 		settings.currentLang = newLang.getLocale().getLanguage();
 	}
 	
-	@OnAction("action:/exit")
-	private void exitApplication () {
-		try{contentManipulator.removeFileContentChangeListener(listener);
-			contentManipulator.close();
-			settings.store();
-			setVisible(false);
-			dispose();
-			latch.countDown();
-		} catch (IOException e) {
-			state.message(Severity.error,"Error saving content: "+e.getLocalizedMessage());
-		}
-	}
-
 	@OnAction("action:/settings")
 	private void settings() {
 		if (ask(settings,300,100)) {
@@ -761,10 +866,14 @@ public class Application extends JFrame implements LocaleChangeListener {
 			}
 			item.setEnabled(settings.keepPasswords);
 			settings.store();
-			leftPanel.refresh();
-			rightPanel.refresh();
+			pamm.getLeftComponent().refresh();
+			pamm.refreshRightComponent();
 		}
 	}
+
+	//
+	//		Help submenu processing
+	//
 	
 	@OnAction("action:/helpOverview")
 	private void startBrowser () {
@@ -815,99 +924,6 @@ public class Application extends JFrame implements LocaleChangeListener {
 		}
 	}	
 	
-	
-	public static byte[] encryptData(byte[] data,
-			  X509Certificate encryptionCertificate)
-			  throws CertificateEncodingException, CMSException, IOException {
-			 
-			    byte[] encryptedData = null;
-			    if (null != data && null != encryptionCertificate) {
-			        CMSEnvelopedDataGenerator cmsEnvelopedDataGenerator
-			          = new CMSEnvelopedDataGenerator();
-			        RecipientInfoGenerator transKeyGen = null;
-			        JceKeyTransRecipientInfoGenerator jceKey 
-			          = new JceKeyTransRecipientInfoGenerator(encryptionCertificate);
-			        cmsEnvelopedDataGenerator.addRecipientInfoGenerator(transKeyGen);
-			        CMSTypedData msg = new CMSProcessableByteArray(data);
-			        OutputEncryptor encryptor
-			          = new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES128_CBC)
-			          .setProvider("BC").build();
-			        CMSEnvelopedData cmsEnvelopedData = cmsEnvelopedDataGenerator
-			          .generate(msg,encryptor);
-			        encryptedData = cmsEnvelopedData.getEncoded();
-			    }
-			    return encryptedData;
-			}	
-
-	public static byte[] decryptData(
-			  byte[] encryptedData, 
-			  PrivateKey decryptionKey) 
-			  throws CMSException {
-			 
-			    byte[] decryptedData = null;
-			    if (null != encryptedData && null != decryptionKey) {
-			        CMSEnvelopedData envelopedData = new CMSEnvelopedData(encryptedData);
-			 
-			        Collection<RecipientInformation> recipients
-			          = envelopedData.getRecipientInfos().getRecipients();
-			        KeyTransRecipientInformation recipientInfo 
-			          = (KeyTransRecipientInformation) recipients.iterator().next();
-			        JceKeyTransRecipient recipient
-			          = new JceKeyTransEnvelopedRecipient(decryptionKey);
-			        
-			        return recipientInfo.getContent(recipient);
-			    }
-			    return decryptedData;
-			}
-	
-	public static byte[] signData(
-			  byte[] data, 
-			  X509Certificate signingCertificate,
-			  PrivateKey signingKey) throws Exception {
-			 
-			    byte[] signedMessage = null;
-			    List<X509Certificate> certList = new ArrayList<X509Certificate>();
-			    CMSTypedData cmsData= new CMSProcessableByteArray(data);
-			    certList.add(signingCertificate);
-			    Store certs = new JcaCertStore(certList);
-			 
-			    CMSSignedDataGenerator cmsGenerator = new CMSSignedDataGenerator();
-			    ContentSigner contentSigner 
-			      = new JcaContentSignerBuilder("SHA256withRSA").build(signingKey);
-			    cmsGenerator.addSignerInfoGenerator(new JcaSignerInfoGeneratorBuilder(
-			      new JcaDigestCalculatorProviderBuilder().setProvider("BC")
-			      .build()).build(contentSigner, signingCertificate));
-			    cmsGenerator.addCertificates(certs);
-			    
-			    CMSSignedData cms = cmsGenerator.generate(cmsData, true);
-			    signedMessage = cms.getEncoded();
-			    return signedMessage;
-			}
-	
-	public static boolean verifSignedData(byte[] signedData)
-			  throws Exception {
-			 
-			    X509Certificate signCert = null;
-			    ByteArrayInputStream inputStream
-			     = new ByteArrayInputStream(signedData);
-			    ASN1InputStream asnInputStream = new ASN1InputStream(inputStream);
-			    CMSSignedData cmsSignedData = new CMSSignedData(
-			      ContentInfo.getInstance(asnInputStream.readObject()));
-			    
-			    SignerInformationStore signers 
-			      = ((CMSSignedData) cmsSignedData.getCertificates()).getSignerInfos();
-			    SignerInformation signer = signers.getSigners().iterator().next();
-			    CollectionStore certs = null;
-				Collection<X509CertificateHolder> certCollection 
-			      = certs .getMatches(signer.getSID());
-			    X509CertificateHolder certHolder = certCollection.iterator().next();
-			    
-			    return signer
-			      .verify(new JcaSimpleSignerInfoVerifierBuilder()
-			      .build(certHolder));
-			}
-
-	
 	private <T> boolean ask(final T instance, final int width, final int height) {
 		try{final ContentMetadataInterface	mdi = ContentModelFactory.forAnnotatedClass(instance.getClass());
 		
@@ -938,9 +954,8 @@ public class Application extends JFrame implements LocaleChangeListener {
 	private void refreshLeftPanel(final String fileName, final KeyStore ks, final char[] password) {
 		current = ks; 
 		currentPassword = settings.keepPasswords ? password : null;
-		split.setLeftComponent(new JScrollPane(leftPanel = new KeyStoreViewer(app.getRoot(),localizer,state,passwords,fileName,current)));
+		pamm.setLeftComponent(new KeyStoreViewer(app.getRoot(),localizer,state,passwords,fileName,current));
 		split.setDividerLocation(KeyStoreViewer.PREFERRED_WIDTH);
-		refreshMenuState();
 	}
 
 	private void changeState(final FileContentChangedEvent event) {
@@ -952,7 +967,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 			case FILE_LOADED		:
 				save.setEnabled(false);
 				saveAs.setEnabled(true);
-				changePwd.setEnabled(true);
+				changePwd.setEnabled(settings.keepPasswords);
 			case FILE_STORED_AS		:
 				fillLRUSubmenu();
 				break;
@@ -964,7 +979,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 				break;
 			case NEW_FILE_CREATED	:
 				saveAs.setEnabled(true);
-				changePwd.setEnabled(true);
+				changePwd.setEnabled(settings.keepPasswords);
 				break;
 			case FILE_STORED		:
 				break;
@@ -974,7 +989,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 			default:
 				throw new UnsupportedOperationException("Change event type ["+event.getChangeType()+"] is not supported yet");
 		}
-		refreshMenuState();
+		pamm.refreshMenuState();
 	}
 
 	private void fillLRUSubmenu() {
@@ -998,74 +1013,9 @@ public class Application extends JFrame implements LocaleChangeListener {
 		lru.setEnabled(added);
 	}
 
-	private void refreshMenuState() {
-		final JMenu			edit = (JMenu)SwingUtils.findComponentByName(menu, "menu.edit");
-		final JMenu			tasks = (JMenu)SwingUtils.findComponentByName(menu, "menu.tasks");
-				
-		final JMenuItem		editCopy = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.edit.copy");
-		final JMenuItem		editMove = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.edit.move");
-		final JMenuItem		kpExport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keypairs.export");
-		final JMenuItem		kpImport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keypairs.import");
-		final JMenuItem		kpGenerateAndExport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keypairs.generateandexport");
-		final JMenuItem		certificatesExport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keypairs.export");
-		final JMenuItem		certificatesLoadTrusted = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.certificates.loadtrusted");
-		final JMenuItem		certificatesRequest = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.certificates.preparerequest");
-		final JMenuItem		certificatesReceive = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.certificates.receive");
-		final JMenuItem		desImport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.3DESkeys.import");
-		
-		if (leftPanel != null) {
-			edit.setEnabled(true);
-			tasks.setEnabled(true);
-			switch (rightPanel.getPanelType()) {
-				case AS_FILESYSTEM	:
-					editCopy.setEnabled(false);
-					editMove.setEnabled(false);
-					kpExport.setEnabled(true);
-					kpImport.setEnabled(true);
-					kpGenerateAndExport.setEnabled(true);
-					certificatesExport.setEnabled(true);
-					certificatesLoadTrusted.setEnabled(true);
-					certificatesRequest.setEnabled(true);
-					certificatesReceive.setEnabled(true);
-					desImport.setEnabled(true);
-					break;
-				case AS_KEYSTORE	:
-					editCopy.setEnabled(true);
-					editMove.setEnabled(true);
-					kpExport.setEnabled(false);
-					kpImport.setEnabled(false);
-					kpGenerateAndExport.setEnabled(false);
-					certificatesExport.setEnabled(false);
-					certificatesLoadTrusted.setEnabled(false);
-					certificatesRequest.setEnabled(false);
-					certificatesReceive.setEnabled(false);
-					desImport.setEnabled(false);
-					break;
-				case UNKNOWN		:
-					editCopy.setEnabled(false);
-					editMove.setEnabled(false);
-					kpExport.setEnabled(false);
-					kpImport.setEnabled(false);
-					kpGenerateAndExport.setEnabled(false);
-					certificatesExport.setEnabled(false);
-					certificatesLoadTrusted.setEnabled(false);
-					certificatesRequest.setEnabled(false);
-					certificatesReceive.setEnabled(false);
-					desImport.setEnabled(false);
-					break;
-				default	:
-					throw new UnsupportedOperationException("Right panel type ["+rightPanel.getPanelType()+"] is not supported yet");
-			}
-		}
-		else {
-			edit.setEnabled(false);
-			tasks.setEnabled(false);
-		}
-	}
-	
 	private void fillLocalizedStrings() throws LocalizationException, IllegalArgumentException {
 		setTitle(localizer.getValue(TITLE_APPLICATION));
-		if (leftPanel == null) {
+		if (pamm.getLeftComponent() == null) {
 			((JLabel)split.getLeftComponent()).setText("<html>"+localizer.getValue(LEFT_PLACEHOLDER_APPLICATION).replace("\n","<br>")+"</html>");
 		}
 	}
@@ -1078,7 +1028,6 @@ public class Application extends JFrame implements LocaleChangeListener {
 			return application.askPassword(dialog,item,250,50);
 		}
 	}
-
 	
 	public static void main(final String[] args) throws IOException, EnvironmentException, FlowException, ContentException, HeadlessException, URISyntaxException {
 		final ArgParser		parser = new ApplicationArgParser().parse(args);
@@ -1186,3 +1135,240 @@ public class Application extends JFrame implements LocaleChangeListener {
 		}
 	}
 }
+
+//Generate root X509Certificate, Sign a Certificate from the root certificate by generating a CSR (Certificate Signing Request) and save the certificates to a keystore using BouncyCastle 1.5x
+//BouncyCastleCertificateGenerator.java
+//import org.bouncycastle.asn1.ASN1Encodable;
+//import org.bouncycastle.asn1.DERSequence;
+//import org.bouncycastle.asn1.x500.X500Name;
+//import org.bouncycastle.asn1.x509.BasicConstraints;
+//import org.bouncycastle.asn1.x509.Extension;
+//import org.bouncycastle.asn1.x509.GeneralName;
+//import org.bouncycastle.asn1.x509.KeyUsage;
+//import org.bouncycastle.cert.X509CertificateHolder;
+//import org.bouncycastle.cert.X509v3CertificateBuilder;
+//import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+//import org.bouncycastle.cert.jcajce.JcaX509ExtensionUtils;
+//import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+//import org.bouncycastle.jce.provider.BouncyCastleProvider;
+//import org.bouncycastle.operator.ContentSigner;
+//import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+//import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+//import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+//import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+//import org.bouncycastle.util.encoders.Base64;
+//
+//import java.io.FileOutputStream;
+//import java.math.BigInteger;
+//import java.security.*;
+//import java.security.cert.Certificate;
+//import java.security.cert.X509Certificate;
+//import java.util.Calendar;
+//import java.util.Date;
+//
+//public class BouncyCastleCertificateGenerator {
+//
+//    private static final String BC_PROVIDER = "BC";
+//    private static final String KEY_ALGORITHM = "RSA";
+//    private static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
+//
+//    public static void main(String[] args) throws Exception{
+//        // Add the BouncyCastle Provider
+//        Security.addProvider(new BouncyCastleProvider());
+//
+//        // Initialize a new KeyPair generator
+//        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM, BC_PROVIDER);
+//        keyPairGenerator.initialize(2048);
+//
+//        // Setup start date to yesterday and end date for 1 year validity
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.add(Calendar.DATE, -1);
+//        Date startDate = calendar.getTime();
+//
+//        calendar.add(Calendar.YEAR, 1);
+//        Date endDate = calendar.getTime();
+//
+//        // First step is to create a root certificate
+//        // First Generate a KeyPair,
+//        // then a random serial number
+//        // then generate a certificate using the KeyPair
+//        KeyPair rootKeyPair = keyPairGenerator.generateKeyPair();
+//        BigInteger rootSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong()));
+//
+//        // Issued By and Issued To same for root certificate
+//        X500Name rootCertIssuer = new X500Name("CN=root-cert");
+//        X500Name rootCertSubject = rootCertIssuer;
+//        ContentSigner rootCertContentSigner = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(BC_PROVIDER).build(rootKeyPair.getPrivate());
+//        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(rootCertIssuer, rootSerialNum, startDate, endDate, rootCertSubject, rootKeyPair.getPublic());
+//
+//        // Add Extensions
+//        // A BasicConstraint to mark root certificate as CA certificate
+//        JcaX509ExtensionUtils rootCertExtUtils = new JcaX509ExtensionUtils();
+//        rootCertBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(true));
+//        rootCertBuilder.addExtension(Extension.subjectKeyIdentifier, false, rootCertExtUtils.createSubjectKeyIdentifier(rootKeyPair.getPublic()));
+//
+//        // Create a cert holder and export to X509Certificate
+//        X509CertificateHolder rootCertHolder = rootCertBuilder.build(rootCertContentSigner);
+//        X509Certificate rootCert = new JcaX509CertificateConverter().setProvider(BC_PROVIDER).getCertificate(rootCertHolder);
+//
+//        writeCertToFileBase64Encoded(rootCert, "root-cert.cer");
+//        exportKeyPairToKeystoreFile(rootKeyPair, rootCert, "root-cert", "root-cert.pfx", "PKCS12", "pass");
+//
+//        // Generate a new KeyPair and sign it using the Root Cert Private Key
+//        // by generating a CSR (Certificate Signing Request)
+//        X500Name issuedCertSubject = new X500Name("CN=issued-cert");
+//        BigInteger issuedCertSerialNum = new BigInteger(Long.toString(new SecureRandom().nextLong()));
+//        KeyPair issuedCertKeyPair = keyPairGenerator.generateKeyPair();
+//
+//        PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(issuedCertSubject, issuedCertKeyPair.getPublic());
+//        JcaContentSignerBuilder csrBuilder = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM).setProvider(BC_PROVIDER);
+//
+//        // Sign the new KeyPair with the root cert Private Key
+//        ContentSigner csrContentSigner = csrBuilder.build(rootKeyPair.getPrivate());
+//        PKCS10CertificationRequest csr = p10Builder.build(csrContentSigner);
+//
+//        // Use the Signed KeyPair and CSR to generate an issued Certificate
+//        // Here serial number is randomly generated. In general, CAs use
+//        // a sequence to generate Serial number and avoid collisions
+//        X509v3CertificateBuilder issuedCertBuilder = new X509v3CertificateBuilder(rootCertIssuer, issuedCertSerialNum, startDate, endDate, csr.getSubject(), csr.getSubjectPublicKeyInfo());
+//
+//        JcaX509ExtensionUtils issuedCertExtUtils = new JcaX509ExtensionUtils();
+//
+//        // Add Extensions
+//        // Use BasicConstraints to say that this Cert is not a CA
+//        issuedCertBuilder.addExtension(Extension.basicConstraints, true, new BasicConstraints(false));
+//
+//        // Add Issuer cert identifier as Extension
+//        issuedCertBuilder.addExtension(Extension.authorityKeyIdentifier, false, issuedCertExtUtils.createAuthorityKeyIdentifier(rootCert));
+//        issuedCertBuilder.addExtension(Extension.subjectKeyIdentifier, false, issuedCertExtUtils.createSubjectKeyIdentifier(csr.getSubjectPublicKeyInfo()));
+//
+//        // Add intended key usage extension if needed
+//        issuedCertBuilder.addExtension(Extension.keyUsage, false, new KeyUsage(KeyUsage.keyEncipherment));
+//
+//        // Add DNS name is cert is to used for SSL
+//        issuedCertBuilder.addExtension(Extension.subjectAlternativeName, false, new DERSequence(new ASN1Encodable[] {
+//                new GeneralName(GeneralName.dNSName, "mydomain.local"),
+//                new GeneralName(GeneralName.iPAddress, "127.0.0.1")
+//        }));
+//
+//        X509CertificateHolder issuedCertHolder = issuedCertBuilder.build(csrContentSigner);
+//        X509Certificate issuedCert  = new JcaX509CertificateConverter().setProvider(BC_PROVIDER).getCertificate(issuedCertHolder);
+//
+//        // Verify the issued cert signature against the root (issuer) cert
+//        issuedCert.verify(rootCert.getPublicKey(), BC_PROVIDER);
+//
+//        writeCertToFileBase64Encoded(issuedCert, "issued-cert.cer");
+//        exportKeyPairToKeystoreFile(issuedCertKeyPair, issuedCert, "issued-cert", "issued-cert.pfx", "PKCS12", "pass");
+//
+//    }
+//
+//    static void exportKeyPairToKeystoreFile(KeyPair keyPair, Certificate certificate, String alias, String fileName, String storeType, String storePass) throws Exception {
+//        KeyStore sslKeyStore = KeyStore.getInstance(storeType, BC_PROVIDER);
+//        sslKeyStore.load(null, null);
+//        sslKeyStore.setKeyEntry(alias, keyPair.getPrivate(),null, new Certificate[]{certificate});
+//        FileOutputStream keyStoreOs = new FileOutputStream(fileName);
+//        sslKeyStore.store(keyStoreOs, storePass.toCharArray());
+//    }
+//
+//    static void writeCertToFileBase64Encoded(Certificate certificate, String fileName) throws Exception {
+//        FileOutputStream certificateOut = new FileOutputStream(fileName);
+//        certificateOut.write("-----BEGIN CERTIFICATE-----".getBytes());
+//        certificateOut.write(Base64.encode(certificate.getEncoded()));
+//        certificateOut.write("-----END CERTIFICATE-----".getBytes());
+//        certificateOut.close();
+//    }
+//}
+
+
+//public static byte[] encryptData(byte[] data,
+//		  X509Certificate encryptionCertificate)
+//		  throws CertificateEncodingException, CMSException, IOException {
+//		 
+//		    byte[] encryptedData = null;
+//		    if (null != data && null != encryptionCertificate) {
+//		        CMSEnvelopedDataGenerator cmsEnvelopedDataGenerator
+//		          = new CMSEnvelopedDataGenerator();
+//		        RecipientInfoGenerator transKeyGen = null;
+//		        JceKeyTransRecipientInfoGenerator jceKey 
+//		          = new JceKeyTransRecipientInfoGenerator(encryptionCertificate);
+//		        cmsEnvelopedDataGenerator.addRecipientInfoGenerator(transKeyGen);
+//		        CMSTypedData msg = new CMSProcessableByteArray(data);
+//		        OutputEncryptor encryptor
+//		          = new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES128_CBC)
+//		          .setProvider("BC").build();
+//		        CMSEnvelopedData cmsEnvelopedData = cmsEnvelopedDataGenerator
+//		          .generate(msg,encryptor);
+//		        encryptedData = cmsEnvelopedData.getEncoded();
+//		    }
+//		    return encryptedData;
+//		}	
+//
+//public static byte[] decryptData(
+//		  byte[] encryptedData, 
+//		  PrivateKey decryptionKey) 
+//		  throws CMSException {
+//		 
+//		    byte[] decryptedData = null;
+//		    if (null != encryptedData && null != decryptionKey) {
+//		        CMSEnvelopedData envelopedData = new CMSEnvelopedData(encryptedData);
+//		 
+//		        Collection<RecipientInformation> recipients
+//		          = envelopedData.getRecipientInfos().getRecipients();
+//		        KeyTransRecipientInformation recipientInfo 
+//		          = (KeyTransRecipientInformation) recipients.iterator().next();
+//		        JceKeyTransRecipient recipient
+//		          = new JceKeyTransEnvelopedRecipient(decryptionKey);
+//		        
+//		        return recipientInfo.getContent(recipient);
+//		    }
+//		    return decryptedData;
+//		}
+//
+//public static byte[] signData(
+//		  byte[] data, 
+//		  X509Certificate signingCertificate,
+//		  PrivateKey signingKey) throws Exception {
+//		 
+//		    byte[] signedMessage = null;
+//		    List<X509Certificate> certList = new ArrayList<X509Certificate>();
+//		    CMSTypedData cmsData= new CMSProcessableByteArray(data);
+//		    certList.add(signingCertificate);
+//		    Store certs = new JcaCertStore(certList);
+//		 
+//		    CMSSignedDataGenerator cmsGenerator = new CMSSignedDataGenerator();
+//		    ContentSigner contentSigner 
+//		      = new JcaContentSignerBuilder("SHA256withRSA").build(signingKey);
+//		    cmsGenerator.addSignerInfoGenerator(new JcaSignerInfoGeneratorBuilder(
+//		      new JcaDigestCalculatorProviderBuilder().setProvider("BC")
+//		      .build()).build(contentSigner, signingCertificate));
+//		    cmsGenerator.addCertificates(certs);
+//		    
+//		    CMSSignedData cms = cmsGenerator.generate(cmsData, true);
+//		    signedMessage = cms.getEncoded();
+//		    return signedMessage;
+//		}
+//
+//public static boolean verifSignedData(byte[] signedData)
+//		  throws Exception {
+//		 
+//		    X509Certificate signCert = null;
+//		    ByteArrayInputStream inputStream
+//		     = new ByteArrayInputStream(signedData);
+//		    ASN1InputStream asnInputStream = new ASN1InputStream(inputStream);
+//		    CMSSignedData cmsSignedData = new CMSSignedData(
+//		      ContentInfo.getInstance(asnInputStream.readObject()));
+//		    
+//		    SignerInformationStore signers 
+//		      = ((CMSSignedData) cmsSignedData.getCertificates()).getSignerInfos();
+//		    SignerInformation signer = signers.getSigners().iterator().next();
+//		    CollectionStore certs = null;
+//			Collection<X509CertificateHolder> certCollection 
+//		      = certs .getMatches(signer.getSID());
+//		    X509CertificateHolder certHolder = certCollection.iterator().next();
+//		    
+//		    return signer
+//		      .verify(new JcaSimpleSignerInfoVerifierBuilder()
+//		      .build(certHolder));
+//		}
+//
+//

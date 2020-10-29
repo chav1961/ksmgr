@@ -70,8 +70,8 @@
 		<key name="menu.tasks.certificates.importfromserver.tt">Import certificated from the given server URL</key>
 		<key name="menu.tasks.certificates.preparerequest">Prepare request</key>
 		<key name="menu.tasks.certificates.preparerequest.tt">Prepare certificate request</key>
-		<key name="menu.tasks.certificates.receive">Receive</key>
-		<key name="menu.tasks.certificates.receive.tt">Receive signed certificate</key>
+		<key name="menu.tasks.certificates.signrequest">Sign request</key>
+		<key name="menu.tasks.certificates.signrequest.tt">Sign certificate request by your certificate</key>
 		<key name="menu.tasks.certificates.signclient">Sign client</key>
 		<key name="menu.tasks.certificates.signclient.tt">Sign client certificate</key>
 		<key name="menu.tasks.certificates.signserver">Sign server</key>
@@ -84,6 +84,16 @@
 		<key name="menu.tasks.3DESkeys.generate.tt">Create 3DES keys</key>
 		<key name="menu.tasks.3DESkeys.import">Import</key>
 		<key name="menu.tasks.3DESkeys.import.tt">Import 3DES keys</key>
+		<key name="menu.tasks.crypto">Cryptography</key>
+		<key name="menu.tasks.crypto.tt">Make cryptografical actions</key>
+		<key name="menu.tasks.crypto.encript">Encript file</key>
+		<key name="menu.tasks.crypto.encript.tt">Encript file content</key>
+		<key name="menu.tasks.crypto.decript">Decript file</key>
+		<key name="menu.tasks.crypto.decript.tt">Decript file content</key>
+		<key name="menu.tasks.crypto.createdigest">Create digest</key>
+		<key name="menu.tasks.crypto.createdigest.tt">Build digest for the given file</key>
+		<key name="menu.tasks.crypto.validatedigest">Validate digest</key>
+		<key name="menu.tasks.crypto.validatedigest.tt">Validate digest for the given file</key>
 		<key name="menu.help">Help</key>
 		<key name="menu.help.tt">Application help</key>
 		<key name="menu.help.overview">Overview</key>
@@ -108,6 +118,9 @@
 		<key name="chav1961.ksmgr.interfaces.securityalgorithm.bc.tt">BC algorithm</key>
 		<key name="chav1961.ksmgr.interfaces.securityalgorithm.des">DES</key>
 		<key name="chav1961.ksmgr.interfaces.securityalgorithm.des.tt">DES algorithm</key>
+
+		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa">SHA1withRSA</key>
+		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa.tt">SHA1withRSA algorithm</key>
 		
 <!-- Localization for 'create keystore' dialog -->		
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Create key store</key>
@@ -188,6 +201,18 @@
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password">Password</key>
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password.tt">password to access key store selected</key>
 
+<!-- Localization for 'sign request' dialog -->		
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog">Sign request</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.tt">Sign certificate request by you certificate</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.algorithm">Signature algorithm</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.algorithm.tt">Select signature algorithm required</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.serialnumber">Serial #</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.serialnumber.tt">Serial number of signed certificate</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom">Date from</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom.tt">Start date of signed certificate</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto">Date to</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto.tt">End date of signed certificate</key>
+
 <!-- Localization for KeyStoreViewer keys -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Confirm deletion...</key>
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.message">You wish to delete following entries in the repo:\n%1$s</key>
@@ -264,8 +289,8 @@
 		<key name="menu.tasks.certificates.importfromserver.tt">Импорт сертификатов с сервера по указанному URL</key>
 		<key name="menu.tasks.certificates.preparerequest">Создать запрос</key>
 		<key name="menu.tasks.certificates.preparerequest.tt">Сгенерировать запрос сертификата</key>
-		<key name="menu.tasks.certificates.receive">Принять</key>
-		<key name="menu.tasks.certificates.receive.tt">Принять подтверждение сертификата</key>
+		<key name="menu.tasks.certificates.signrequest">Подписать запрос</key>
+		<key name="menu.tasks.certificates.signrequest.tt">Подписать запрос сертификата своим сертификатом</key>
 		<key name="menu.tasks.certificates.signclient">Подписать клиента</key>
 		<key name="menu.tasks.certificates.signclient.tt">Подписать клиентский сертификат</key>
 		<key name="menu.tasks.certificates.signserver">Подписать сервер</key>
@@ -278,6 +303,16 @@
 		<key name="menu.tasks.3DESkeys.generate.tt">Сгенерировать 3DES ключи</key>
 		<key name="menu.tasks.3DESkeys.import">Импорт</key>
 		<key name="menu.tasks.3DESkeys.import.tt">Импорт 3DES ключей</key>
+		<key name="menu.tasks.crypto">Криптография</key>
+		<key name="menu.tasks.crypto.tt">Выполнить криптографические действия</key>
+		<key name="menu.tasks.crypto.encript">Зашифровать файл</key>
+		<key name="menu.tasks.crypto.encript.tt">Зашифровать содержимое файла</key>
+		<key name="menu.tasks.crypto.decript">Расшифровать файл</key>
+		<key name="menu.tasks.crypto.decript.tt">Расшифровать содержимое файла</key>
+		<key name="menu.tasks.crypto.createdigest">Создать дайджест</key>
+		<key name="menu.tasks.crypto.createdigest.tt">Построить дайджест для заданного файла</key>
+		<key name="menu.tasks.crypto.validatedigest">Проверить дайджест</key>
+		<key name="menu.tasks.crypto.validatedigest.tt">Проверить дайджест для заданного файла</key>
 		<key name="menu.help">Справка</key>
 		<key name="menu.help.tt">Справка по приложению</key>
 		<key name="menu.help.overview">Обзор</key>
@@ -303,6 +338,8 @@
 		<key name="chav1961.ksmgr.interfaces.securityalgorithm.des">DES</key>
 		<key name="chav1961.ksmgr.interfaces.securityalgorithm.des.tt">Алгоритм DES</key>
 		
+		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa">SHA1withRSA</key>
+		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa.tt">Алгоритм SHA1withRSA</key>
 		
 <!-- Локализация для диалога 'create keystore' -->		
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Создать репозитарий ключей</key>
@@ -381,6 +418,18 @@
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.file.tt">Имя файла репозитария</key>
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password">Пароль</key>
 		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password.tt">Пароль для доступа к файлу репозитария</key>
+	
+<!-- Локализация для диалога 'sign request' -->		
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog">Подписать запрос</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.tt">Подписать азпрос сертификата своим сертификатом</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.algorithm">Алгоритм сигнатуры</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.algorithm.tt">Выбрать требуемый алгоритм сигнатуры</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.serialnumber">Серийный номер</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.serialnumber.tt">Серийны номр подписанного сертификата</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom">Дата от</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom.tt">Начало даты действия подписи</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto">Дата до</key>
+		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto.tt">Окончание даты дествия подписи</key>
 	
 <!-- локализация для ключей KeyStoreViewer -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Подтвердить удаление...</key>

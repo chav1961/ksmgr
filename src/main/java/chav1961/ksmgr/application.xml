@@ -37,7 +37,7 @@
 				<app:item name="menu.tasks.certificates.importfromserver" caption="menu.tasks.certificates.importfromserver" tooltip="menu.tasks.certificates.importfromserver.tt" action="certificatesImportFromServer"/>
 				<app:separator/>
 				<app:item name="menu.tasks.certificates.preparerequest" caption="menu.tasks.certificates.preparerequest" tooltip="menu.tasks.certificates.preparerequest.tt" action="certificatesPrepareRequest"/>
-				<app:item name="menu.tasks.certificates.receive" caption="menu.tasks.certificates.receive" tooltip="menu.tasks.certificates.receive.tt" action="certificatesReceive"/>
+				<app:item name="menu.tasks.certificates.signrequest" caption="menu.tasks.certificates.signrequest" tooltip="menu.tasks.certificates.signrequest.tt" action="certificatesSignRequest"/>
 				<app:separator/>
 				<app:item name="menu.tasks.certificates.signclient" caption="menu.tasks.certificates.signclient" tooltip="menu.tasks.certificates.signclient.tt" action="certificatesSignClient"/>
 				<app:item name="menu.tasks.certificates.signserver" caption="menu.tasks.certificates.signserver" tooltip="menu.tasks.certificates.signserver.tt" action="certificatesSignServer"/>
@@ -47,6 +47,13 @@
 			<app:submenu name="menu.tasks.3DESkeys" caption="menu.tasks.3DESkeys" tooltip="menu.tasks.3DESkeys.tt">
 				<app:item name="menu.tasks.3DESkeys.generate" caption="menu.tasks.3DESkeys.generate" tooltip="menu.tasks.3DESkeys.generate.tt" action="3DESGenerate"/>
 				<app:item name="menu.tasks.3DESkeys.import" caption="menu.tasks.3DESkeys.import" tooltip="menu.tasks.3DESkeys.import.tt" action="3DESImport"/>
+			</app:submenu>
+			<app:submenu name="menu.tasks.crypto" caption="menu.tasks.crypto" tooltip="menu.tasks.crypto.tt">
+				<app:item name="menu.tasks.crypto.encript" caption="menu.tasks.crypto.encript" tooltip="menu.tasks.crypto.encript.tt" action="encrypt"/>
+				<app:item name="menu.tasks.crypto.decript" caption="menu.tasks.crypto.decript" tooltip="menu.tasks.crypto.decript.tt" action="decrypt"/>
+				<app:separator/>
+				<app:item name="menu.tasks.crypto.createdigest" caption="menu.tasks.crypto.createdigest" tooltip="menu.tasks.crypto.createdigest.tt" action="createDigest"/>
+				<app:item name="menu.tasks.crypto.validatedigest" caption="menu.tasks.crypto.validatedigest" tooltip="menu.tasks.crypto.validatedigest.tt" action="validateDigest"/>
 			</app:submenu>
 		</app:submenu>
 		<app:submenu name="menu.settings" caption="menu.settings" tooltip="menu.settings.tt">
@@ -85,6 +92,27 @@
 		<app:separator/>
 		<app:itemref name="popup.edit.copy" ref="menu.edit.copy"/>
 		<app:itemref name="popup.edit.move" ref="menu.edit.move"/>
+		<app:itemref name="popup.edit.rename" ref="menu.edit.rename"/>
+		<app:itemref name="popup.edit.delete" ref="menu.edit.delete"/>
+	</app:menu>
+	<app:menu id="fileSystemActions">
+		<app:submenuref name="popup.tasks.keypairs" ref="menu.tasks.keypairs">
+			<app:itemref name="popup.tasks.keypairs.import" ref="menu.tasks.keypairs.import"/>
+		</app:submenuref>
+		<app:submenuref name="popup.tasks.certificates" ref="menu.tasks.certificates">
+			<app:itemref name="popup.tasks.certificates.loadtrusted" ref="menu.tasks.certificates.loadtrusted"/>
+		</app:submenuref>
+		<app:submenuref name="popup.tasks.3DESkeys" ref="menu.tasks.3DESkeys">
+			<app:itemref name="popup.tasks.3DESkeys.import" ref="menu.tasks.3DESkeys.import"/>
+		</app:submenuref>
+		<app:submenuref name="popup.tasks.crypto" ref="menu.tasks.crypto">
+			<app:itemref name="popup.tasks.crypto.encript" ref="menu.tasks.crypto.encript"/>
+			<app:itemref name="popup.tasks.crypto.decript" ref="menu.tasks.crypto.decript"/>
+			<app:separator/>
+			<app:itemref name="popup.tasks.crypto.createdigest" ref="menu.tasks.crypto.createdigest"/>
+			<app:itemref name="popup.tasks.crypto.validatedigest" ref="menu.tasks.crypto.validatedigest"/>
+		</app:submenuref>
+		<app:separator/>
 		<app:itemref name="popup.edit.rename" ref="menu.edit.rename"/>
 		<app:itemref name="popup.edit.delete" ref="menu.edit.delete"/>
 	</app:menu>
