@@ -30,20 +30,27 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 	public static final String	KEY_KEEP_PASSWORDS = "keepPasswords";
 	public static final String	KEY_LRU_LIST = "LRUList";
 	public static final String	KEY_CURRENT_LANG = "currentLang";
+	public static final String	KEY_PREFERRED_PROVIDER = "preferredProvider";
+	public static final String	KEY_PRINCIPAL_NAME = "principalName";
+	public static final String	KEY_CURRENT_SALT = "currentSalt";
 	
 	private final LoggerFacade	facade;
 	
 	@LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords",tooltip="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords.tt")
 	@Format("1m")
-	public boolean				keepPasswords = true;
+	public boolean				keepPasswords;
 
 	@LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider",tooltip="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider.tt")
 	@Format("30smd")
-	public String				preferredProvider = "BC";
+	public String				preferredProvider;
 
 	@LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog.principalname",tooltip="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt")
 	@Format("30sm")
-	public String				principalName = "Self-signed principal";
+	public String				principalName;
+
+	@LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog.currentsalt",tooltip="chav1961.ksmgr.dialogs.settingsdialog.currentsalt.tt")
+	@Format("30sm")
+	public String				currentSalt;
 	
 	public String				currentLang;
 	
@@ -69,6 +76,9 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 			this.repo = repo;
 			this.props = content.exists() && content.isFile() && content.canRead() ? Utils.mkProps(content) : new SubstitutableProperties();
 			this.keepPasswords = props.getProperty(KEY_KEEP_PASSWORDS, boolean.class, "true");
+			this.preferredProvider = props.getProperty(KEY_PREFERRED_PROVIDER, String.class, "BC");
+			this.principalName = props.getProperty(KEY_PRINCIPAL_NAME, String.class, "Self-signed principal");
+			this.currentSalt = props.getProperty(KEY_CURRENT_SALT, String.class, "Hitler kaput!");
 			this.currentLang = props.getProperty(KEY_CURRENT_LANG, String.class, Locale.getDefault().getLanguage());
 		}
 	}
@@ -76,8 +86,11 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 	public void store() {
 		final File		content = new File(configFile);
 
-		props.setProperty(KEY_KEEP_PASSWORDS,String.valueOf(keepPasswords));
-		props.setProperty(KEY_CURRENT_LANG,currentLang);
+		props.setProperty(KEY_KEEP_PASSWORDS, String.valueOf(keepPasswords));
+		props.setProperty(KEY_PREFERRED_PROVIDER, preferredProvider);
+		props.setProperty(KEY_PRINCIPAL_NAME, principalName);
+		props.setProperty(KEY_CURRENT_SALT, currentSalt);
+		props.setProperty(KEY_CURRENT_LANG, currentLang);
 		
 		if (!content.exists() || content.isFile() && content.canWrite()) {
 			try(final OutputStream	os = new FileOutputStream(content)) {

@@ -48,6 +48,7 @@
 				<app:item name="menu.tasks.3DESkeys.generate" caption="menu.tasks.3DESkeys.generate" tooltip="menu.tasks.3DESkeys.generate.tt" action="3DESGenerate"/>
 				<app:item name="menu.tasks.3DESkeys.import" caption="menu.tasks.3DESkeys.import" tooltip="menu.tasks.3DESkeys.import.tt" action="3DESImport"/>
 			</app:submenu>
+			<app:separator/>
 			<app:submenu name="menu.tasks.crypto" caption="menu.tasks.crypto" tooltip="menu.tasks.crypto.tt">
 				<app:item name="menu.tasks.crypto.encript" caption="menu.tasks.crypto.encript" tooltip="menu.tasks.crypto.encript.tt" action="encrypt"/>
 				<app:item name="menu.tasks.crypto.decript" caption="menu.tasks.crypto.decript" tooltip="menu.tasks.crypto.decript.tt" action="decrypt"/>

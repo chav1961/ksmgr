@@ -157,6 +157,8 @@
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider.tt">Select preferred security provider from available list</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname">Principal name</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt">Default principal name (used in self-signed certificates, certificate requests etc...)</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt">Default salt</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt.tt">Default salt to use in encryption/decryption tasks</key>
 		
 
 <!-- Localization for 'key pair/generate' dialog -->		
@@ -212,6 +214,26 @@
 		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom.tt">Start date of signed certificate</key>
 		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto">Date to</key>
 		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto.tt">End date of signed certificate</key>
+
+<!-- Localization for 'ask server URI' dialog -->		
+		<key name="chav1961.ksmgr.dialogs.askserveruridialog">Load certificates</key>
+		<key name="chav1961.ksmgr.dialogs.askserveruridialog.tt">Load certificates from server</key>
+		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri">Server URI</key>
+		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri.tt">Serve URI to get certificated from. Must be absolute and have 'https:' scheme</key>
+
+<!-- Localization for 'encrypt file' dialog-->		
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog">Encrypt file</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.tt">Encrypt selected file(s) with selected key</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithm">Cipher algorithm</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithm.tt">Select cipher algorithm. Ctrl+space hits list of algorithms</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithmsuffix">Cipher algorithm suffix</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithmsuffix.tt">Suffix for cipher algorithm</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipherkeylength">Key length</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipherkeylength.tt">Cipher key length</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations"># of interations</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations.tt">Number of cipher iterations</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt">Encrypted salt</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt.tt">Salt for encryption</key>
 
 <!-- Localization for KeyStoreViewer keys -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Confirm deletion...</key>
@@ -376,6 +398,8 @@
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider.tt">Выбрать предпочитаемого провайдера безопасности из имеющегося списка</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname">Имя принципала</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt">Имя принципала по умолчанию (используется в самоподписанных сертификатах, запросах сертификатов и т.д.)</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt">Соль по умолчанию</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt.tt">Значение соли по умолчанию для операций шифрования/дешифрования</key>
 	
 <!-- Локализация для диалога 'key pair/generate' -->		
 		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog">Генерация пары ключей</key>
@@ -430,6 +454,26 @@
 		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom.tt">Начало даты действия подписи</key>
 		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto">Дата до</key>
 		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto.tt">Окончание даты дествия подписи</key>
+	
+<!-- Локализация для диалога 'ask server URI'-->		
+		<key name="chav1961.ksmgr.dialogs.askserveruridialog">Загрузить сертификаты</key>
+		<key name="chav1961.ksmgr.dialogs.askserveruridialog.tt">Загрузить сертификаты с сервера</key>
+		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri">URI сервера</key>
+		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri.tt">Адрес сервера, откуда грузить сертификаты. Долежен быть абсолютным и иметь схему 'https:'</key>
+
+<!-- Локализация для диалога 'encrypt file'-->		
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog">Зашифровать файл</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.tt">Зашифровать выбранные файлы выбранным ключом</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithm">Алгоритм шифрования</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithm.tt">Выбрать алгоритм шифрования. Ctrl+пробел вызывает подсказку по алгоритмам</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithmsuffix">Суффикс алгоритма</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithmsuffix.tt">Суффикс алгоритма шифрования</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipherkeylength">Длина ключа</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipherkeylength.tt">Длина ключа шифрования</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations">Число итераций</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations.tt">Число итерация шифрования</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt">Соль шифра</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt.tt">Соль шифра</key>
 	
 <!-- локализация для ключей KeyStoreViewer -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Подтвердить удаление...</key>

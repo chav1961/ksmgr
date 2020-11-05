@@ -17,14 +17,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
@@ -34,14 +37,26 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.PKIXParameters;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
@@ -60,17 +75,33 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.pkcs.SignedData;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.cert.CertIOException;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 
 import chav1961.ksmgr.dialogs.AskPasswordDialog;
+import chav1961.ksmgr.dialogs.AskServerURIDialog;
 import chav1961.ksmgr.dialogs.ChangePasswordDialog;
 import chav1961.ksmgr.dialogs.CreateKeystoreDialog;
 import chav1961.ksmgr.dialogs.CurrentSettingsDialog;
+import chav1961.ksmgr.dialogs.EncryptFileDialog;
 import chav1961.ksmgr.dialogs.KeyPairCreateDialog;
 import chav1961.ksmgr.dialogs.OpenKeystoreDialog;
 import chav1961.ksmgr.dialogs.SelfSignedCertificateCreateDialog;
@@ -88,6 +119,7 @@ import chav1961.ksmgr.internal.RightPanelContainer.RightPanelType;
 import chav1961.purelib.basic.ArgParser;
 import chav1961.purelib.basic.MimeType;
 import chav1961.purelib.basic.PureLibSettings;
+import chav1961.purelib.basic.SocketUtils;
 import chav1961.purelib.basic.SubstitutableProperties;
 import chav1961.purelib.basic.Utils;
 import chav1961.purelib.basic.exceptions.ContentException;
@@ -133,8 +165,13 @@ public class Application extends JFrame implements LocaleChangeListener {
 	public static final String				LEFT_PLACEHOLDER_APPLICATION = "application.placeholder.left";
 
 	private static final String				KEYSTORE_TARGET = "keystore.target";
+	private static final Set<String>		SCHEMES = new HashSet<>();
 
 	private static Application				application;
+	
+	static {
+		SCHEMES.add("https");
+	}
 
 	private final ContentMetadataInterface 	app;
 	private final Localizer					localizer;
@@ -622,6 +659,28 @@ public class Application extends JFrame implements LocaleChangeListener {
 	
 	@OnAction("action:/certificatesImportFromServer")
 	private void certificatesImportFromServer() {
+		final AskServerURIDialog	asud = new AskServerURIDialog(state);
+		
+		if (ask(asud,250,60)) {
+			try{final URI			serverUri = asud.serverURI;
+		
+				if (!SCHEMES.contains(serverUri.getScheme())) {
+					throw new IOException("Invalid URI ["+serverUri+"] to get certificates: must be absoulte and can use 'https' schemes only");
+				}
+				else {
+					state.message(Severity.info,"Sending request to ["+serverUri+"], please wait...");
+					if (!SocketUtils.collectSSLCertificates(serverUri, current)) {
+						state.message(Severity.warning,"No any certifictes on the ["+serverUri+"]");
+					}
+					else {
+						state.message(Severity.info,"Certificate loading complete");
+						pamm.getLeftComponent().refresh();
+					}
+				}
+			} catch (IOException exc) {
+				state.message(Severity.error,"Error getting certificates: "+exc.getLocalizedMessage());
+			}
+		}
 	}
 	
 	@OnAction("action:/certificatesPrepareRequest")
@@ -711,6 +770,82 @@ public class Application extends JFrame implements LocaleChangeListener {
 		
 	}
 
+// https://habr.com/ru/post/353586/	
+	@OnAction("action:/certificatesSignClient")
+	private void certificatesSignClient() throws Exception {
+		try(final FileSystemInterface	fs = fsi.clone().open(pamm.getRightContainer().getCurrentFileSystemFile());
+			final Reader				rdr = fs.charRead();
+			final PEMParser				parser = new PEMParser(rdr)) {
+			
+					    // Signing CSR
+			AlgorithmIdentifier sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find("SHA1withRSA");
+
+					    X500Name serverCertificate = null;
+						PKCS10CertificationRequest jcaPKCS10CertificationRequest = null;
+						X509v3CertificateBuilder certificateBuilder = new JcaX509v3CertificateBuilder(
+					        serverCertificate, 
+					        new BigInteger("1"), //serial
+					        new Date(System.currentTimeMillis()),
+					        new Date(System.currentTimeMillis() + 30L * 365L * 24L * 60L * 60L * 1000L),
+					        jcaPKCS10CertificationRequest.getSubject(),
+					        /*jcaPKCS10CertificationRequest.getSubjectPublicKeyInfo().getPublicKey()*/null
+					    /*).addExtension(
+					        new ASN1ObjectIdentifier("2.5.29.35"),
+					        false,
+					        new AuthorityKeyIdentifier(...)*/
+					    ).addExtension(
+					            new ASN1ObjectIdentifier("2.5.29.19"),
+					            false,
+					            new BasicConstraints(false) // true if it is allowed to sign other certs
+					    ).addExtension(
+					            new ASN1ObjectIdentifier("2.5.29.15"),
+					            true,
+					            new X509KeyUsage(
+					                X509KeyUsage.digitalSignature |
+					                    X509KeyUsage.nonRepudiation   |
+					                    X509KeyUsage.keyEncipherment  |
+					                    X509KeyUsage.dataEncipherment));
+
+					    KeyPair keyPair = null;
+						AsymmetricKeyParameter asymmetricKeyParameter =
+					          PrivateKeyFactory.createKey(keyPair.getPrivate().getEncoded());
+					    //ContentSigner sigGen = new BcRSAContentSignerBuilder(sigAlgId, digAlgId).build(asymmetricKeyParameter);
+					    ContentSigner sigGen = new JcaContentSignerBuilder("SHA1withRSA").build(keyPair.getPrivate());
+
+
+					    X509CertificateHolder x509CertificateHolder = certificateBuilder.build(sigGen);
+//					    org.spongycastle.asn1.x509.Certificate eeX509CertificateStructure =
+					      x509CertificateHolder.toASN1Structure();
+	//				    return eeX509CertificateStructure;
+
+			
+		}
+	}	
+
+//	  private X509Certificate readCertificateFromASN1Certificate(
+//			    org.spongycastle.asn1.x509.Certificate eeX509CertificateStructure,
+//			    CertificateFactory certificateFactory)
+//			    throws IOException, CertificateException {
+//			    // Read Certificate
+//			    InputStream is1 = new ByteArrayInputStream(eeX509CertificateStructure.getEncoded());
+//			    X509Certificate signedCertificate =
+//			      (X509Certificate) certificateFactory.generateCertificate(is1);
+//			    return signedCertificate;
+//			  }
+//
+//			  private String convertCertificateToPEM(X509Certificate signedCertificate) throws IOException {
+//			    StringWriter signedCertificatePEMDataStringWriter = new StringWriter();
+//			    JcaPEMWriter pemWriter = new JcaPEMWriter(signedCertificatePEMDataStringWriter);
+//			    pemWriter.writeObject(signedCertificate);
+//			    pemWriter.close();
+//			    log.info("PEM data:");
+//			    log.info("" + signedCertificatePEMDataStringWriter.toString());
+//			    return signedCertificatePEMDataStringWriter.toString();
+//			  }			
+	
+	
+	
+	
 	@OnAction("action:/certificatesSignServer")
 	private void certificatesSignServer() throws Exception {
 	}	
@@ -741,10 +876,82 @@ public class Application extends JFrame implements LocaleChangeListener {
 	
 	@OnAction("action:/encrypt")
 	private void encrypt() {
+		final EncryptFileDialog		efd = new EncryptFileDialog(state, algo, settings.preferredProvider, settings.currentSalt);
+		
+		if (ask(efd,350,150)) {
+			final ItemDescriptor	desc = (ItemDescriptor) pamm.getLeftComponent().getModel().getValueAt(pamm.getLeftComponent().getSelectedRow(),0); 
+			final AskPasswordDialog	apd = new AskPasswordDialog(state);
+			
+			if (askPassword(apd,desc.alias)) {
+				try{final JFileList	right = (JFileList)pamm.getRightComponent();
+					final Cipher	cipher = generateEncryptCypher(efd.cipherAlgorithm+"/"+efd.cipherAlgorithmSuffix, settings.preferredProvider, apd.password, efd.currentSalt, efd.iterations, efd.cipherKeyLength.getKeyLength());
+					
+					for (JFileListItemDescriptor item : right.getSelectedValuesList()) {
+						final String	name = item.getPath();
+						
+						try(final FileSystemInterface	fsIn = fsi.clone().open(name);
+							final FileSystemInterface	fsOut = fsi.clone().open(name+".enc").create();
+							final InputStream			is = fsIn.read();
+							final OutputStream			os = fsOut.write()) {
+							final byte[]				buffer = new byte[8192];
+							int		len;
+							
+							while ((len = is.read(buffer)) > 0) {
+								os.write(cipher.update(buffer,0,len));
+							}
+							os.write(cipher.doFinal());
+							os.flush();
+						} catch (IOException e) {
+							state.message(Severity.error,"Error encrypting file ["+item.getPath()+"]: "+e.getLocalizedMessage());
+						}
+					}
+					pamm.refreshRightComponent();
+					state.message(Severity.info,"Encryption completed");
+				} catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeySpecException | NoSuchProviderException e) {
+					state.message(Severity.error,"Error encrypting file: "+e.getLocalizedMessage());
+				}
+			}
+		}
 	}	
 	
 	@OnAction("action:/decrypt")
 	private void decrypt() {
+		final EncryptFileDialog		efd = new EncryptFileDialog(state, algo, settings.preferredProvider, settings.currentSalt);
+		
+		if (ask(efd,350,150)) {
+			final ItemDescriptor	desc = (ItemDescriptor) pamm.getLeftComponent().getModel().getValueAt(pamm.getLeftComponent().getSelectedRow(),0); 
+			final AskPasswordDialog	apd = new AskPasswordDialog(state);
+			
+			if (askPassword(apd,desc.alias)) {
+				try{final JFileList	right = (JFileList)pamm.getRightComponent();
+					final Cipher	cipher = generateDecryptCypher(efd.cipherAlgorithm+"/"+efd.cipherAlgorithmSuffix, settings.preferredProvider, apd.password, efd.currentSalt, efd.iterations, efd.cipherKeyLength.getKeyLength());
+					
+					for (JFileListItemDescriptor item : right.getSelectedValuesList()) {
+						final String	name = item.getPath();
+						
+						try(final FileSystemInterface	fsIn = fsi.clone().open(name);
+							final FileSystemInterface	fsOut = fsi.clone().open(name.replace(".enc","")).create();
+							final InputStream			is = fsIn.read();
+							final OutputStream			os = fsOut.write()) {
+							final byte[]				buffer = new byte[8192];
+							int		len;
+							
+							while ((len = is.read(buffer)) > 0) {
+								os.write(cipher.update(buffer,0,len));
+							}
+							os.write(cipher.doFinal());
+							os.flush();
+						} catch (IOException e) {
+							state.message(Severity.error,"Error encrypting file ["+item.getPath()+"]: "+e.getLocalizedMessage());
+						}
+					}
+					pamm.refreshRightComponent();
+					state.message(Severity.info,"Encryption completed");
+				} catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeySpecException | NoSuchProviderException e) {
+					state.message(Severity.error,"Error encrypting file: "+e.getLocalizedMessage());
+				}
+			}
+		}
 	}
 	
 	@OnAction("action:/createDigest")
@@ -754,6 +961,41 @@ public class Application extends JFrame implements LocaleChangeListener {
 	@OnAction("action:/validateDigest")
 	private void validateDigest() {
 	}
+	
+	private static Cipher generateEncryptCypher(final String cipherAlgorithm, final String algorithmProvider, final char[] passphrase, final String salt, final int iterations, final int keyLength) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, NoSuchProviderException {
+	    final SecureRandom 	random = new SecureRandom();
+	    final SecretKey 	key = generateKey(passphrase, salt.getBytes(), iterations, keyLength);
+	
+	    final Cipher cipher = Cipher.getInstance(cipherAlgorithm, algorithmProvider);
+	    cipher.init(Cipher.ENCRYPT_MODE, key, generateIV(cipher, random), random);
+
+	    return cipher;
+	}
+
+	private static Cipher generateDecryptCypher(final String cipherAlgorithm, final String algorithmProvider, final char[] passphrase, final String salt, final int iterations, final int keyLength) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, NoSuchProviderException {
+	    final SecureRandom 	random = new SecureRandom();
+	    final SecretKey 	key = generateKey(passphrase, salt.getBytes(), iterations, keyLength);
+	
+	    final Cipher cipher = Cipher.getInstance(cipherAlgorithm, algorithmProvider);
+	    cipher.init(Cipher.DECRYPT_MODE, key, generateIV(cipher, random), random);
+
+	    return cipher;
+	}
+	
+	private static SecretKey generateKey(final char[] passphrase, final byte[] salt, final int iterations, final int keyLength) throws InvalidKeySpecException, NoSuchAlgorithmException {
+	    final PBEKeySpec 		keySpec = new PBEKeySpec(passphrase, salt, iterations, keyLength);
+	    final SecretKeyFactory 	keyFactory = SecretKeyFactory.getInstance("PBEWITHSHA256AND256BITAES-CBC-BC");
+	    
+	    return keyFactory.generateSecret(keySpec);
+	}
+
+	private static IvParameterSpec generateIV(final Cipher cipher, final SecureRandom random) {
+	    final byte[] 		ivBytes = new byte[cipher.getBlockSize()];
+	    
+	    random.nextBytes(ivBytes);
+	    return new IvParameterSpec(ivBytes);
+	}
+	
 	
 	//
 	//		Settings submenu processing
