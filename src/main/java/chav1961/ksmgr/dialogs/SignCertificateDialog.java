@@ -62,7 +62,7 @@ public class SignCertificateDialog implements FormManager<Object, SignCertificat
 	}
 
 	@Override
-	public RefreshMode onField(SignCertificateDialog inst, Object id, String fieldName, Object oldValue) throws FlowException, LocalizationException {
+	public RefreshMode onField(SignCertificateDialog inst, Object id, String fieldName, Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
 		return RefreshMode.DEFAULT;
 	}
 

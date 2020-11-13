@@ -5,7 +5,6 @@
 		<app:submenu name="menu.file" caption="menu.file" tooltip="menu.file.tt">
 			<app:item name="menu.file.newkeystore" caption="menu.file.newKeyStore" tooltip="menu.file.newKeyStore.tt" action="newKeyStore"/>
 			<app:item name="menu.file.openkeystore" caption="menu.file.openKeyStore" tooltip="menu.file.openKeyStore.tt" action="openKeyStore"/>
-			<app:item name="menu.file.openkeystorePKCS12" caption="menu.file.openKeyStorePKCS12" tooltip="menu.file.openKeyStorePKCS12.tt" action="openKeyStorePKCS12"/>
 			<app:submenu name="menu.file.lru" caption="menu.file.lru" tooltip="menu.file.lru.tt">
 				<app:placeholder/>
 			</app:submenu>
@@ -44,9 +43,10 @@
 				<app:separator/>
 				<app:item name="menu.tasks.certificates.selfsigned" caption="menu.tasks.certificates.selfsigned" tooltip="menu.tasks.certificates.selfsigned.tt" action="certificatesCreateSelfsigned"/>
 			</app:submenu>
-			<app:submenu name="menu.tasks.3DESkeys" caption="menu.tasks.3DESkeys" tooltip="menu.tasks.3DESkeys.tt">
-				<app:item name="menu.tasks.3DESkeys.generate" caption="menu.tasks.3DESkeys.generate" tooltip="menu.tasks.3DESkeys.generate.tt" action="3DESGenerate"/>
-				<app:item name="menu.tasks.3DESkeys.import" caption="menu.tasks.3DESkeys.import" tooltip="menu.tasks.3DESkeys.import.tt" action="3DESImport"/>
+			<app:submenu name="menu.tasks.keys" caption="menu.tasks.keys" tooltip="menu.tasks.keys.tt">
+				<app:item name="menu.tasks.keys.generate" caption="menu.tasks.keys.generate" tooltip="menu.tasks.keys.generate.tt" action="keyGenerate"/>
+				<app:item name="menu.tasks.keys.export" caption="menu.tasks.keys.export" tooltip="menu.tasks.keys.export.tt" action="keyExport"/>
+				<app:item name="menu.tasks.keys.import" caption="menu.tasks.keys.import" tooltip="menu.tasks.keys.import.tt" action="keyImport"/>
 			</app:submenu>
 			<app:separator/>
 			<app:submenu name="menu.tasks.crypto" caption="menu.tasks.crypto" tooltip="menu.tasks.crypto.tt">
@@ -103,8 +103,8 @@
 		<app:submenuref name="popup.tasks.certificates" ref="menu.tasks.certificates">
 			<app:itemref name="popup.tasks.certificates.loadtrusted" ref="menu.tasks.certificates.loadtrusted"/>
 		</app:submenuref>
-		<app:submenuref name="popup.tasks.3DESkeys" ref="menu.tasks.3DESkeys">
-			<app:itemref name="popup.tasks.3DESkeys.import" ref="menu.tasks.3DESkeys.import"/>
+		<app:submenuref name="popup.tasks.keys" ref="menu.tasks.keys">
+			<app:itemref name="popup.tasks.keys.import" ref="menu.tasks.keys.import"/>
 		</app:submenuref>
 		<app:submenuref name="popup.tasks.crypto" ref="menu.tasks.crypto">
 			<app:itemref name="popup.tasks.crypto.encript" ref="menu.tasks.crypto.encript"/>

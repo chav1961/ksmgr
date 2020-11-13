@@ -1,0 +1,23 @@
+== Создание секретного ключа ==
+
+Секретный ключ (secret key) используется в различных алгоритмах [[https://ru.wikipedia.org/wiki/%D0%A1%D0%B8%D0%BC%D0%BC%D0%B5%D1%82%D1%80%D0%B8%D1%87%D0%BD%D1%8B%D0%B5_%D0%BA%D1%80%D0%B8%D0%BF%D1%82%D0%BE%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D1%8B|симметричного шифрования]].
+Секретный ключ может храниться как в виде отдельного файла, так и быть помещен в репозитарий ключей. Следует, //однако//, отметить, что не любой тип репозитария может хранить секретные ключи (в частности, "родной" для Java тип репозитария **PKCS12** этого делать не может). 
+
+При создании секретного ключа задаются:
+
+* алгоритм шифрования (для российских реалий, в частности, полезен алгоритм **PBEWITHHMACGOST3411** по [[http://docs.cntd.ru/document/gost-r-34-11-2012|ГОСТ 34.11]])
+* размер блока шифрования
+* число итераций преобразования исходных данных в процессе шифрования
+* [[https://ru.wikipedia.org/wiki/%D0%A1%D0%BE%D0%BB%D1%8C_(%D0%BA%D1%80%D0%B8%D0%BF%D1%82%D0%BE%D0%B3%D1%80%D0%B0%D1%84%D0%B8%D1%8F)|соль]] ключа 
+
+=== Заметки для программиста ===
+
+Конкретно в этом приложении генерация симметричного ключа осуществляется следующим образом:
+
+{{{
+		final SecretKeyFactory	keyFactory = SecretKeyFactory.getInstance(kcd.keyAlgorithm);
+		final PBEKeySpec 		keySpec = new PBEKeySpec(kcd.password, kcd.currentSalt.getBytes(), kcd.iterations, kcd.cipherKeyLength.getKeyLength());
+		final SecretKey 		key = keyFactory.generateSecret(keySpec);
+}}}
+
+В [[https://www.bouncycastle.org/fips-java/BCFipsIn100.pdf|книге]] этому коду примерно соответствуют примеры № **4** и **60**

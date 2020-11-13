@@ -9,6 +9,7 @@ import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.purelib.basic.exceptions.FlowException;
 import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
+import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
 import chav1961.purelib.i18n.interfaces.LocaleResource;
 import chav1961.purelib.i18n.interfaces.LocaleResourceLocation;
 import chav1961.purelib.ui.interfaces.FormManager;
@@ -41,8 +42,12 @@ public class EncryptFileDialog implements FormManager<Object, EncryptFileDialog>
 	@LocaleResource(value="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt",tooltip="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt.tt")
 	@Format("30sm")
 	public String				currentSalt;
+
+	@LocaleResource(value="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed",tooltip="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed.tt")
+	@Format("30sm")
+	public long					currentRandomSeed;
 	
-	public EncryptFileDialog(final LoggerFacade facade, final AlgorithmRepo repo, final String provider, final String currentSalt) {
+	public EncryptFileDialog(final LoggerFacade facade, final AlgorithmRepo repo, final String provider, final String currentSalt, final long currentRandomSeed) {
 		if (facade == null) {
 			throw new NullPointerException("Logger facade can't be null"); 
 		}
@@ -60,12 +65,32 @@ public class EncryptFileDialog implements FormManager<Object, EncryptFileDialog>
 			this.repo = repo;
 			this.provider = provider;
 			this.currentSalt = currentSalt;
+			this.currentRandomSeed = currentRandomSeed;
 		}
 	}
 
 	@Override
-	public RefreshMode onField(final EncryptFileDialog inst, final Object id, final String fieldName, final Object oldValue) throws FlowException, LocalizationException {
-		return RefreshMode.DEFAULT;
+	public RefreshMode onField(final EncryptFileDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
+		switch (fieldName) {
+			case "cipherAlgorithm"			:
+				if (cipherAlgorithm.trim().isEmpty()) {
+					getLogger().message(Severity.warning,"Field must be filled!");
+					return RefreshMode.REJECT;
+				}
+				else {
+					return RefreshMode.DEFAULT;
+				}
+			case "cipherAlgorithmSuffix"	:
+				if (cipherAlgorithmSuffix.trim().isEmpty()) {
+					getLogger().message(Severity.warning,"Field must be filled!");
+					return RefreshMode.REJECT;
+				}
+				else {
+					return RefreshMode.DEFAULT;
+				}
+			default :
+				return RefreshMode.DEFAULT;
+		}
 	}
 
 	@Override
@@ -74,7 +99,7 @@ public class EncryptFileDialog implements FormManager<Object, EncryptFileDialog>
 	}
 
 	@Override
-	public String[] getForEditorContent(final EncryptFileDialog inst, final Object id, final String fieldName, final Object... parameters) throws FlowException {
+	public <T> T[] getForEditorContent(final EncryptFileDialog inst, final Object id, final String fieldName, final Object... parameters) throws FlowException {
 		switch (fieldName) {
 			case "cipherAlgorithm"	: 
 				final Set<String>	algorithms = new HashSet<>();
@@ -85,7 +110,7 @@ public class EncryptFileDialog implements FormManager<Object, EncryptFileDialog>
 						algorithms.add(item);
 					}
 				}
-				return algorithms.toArray(new String[algorithms.size()]);
+				return (T[])algorithms.toArray(new String[algorithms.size()]);
 			default :
 				return null;
 		}

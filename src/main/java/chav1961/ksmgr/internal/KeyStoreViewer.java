@@ -13,7 +13,10 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStore.SecretKeyEntry;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.crypto.SecretKey;
 import javax.imageio.ImageIO;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
@@ -57,10 +61,12 @@ public class KeyStoreViewer extends JTable {
 	
 	public enum KeyStoreViewerSelectionType {
 		NONE,
-		EXACTLY_ONE_KEY,
+		EXACTLY_ONE_KEY_PAIR,
 		EXACTLY_ONE_CERTIFICATE,
-		KEYS_ONLY,
+		EXACTLY_ONE_SECRET_KEY,
+		KEY_PAIRS_ONLY,
 		CERTIFICATES_ONLY,
+		SECRET_KEYS_ONLY,
 		MIX
 	}
 	
@@ -178,10 +184,10 @@ public class KeyStoreViewer extends JTable {
 		if (row >= 0) {
 			try{final ItemDescriptor	desc = (ItemDescriptor) getModel().getValueAt(row, 0);
 				final Certificate		cert = store.getCertificate(desc.alias);
+				final StringBuilder		sb = new StringBuilder();
 
 				if (cert != null) {
 					if (cert instanceof X509Certificate) {
-						final StringBuilder		sb = new StringBuilder();
 						final X509Certificate	x509 = (X509Certificate)cert; 
 						
 						sb.append("type=").append(x509.getType()).append(", version=").append(x509.getVersion()).append("<br>");
@@ -192,15 +198,33 @@ public class KeyStoreViewer extends JTable {
 						if (repo.hasPasswordFor(desc.alias)) {
 							sb.append("<font color=red>Password keeps!</font><br>");
 						}
-						return "<html><body>"+sb+"</body></html>";
 					}
 					else {
 						return null;
 					}
 				}
+				else if (store.entryInstanceOf(desc.alias, PrivateKeyEntry.class)) {
+					sb.append("Private key<br/>");
+					if (repo.hasPasswordFor(desc.alias)) {
+						try{sb.append("Algorithm=").append(store.getKey(desc.alias, repo.getPasswordFor(desc.alias)).getAlgorithm()).append("<br/>");
+						} catch (UnrecoverableKeyException | NoSuchAlgorithmException e) {
+						}
+						sb.append("<font color=red>Password keeps!</font><br>");
+					}
+				}
+				else if (store.entryInstanceOf(desc.alias, SecretKeyEntry.class)) {
+					sb.append("Secret key<br/>");
+					if (repo.hasPasswordFor(desc.alias)) {
+						try{sb.append("Algorithm=").append(store.getKey(desc.alias, repo.getPasswordFor(desc.alias)).getAlgorithm()).append("<br/>");
+						} catch (UnrecoverableKeyException | NoSuchAlgorithmException e) {
+						}
+						sb.append("<font color=red>Password keeps!</font><br>");
+					}
+				}
 				else {
 					return null;
 				}
+				return "<html><body>"+sb+"</body></html>";
 			} catch (KeyStoreException e) {
 				return null;
 			}
@@ -227,7 +251,9 @@ public class KeyStoreViewer extends JTable {
 				case CERTIFICATE	:
 					return KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE;
 				case KEY_PAIR		:
-					return KeyStoreViewerSelectionType.EXACTLY_ONE_KEY;
+					return KeyStoreViewerSelectionType.EXACTLY_ONE_KEY_PAIR;
+				case SECRET_KEY		:
+					return KeyStoreViewerSelectionType.EXACTLY_ONE_SECRET_KEY;
 				case UNKNOWN		:
 					return KeyStoreViewerSelectionType.NONE;
 				default	:
@@ -245,7 +271,10 @@ public class KeyStoreViewer extends JTable {
 					return KeyStoreViewerSelectionType.CERTIFICATES_ONLY;
 				}
 				else if (types.contains(ItemType.KEY_PAIR)) {
-					return KeyStoreViewerSelectionType.KEYS_ONLY;
+					return KeyStoreViewerSelectionType.KEY_PAIRS_ONLY;
+				}
+				else if (types.contains(ItemType.SECRET_KEY)) {
+					return KeyStoreViewerSelectionType.SECRET_KEYS_ONLY;
 				}
 				else {
 					return KeyStoreViewerSelectionType.NONE;
@@ -257,7 +286,6 @@ public class KeyStoreViewer extends JTable {
 		}
 	}
 	
-//	@OnAction("action:/delete")
 	public void deleteItems() {
 		final int[]	indices = getSelectionModel().getSelectedIndices();
 		
@@ -292,7 +320,6 @@ public class KeyStoreViewer extends JTable {
 		}
 	}
 
-//	@OnAction("action:/rename")
 	public void rename() {
 		editCellAt(getSelectionModel().getMinSelectionIndex(),0);
 	}
@@ -313,11 +340,11 @@ public class KeyStoreViewer extends JTable {
 	public static class KeyStoreModel extends DefaultTableModel {
 		private static final long serialVersionUID = -3488066941423522586L;
 		
-		private final String				keyStoreName;
 		private final KeyStore				ks;
 		private final LoggerFacade			logger;
 		private final PasswordsRepo			repo;
 		private final List<ItemDescriptor>	list = new ArrayList<>();
+		private String						keyStoreName;
 
 		public KeyStoreModel(final String keyStoreName, final KeyStore ks, final LoggerFacade logger, final PasswordsRepo repo) {
 			if (keyStoreName == null) {
@@ -357,7 +384,7 @@ public class KeyStoreViewer extends JTable {
 
 		@Override
 		public String getColumnName(final int columnIndex) {
-			return keyStoreName;
+			return keyStoreName + ": " + ks.getType();
 		}
 
 		@Override
@@ -392,7 +419,18 @@ public class KeyStoreViewer extends JTable {
 						list.add(new ItemDescriptor(item,ItemDescriptor.ItemType.CERTIFICATE, null));
 					}
 					else if (ks.isKeyEntry(item)) {
-						list.add(new ItemDescriptor(item,ItemDescriptor.ItemType.KEY_PAIR, null));
+						if (ks.entryInstanceOf(item, PrivateKeyEntry.class)) {
+							list.add(new ItemDescriptor(item,ItemDescriptor.ItemType.KEY_PAIR, null));
+						}
+						else if (ks.entryInstanceOf(item, SecretKeyEntry.class)) {
+							list.add(new ItemDescriptor(item,ItemDescriptor.ItemType.SECRET_KEY, null));
+						}
+						else {
+							list.add(new ItemDescriptor(item,ItemDescriptor.ItemType.UNKNOWN, null));
+						}
+					}
+					else {
+						list.add(new ItemDescriptor(item,ItemDescriptor.ItemType.UNKNOWN, null));
 					}
 				}
 				fireTableDataChanged();
@@ -401,6 +439,17 @@ public class KeyStoreViewer extends JTable {
 			}
 		}
 
+		public void setKeyStoreName(final String name) {
+			if (name == null || name.isEmpty()) {
+				throw new IllegalArgumentException("Key store name can't be null or empty");
+			}
+			else {
+				keyStoreName = name;
+				fireTableStructureChanged();
+				fireTableDataChanged();
+			}
+		}
+		
 		private void renameItem(final ItemDescriptor desc, final String newAlias) {
 			try{if (ks.containsAlias(newAlias)) {
 					logger.message(Severity.error,"Alias ["+newAlias+"] already exists in the key store");
@@ -445,7 +494,8 @@ public class KeyStoreViewer extends JTable {
 	public static class ItemDescriptor {
 		public enum ItemType {
 			CERTIFICATE("certificate.png"),
-			KEY_PAIR("key.png"),
+			KEY_PAIR("keypair.png"),
+			SECRET_KEY("key.png"),
 			UNKNOWN("unknown.png");
 			
 			private final String iconName; 

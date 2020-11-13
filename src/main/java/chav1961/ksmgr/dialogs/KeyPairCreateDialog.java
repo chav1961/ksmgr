@@ -19,12 +19,11 @@ import chav1961.purelib.ui.interfaces.FormManager;
 import chav1961.purelib.ui.interfaces.Format;
 import chav1961.purelib.ui.interfaces.RefreshMode;
 
-@LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.dialogs.CreateKeystoreDialog/chav1961/ksmgr/i18n/i18n.xml")
+@LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.dialogs.KeyPairCreateDialog/chav1961/ksmgr/i18n/i18n.xml")
 @LocaleResource(value="chav1961.ksmgr.dialogs.keypaircreatedialog",tooltip="chav1961.ksmgr.dialogs.keypaircreatedialog.tt",help="help.aboutApplication")
 public class KeyPairCreateDialog implements FormManager<Object, KeyPairCreateDialog> {
 	private final LoggerFacade 	facade;
 	private final KeyStore 		ks;
-
 
 	@LocaleResource(value="chav1961.ksmgr.dialogs.keypaircreatedialog.keylength",tooltip="chav1961.ksmgr.dialogs.keypaircreatedialog.keylength.tt")
 	@Format("30m")
@@ -52,7 +51,7 @@ public class KeyPairCreateDialog implements FormManager<Object, KeyPairCreateDia
 	}
 	
 	@Override
-	public RefreshMode onField(final KeyPairCreateDialog inst, final Object id, final String fieldName, final Object oldValue) throws FlowException, LocalizationException {
+	public RefreshMode onField(final KeyPairCreateDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
 		switch (fieldName) {
 			case "alias"	:
 				try{final Enumeration<String>	aliases = ks.aliases();

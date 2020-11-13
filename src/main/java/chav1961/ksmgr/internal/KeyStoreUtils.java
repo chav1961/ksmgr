@@ -18,6 +18,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -63,9 +64,31 @@ import org.bouncycastle.util.encoders.Base64;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
 import chav1961.purelib.fsys.interfaces.FileSystemInterface;
+import chav1961.purelib.ui.interfaces.RefreshMode;
 
 public class KeyStoreUtils {
 	private static final String			DEFAULT_ENCODING = "UTF-8";
+	
+	public static boolean isAliasInKeyStore(final String alias, final KeyStore ks) throws KeyStoreException, IllegalArgumentException, NullPointerException {
+		if (alias == null || alias.isEmpty()) {
+			throw new IllegalArgumentException("Alias name can't be null or empty"); 
+		}
+		else if (ks == null) {
+			throw new NullPointerException("Key store can't be null"); 
+		}
+		else {
+			final Enumeration<String>	aliases = ks.aliases();
+				
+			while (aliases.hasMoreElements()) {
+				final String	name = aliases.nextElement();
+				
+				if (alias.equals(name)) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
 	
 	public static String keyPairsImport(final FileSystemInterface fsi, final LoggerFacade logger, final String from, final KeyStore to, final char[] password) {
 		final String	file = from;

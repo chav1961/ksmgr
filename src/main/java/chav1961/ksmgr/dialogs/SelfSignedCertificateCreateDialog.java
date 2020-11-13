@@ -108,7 +108,7 @@ public class SelfSignedCertificateCreateDialog implements FormManager<Object, Se
 	}
 
 	@Override
-	public RefreshMode onField(final SelfSignedCertificateCreateDialog inst, final Object id, final String fieldName, final Object oldValue) throws FlowException, LocalizationException {
+	public RefreshMode onField(final SelfSignedCertificateCreateDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
 		switch (fieldName) {
 			case "alias"	:
 				try{final Enumeration<String>	aliases = ks.aliases();

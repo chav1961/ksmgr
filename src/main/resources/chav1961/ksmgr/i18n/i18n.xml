@@ -14,8 +14,6 @@
 		<key name="menu.file.newKeyStore.tt">Create new keystore and open it</key>
 		<key name="menu.file.openKeyStore">Open keystore</key>
 		<key name="menu.file.openKeyStore.tt">Open existent keystore</key>
-		<key name="menu.file.openKeyStorePKCS12">Open PKCS12 keystore</key>
-		<key name="menu.file.openKeyStorePKCS12.tt">Open existent PKCS12 keystore</key>
 		<key name="menu.file.lru">Open last used...</key>
 		<key name="menu.file.lru.tt">Open last recently used repositories</key>
 		<key name="menu.file.saveKeyStore">Save keystore</key>
@@ -78,12 +76,14 @@
 		<key name="menu.tasks.certificates.signserver.tt">Sign server certificate</key>
 		<key name="menu.tasks.certificates.selfsigned">Self-signed</key>
 		<key name="menu.tasks.certificates.selfsigned.tt">Create self-signed certificate</key>
-		<key name="menu.tasks.3DESkeys">3DES keys</key>
-		<key name="menu.tasks.3DESkeys.tt">3DES keys manipulation</key>
-		<key name="menu.tasks.3DESkeys.generate">Create</key>
-		<key name="menu.tasks.3DESkeys.generate.tt">Create 3DES keys</key>
-		<key name="menu.tasks.3DESkeys.import">Import</key>
-		<key name="menu.tasks.3DESkeys.import.tt">Import 3DES keys</key>
+		<key name="menu.tasks.keys">Symmetrical keys</key>
+		<key name="menu.tasks.keys.tt">Symmetrical keys manipulation</key>
+		<key name="menu.tasks.keys.generate">Create</key>
+		<key name="menu.tasks.keys.generate.tt">Create symmetrical key</key>
+		<key name="menu.tasks.keys.export">Export</key>
+		<key name="menu.tasks.keys.export.tt">Upload symmetrical key from repository to file system</key>
+		<key name="menu.tasks.keys.import">Import</key>
+		<key name="menu.tasks.keys.import.tt">Download symmetrical key from fiel system into repository</key>
 		<key name="menu.tasks.crypto">Cryptography</key>
 		<key name="menu.tasks.crypto.tt">Make cryptografical actions</key>
 		<key name="menu.tasks.crypto.encript">Encript file</key>
@@ -102,15 +102,25 @@
 		<key name="menu.help.about.tt">Help about application</key>
 		
 <!-- Localization for enumerations -->		
-		<key name="chav1961.ksmgr.interfaces.keystoretype.pkcs12">PKCS12</key>
-		<key name="chav1961.ksmgr.interfaces.keystoretype.pkcs12.tt">PKCS12 keystore type</key>
-		
 		<key name="chav1961.ksmgr.interfaces.keylength.1024">1024 bit</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.1024.tt">Key length = 1024 bits</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.2048">2048 bit</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.2048.tt">Key length = 2048 bits</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.4096">4096 bit</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.4096.tt">Key length = 4095 bits</key>
+
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.128">128 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.128.tt">Encrypt block length = 128 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.256">256 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.256.tt">Encrypt block length = 256 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.512">512 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.512.tt">Encrypt block length = 512 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.1024">1024 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.1024.tt">Encrypt block length = 1024 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.2048">2048 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.2048.tt">Encrypt block length = 2048 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.4096">4096 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.4096.tt">Encrypt block length = 4096 bit</key>
 
 		<key name="chav1961.ksmgr.interfaces.securityalgorithm.rsa">RSA</key>
 		<key name="chav1961.ksmgr.interfaces.securityalgorithm.rsa.tt">RSA algorithm</key>
@@ -125,6 +135,7 @@
 <!-- Localization for 'create keystore' dialog -->		
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Create key store</key>
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.tt">Create new key store with the given type and password</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.help">uri(chav1961.ksmgr.dialogs.createkeystoredialog.cre)</key>
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type">Keystore type</key>
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt">Type of the key store</key>
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password">Password</key>
@@ -159,7 +170,8 @@
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt">Default principal name (used in self-signed certificates, certificate requests etc...)</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt">Default salt</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt.tt">Default salt to use in encryption/decryption tasks</key>
-		
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed">Default random seed</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed.tt">Default random seed to use in encryption/decryption tasks</key>
 
 <!-- Localization for 'key pair/generate' dialog -->		
 		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog">Key pair generation</key>
@@ -221,6 +233,36 @@
 		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri">Server URI</key>
 		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri.tt">Serve URI to get certificated from. Must be absolute and have 'https:' scheme</key>
 
+<!-- Localization for 'create key' dialog -->		
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog">Create key</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.tt">Create secret key</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.help">uri(chav1961.ksmgr.dialogs.keycreatedialog.cre)</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keyalgorithm">Key algorithm</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keyalgorithm.tt">Encrypting algorithm for key</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keylength">Block size</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keylength.tt">Size of encrypted data block</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.iterations">Number of iterations</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.iterations.tt">Number of encryption iterations</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.currentsalt">Salt</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.currentsalt.tt">Salt for key to generate</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.password">Password</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.password.tt">Key password</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.passwordretype">Retype password</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.passwordretype.tt">Retype key password</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.alias">Alias name</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.alias.tt">Alias name for key in the key store</key>
+
+<!-- Localization for 'import key' dialog -->		
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog">Import key</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.tt">Import secret key</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.help">uri(chav1961.ksmgr.dialogs.keyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm">Key algorithm</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm.tt">Encrypting algorithm for key</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.password">Password to store</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.password.tt">Password for the imported key in the key store</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias">Alias name</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias.tt">Alias name for key in the key store</key>
+
 <!-- Localization for 'encrypt file' dialog-->		
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog">Encrypt file</key>
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.tt">Encrypt selected file(s) with selected key</key>
@@ -234,6 +276,8 @@
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations.tt">Number of cipher iterations</key>
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt">Encrypted salt</key>
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt.tt">Salt for encryption</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed">Random seed</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed.tt">Random seed for encryption</key>
 
 <!-- Localization for KeyStoreViewer keys -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Confirm deletion...</key>
@@ -255,8 +299,6 @@
 		<key name="menu.file.newKeyStore.tt">Создать новый репозитарий и открыть его</key>
 		<key name="menu.file.openKeyStore">Открыть репозитарий</key>
 		<key name="menu.file.openKeyStore.tt">Открыть существующий репозитарий</key>
-		<key name="menu.file.openKeyStorePKCS12">Открыть PKCS12 репозитарий</key>
-		<key name="menu.file.openKeyStorePKCS12.tt">Открыть существующий репозитарий формата PKCS12</key>
 		<key name="menu.file.lru">Открыть последние...</key>
 		<key name="menu.file.lru.tt">Открыть последние использованные репозитарии</key>
 		<key name="menu.file.saveKeyStore">Сохранить репозитарий</key>
@@ -319,12 +361,14 @@
 		<key name="menu.tasks.certificates.signserver.tt">Подписать серверный сертификат</key>
 		<key name="menu.tasks.certificates.selfsigned">Самоподписанный</key>
 		<key name="menu.tasks.certificates.selfsigned.tt">Создать самоподписанный сертификат</key>
-		<key name="menu.tasks.3DESkeys">3DES ключи</key>
-		<key name="menu.tasks.3DESkeys.tt">Манипуляция 3DES ключами</key>
-		<key name="menu.tasks.3DESkeys.generate">Создать</key>
-		<key name="menu.tasks.3DESkeys.generate.tt">Сгенерировать 3DES ключи</key>
-		<key name="menu.tasks.3DESkeys.import">Импорт</key>
-		<key name="menu.tasks.3DESkeys.import.tt">Импорт 3DES ключей</key>
+		<key name="menu.tasks.keys">Симм. ключи</key>
+		<key name="menu.tasks.keys.tt">Манипуляция симметричными ключами</key>
+		<key name="menu.tasks.keys.generate">Создать</key>
+		<key name="menu.tasks.keys.generate.tt">Сгенерировать симметричный ключ</key>
+		<key name="menu.tasks.keys.export">Зкспорт</key>
+		<key name="menu.tasks.keys.export.tt">Выгрузить симметричный ключ из репозитерия в файловую систему</key>
+		<key name="menu.tasks.keys.import">Импорт</key>
+		<key name="menu.tasks.keys.import.tt">Загрузить симметричный ключ из файловой системы в репозитарий</key>
 		<key name="menu.tasks.crypto">Криптография</key>
 		<key name="menu.tasks.crypto.tt">Выполнить криптографические действия</key>
 		<key name="menu.tasks.crypto.encript">Зашифровать файл</key>
@@ -343,15 +387,25 @@
 		<key name="menu.help.about.tt">Справка о программе</key>
 	
 <!-- Локализация нумераций -->		
-		<key name="chav1961.ksmgr.interfaces.keystoretype.pkcs12">PKCS12</key>
-		<key name="chav1961.ksmgr.interfaces.keystoretype.pkcs12.tt">тип репозитария PKCS12</key>
-		
 		<key name="chav1961.ksmgr.interfaces.keylength.1024">1024 бита</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.1024.tt">Длина ключа = 1024 бита</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.2048">2048 бит</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.2048.tt">Длина ключа = 2048 бит</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.4096">4096 бит</key>
 		<key name="chav1961.ksmgr.interfaces.keylength.4096.tt">Длина ключа = 4095 бит</key>
+		
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.128">128 бит</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.128.tt">Размер блока шифрования = 128 бит</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.256">256 бит</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.256.tt">Размер блока шифрования = 256 бит</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.512">512 бит</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.512.tt">Размер блока шифрования = 512 бит</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.1024">1024 бита</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.1024.tt">Размер блока шифрования = 1024 bit</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.2048">2048 бит</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.2048.tt">Размер блока шифрования = 2048 бит</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.4096">4096 бит</key>
+		<key name="chav1961.ksmgr.interfaces.cipherkeylength.4096.tt">Размер блока шифрования = 4096 бит</key>
 		
 		<key name="chav1961.ksmgr.interfaces.securityalgorithm.rsa">RSA</key>
 		<key name="chav1961.ksmgr.interfaces.securityalgorithm.rsa.tt">Алгоритм RSA</key>
@@ -366,6 +420,7 @@
 <!-- Локализация для диалога 'create keystore' -->		
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Создать репозитарий ключей</key>
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.tt">Создать репозитарий ключей с указанным типом и паролем</key>
+		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.help">uri(chav1961.ksmgr.dialogs.createkeystoredialog.cre)</key>
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type">Тип репозитария</key>
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt">Тип репозитария</key>
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password">Пароль</key>
@@ -400,6 +455,9 @@
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt">Имя принципала по умолчанию (используется в самоподписанных сертификатах, запросах сертификатов и т.д.)</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt">Соль по умолчанию</key>
 		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt.tt">Значение соли по умолчанию для операций шифрования/дешифрования</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed">Random seed по умолчанию</key>
+		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed.tt">Значение Random seed по умолчанию для операций шифрования/дешифрования</key>
+
 	
 <!-- Локализация для диалога 'key pair/generate' -->		
 		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog">Генерация пары ключей</key>
@@ -461,6 +519,36 @@
 		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri">URI сервера</key>
 		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri.tt">Адрес сервера, откуда грузить сертификаты. Долежен быть абсолютным и иметь схему 'https:'</key>
 
+<!-- Локализация для диалога 'create key'-->		
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog">Создать ключ</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.tt">Создать секретный ключ</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.help">uri(chav1961.ksmgr.dialogs.keycreatedialog.cre)</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keyalgorithm">Алгоритм ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keyalgorithm.tt">Алгоритм шифрования ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keylength">Длина блока</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keylength.tt">Длина шифруемого блока данных</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.iterations">Число итераций</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.iterations.tt">Число итераций шифрования</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.currentsalt">Соль шифра</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.currentsalt.tt">Соль генерируемого ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.password">Пароль</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.password.tt">Пароль ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.passwordretype">Повторить пароль</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.passwordretype.tt">Повторить пароль ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.alias">Имя ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keycreatedialog.alias.tt">Имя алиаса в памяти ключей</key>
+
+<!-- Локализация для диалога 'import key' -->		
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog">Импорт ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.tt">Импорт секретного ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.help">uri(chav1961.ksmgr.dialogs.keyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm">Алгоритм ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm.tt">Алгоритм шифрования ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.password">Пароль в репозитарии</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.password.tt">Пароль для импортируемого ключа в памяти ключей</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias">Имя ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias.tt">Имя алиаса в памяти ключей</key>
+
 <!-- Локализация для диалога 'encrypt file'-->		
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog">Зашифровать файл</key>
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.tt">Зашифровать выбранные файлы выбранным ключом</key>
@@ -474,6 +562,8 @@
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations.tt">Число итерация шифрования</key>
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt">Соль шифра</key>
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt.tt">Соль шифра</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed">Random seed</key>
+		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed.tt">Random seed для шифрования</key>
 	
 <!-- локализация для ключей KeyStoreViewer -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Подтвердить удаление...</key>

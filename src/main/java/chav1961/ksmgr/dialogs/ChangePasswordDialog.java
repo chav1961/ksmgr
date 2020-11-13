@@ -2,7 +2,6 @@ package chav1961.ksmgr.dialogs;
 
 import java.util.Arrays;
 
-import chav1961.ksmgr.interfaces.KeyStoreType;
 import chav1961.purelib.basic.exceptions.FlowException;
 import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
@@ -40,9 +39,15 @@ public class ChangePasswordDialog implements FormManager<Object, ChangePasswordD
 	}
 	
 	@Override
-	public RefreshMode onField(final ChangePasswordDialog inst, final Object id, final String fieldName, final Object oldValue) throws FlowException, LocalizationException {
+	public RefreshMode onField(final ChangePasswordDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
 		if (!Arrays.equals(password,passwordRetype)) {
-			getLogger().message(Severity.warning,"Password and retype password differ!");
+			if (beforeCommit) {
+				getLogger().message(Severity.error,"Password and retype password differ!");
+				return RefreshMode.REJECT;
+			}
+			else {
+				getLogger().message(Severity.warning,"Password and retype password differ!");
+			}
 		}
 		else {
 			getLogger().message(Severity.info,"Password and retype password identical");

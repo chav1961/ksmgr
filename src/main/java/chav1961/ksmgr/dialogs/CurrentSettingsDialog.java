@@ -1,10 +1,11 @@
 package chav1961.ksmgr.dialogs;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +20,7 @@ import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
 import chav1961.purelib.i18n.interfaces.LocaleResource;
 import chav1961.purelib.i18n.interfaces.LocaleResourceLocation;
+import chav1961.purelib.ui.interfaces.Action;
 import chav1961.purelib.ui.interfaces.FormManager;
 import chav1961.purelib.ui.interfaces.Format;
 import chav1961.purelib.ui.interfaces.RefreshMode;
@@ -33,6 +35,7 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 	public static final String	KEY_PREFERRED_PROVIDER = "preferredProvider";
 	public static final String	KEY_PRINCIPAL_NAME = "principalName";
 	public static final String	KEY_CURRENT_SALT = "currentSalt";
+	public static final String	KEY_CURRENT_RANDOM = "currentRandom";
 	
 	private final LoggerFacade	facade;
 	
@@ -51,6 +54,10 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 	@LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog.currentsalt",tooltip="chav1961.ksmgr.dialogs.settingsdialog.currentsalt.tt")
 	@Format("30sm")
 	public String				currentSalt;
+
+	@LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed",tooltip="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed.tt")
+	@Format("30sm")
+	public long					currentRandomSeed;
 	
 	public String				currentLang;
 	
@@ -80,6 +87,7 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 			this.principalName = props.getProperty(KEY_PRINCIPAL_NAME, String.class, "Self-signed principal");
 			this.currentSalt = props.getProperty(KEY_CURRENT_SALT, String.class, "Hitler kaput!");
 			this.currentLang = props.getProperty(KEY_CURRENT_LANG, String.class, Locale.getDefault().getLanguage());
+			this.currentRandomSeed = props.getProperty(KEY_CURRENT_RANDOM, long.class, String.valueOf((long)(Long.MAX_VALUE*Math.random())));
 		}
 	}
 
@@ -90,6 +98,7 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 		props.setProperty(KEY_PREFERRED_PROVIDER, preferredProvider);
 		props.setProperty(KEY_PRINCIPAL_NAME, principalName);
 		props.setProperty(KEY_CURRENT_SALT, currentSalt);
+		props.setProperty(KEY_CURRENT_RANDOM, String.valueOf(currentRandomSeed));
 		props.setProperty(KEY_CURRENT_LANG, currentLang);
 		
 		if (!content.exists() || content.isFile() && content.canWrite()) {
@@ -106,7 +115,7 @@ public class CurrentSettingsDialog implements FormManager<Object, CurrentSetting
 	}
 	
 	@Override
-	public RefreshMode onField(final CurrentSettingsDialog inst, final Object id, final String fieldName, final Object oldValue) throws FlowException, LocalizationException {
+	public RefreshMode onField(final CurrentSettingsDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
 		return RefreshMode.DEFAULT;
 	}
 

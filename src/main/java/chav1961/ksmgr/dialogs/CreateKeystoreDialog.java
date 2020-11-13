@@ -1,8 +1,10 @@
 package chav1961.ksmgr.dialogs;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
-import chav1961.ksmgr.interfaces.KeyStoreType;
+import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.purelib.basic.exceptions.FlowException;
 import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
@@ -14,13 +16,17 @@ import chav1961.purelib.ui.interfaces.Format;
 import chav1961.purelib.ui.interfaces.RefreshMode;
 
 @LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.dialogs.CreateKeystoreDialog/chav1961/ksmgr/i18n/i18n.xml")
-@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.tt",help="help.aboutApplication")
+@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.tt",help="chav1961.ksmgr.dialogs.createkeystoredialog.help")
 public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreDialog> {
+	private static final String	ALGORITHM_TYPE = "KeyStore";
+	
 	private final LoggerFacade	facade;
+	private final AlgorithmRepo	repo;
+	private final String		provider;
 	
 	@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog.type",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt")
-	@Format("30m")
-	public KeyStoreType			type = KeyStoreType.PKCS12;
+	@Format("30msd")
+	public String				type = "unknown";
 
 	@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog.password",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.password.tt")
 	@Format("30ms")
@@ -30,28 +36,68 @@ public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreD
 	@Format("30ms")
 	public char[]				passwordRetype = null;
 
-	public CreateKeystoreDialog(final LoggerFacade facade) {
+	public CreateKeystoreDialog(final LoggerFacade facade, final AlgorithmRepo repo, final String provider) {
 		if (facade == null) {
 			throw new NullPointerException("Logger facade can't be null"); 
 		}
+		else if (repo == null) {
+			throw new NullPointerException("Algorithm repo can't be null"); 
+		}
+		else if (provider == null || provider.isEmpty()) {
+			throw new IllegalArgumentException("preferred provider can't be null or empty"); 
+		}
 		else {
 			this.facade = facade;
+			this.repo = repo;
+			this.provider = provider;
 		}
 	}
 	
 	@Override
-	public RefreshMode onField(final CreateKeystoreDialog inst, final Object id, final String fieldName, final Object oldValue) throws FlowException, LocalizationException {
-		if (!Arrays.equals(password,passwordRetype)) {
-			getLogger().message(Severity.warning,"Password and retype password differ!");
+	public RefreshMode onField(final CreateKeystoreDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
+		switch (fieldName) {
+			case "password" : case "passwordRetype" :
+				if (!Arrays.equals(password,passwordRetype)) {
+					if (beforeCommit) {
+						getLogger().message(Severity.error,"Password and retype password differ!");
+						return RefreshMode.REJECT;
+					}
+					else {
+						getLogger().message(Severity.warning,"Password and retype password differ!");
+					}
+				}
+				else {
+					getLogger().message(Severity.info,"Password and retype password identical");
+				}
+				return RefreshMode.DEFAULT;
+			default :
+				return RefreshMode.DEFAULT;
 		}
-		else {
-			getLogger().message(Severity.info,"Password and retype password identical");
-		}
-		return RefreshMode.DEFAULT;
 	}
 
 	@Override
 	public LoggerFacade getLogger() {
 		return facade;
 	}
+
+	@Override
+	public <T> T[] getForEditorContent(final CreateKeystoreDialog inst, final Object id, final String fieldName, final Object... parameters) throws FlowException {
+		switch (fieldName) {
+			case "type"	: 
+				final Set<String>	algorithms = new HashSet<>();
+				final String		prefix = ((String)parameters[0]).toUpperCase();
+
+				for (String item : repo.getAlgorithms(ALGORITHM_TYPE,provider)) {
+					if (item.toUpperCase().startsWith(prefix)) {
+						algorithms.add(item);
+					}
+				}
+				final String[]		result = algorithms.toArray(new String[algorithms.size()]); 
+				
+				Arrays.sort(result);
+				return (T[])result;
+			default :
+				return null;
+		}
+	} 
 }

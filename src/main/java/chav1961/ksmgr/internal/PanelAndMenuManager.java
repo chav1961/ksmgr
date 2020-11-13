@@ -65,7 +65,7 @@ public class PanelAndMenuManager {
 		leftComponent = component;
 		leftComponent.addFocusListener(leftFocusListener);
 		leftComponent.getSelectionModel().addListSelectionListener(leftSelectionListener);
-		splitter.setLeftComponent(new JScrollPane(component));
+		splitter.setLeftComponent(new JScrollPane(leftComponent));
 		refreshMenuState();
 	}
 
@@ -184,8 +184,9 @@ public class PanelAndMenuManager {
 		final JMenuItem		certificatesSignRequest = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.certificates.signrequest");
 		final JMenuItem		certificatesSelfSigned = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.certificates.selfsigned");
 		
-		final JMenuItem		desGenerate = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.3DESkeys.generate");
-		final JMenuItem		desImport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.3DESkeys.import");
+		final JMenuItem		keyGenerate = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keys.generate");
+		final JMenuItem		keyExport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keys.export");
+		final JMenuItem		keyImport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keys.import");
 		
 		final KeyStoreViewerSelectionType selType = leftComponent == null ? KeyStoreViewerSelectionType.NONE : leftComponent.getSelectionType();
 		
@@ -195,29 +196,30 @@ public class PanelAndMenuManager {
 				
 				editCopy.setEnabled(false);
 				editMove.setEnabled(false);
-				editRename.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(selType));
+				editRename.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY_PAIR,KeyStoreViewerSelectionType.EXACTLY_ONE_SECRET_KEY,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(selType));
 				editDelete.setEnabled(selType != KeyStoreViewerSelectionType.NONE);
 		
 				kpGenerate.setEnabled(true);
-				kpExport.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY,KeyStoreViewerSelectionType.KEYS_ONLY).contains(selType));
+				kpExport.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY_PAIR,KeyStoreViewerSelectionType.KEY_PAIRS_ONLY).contains(selType));
 				kpImport.setEnabled(true);
 				kpGenerateAndExport.setEnabled(true);
 				
 				certificatesExport.setEnabled(selType != KeyStoreViewerSelectionType.NONE);
 				certificatesLoadTrusted.setEnabled(true);
-				certificatesRequest.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY).contains(selType));
-				certificatesSignRequest.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY).contains(selType));
+				certificatesRequest.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY_PAIR).contains(selType));
+				certificatesSignRequest.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY_PAIR).contains(selType));
 				certificatesSelfSigned.setEnabled(true);
 				
-				desGenerate.setEnabled(true);
-				desImport.setEnabled(true);
+				keyGenerate.setEnabled(true);
+				keyExport.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_SECRET_KEY).contains(selType));
+				keyImport.setEnabled(true);
 				
-				crypto.setEnabled(Set.of(JFileListSelectionType.EXACTLY_ONE_FILE,JFileListSelectionType.FILES_ONLY).contains(rightSelType) && Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(selType));
+				crypto.setEnabled(Set.of(JFileListSelectionType.EXACTLY_ONE_FILE,JFileListSelectionType.FILES_ONLY).contains(rightSelType) && Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY_PAIR,KeyStoreViewerSelectionType.EXACTLY_ONE_SECRET_KEY,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(selType));
 				break;
 			case AS_KEYSTORE	:
 				editCopy.setEnabled(true);
 				editMove.setEnabled(true);
-				editRename.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(selType));
+				editRename.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY_PAIR,KeyStoreViewerSelectionType.EXACTLY_ONE_SECRET_KEY,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(selType));
 				editDelete.setEnabled(selType != KeyStoreViewerSelectionType.NONE);
 				
 				kpGenerate.setEnabled(false);
@@ -231,8 +233,9 @@ public class PanelAndMenuManager {
 				certificatesSignRequest.setEnabled(false);
 				certificatesSelfSigned.setEnabled(true);
 				
-				desGenerate.setEnabled(true);
-				desImport.setEnabled(false);
+				keyGenerate.setEnabled(true);
+				keyExport.setEnabled(false);
+				keyImport.setEnabled(false);
 				
 				crypto.setEnabled(false);
 				break;
@@ -260,8 +263,9 @@ public class PanelAndMenuManager {
 		final JMenuItem		certificatesSignRequest = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.certificates.signrequest");
 		final JMenuItem		certificatesSelfSigned = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.certificates.selfsigned");
 		
-		final JMenuItem		desGenerate = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.3DESkeys.generate");
-		final JMenuItem		desImport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.3DESkeys.import");
+		final JMenuItem		keyGenerate = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keys.generate");
+		final JMenuItem		keyExport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keys.export");
+		final JMenuItem		keyImport = (JMenuItem)SwingUtils.findComponentByName(menu, "menu.tasks.keys.import");
 		
 		final KeyStoreViewerSelectionType leftSelType = leftComponent == null ? KeyStoreViewerSelectionType.NONE : leftComponent.getSelectionType();
 		
@@ -285,17 +289,18 @@ public class PanelAndMenuManager {
 				certificatesSignRequest.setEnabled(false);
 				certificatesSelfSigned.setEnabled(false);
 				
-				desGenerate.setEnabled(false);
-				desImport.setEnabled(Set.of(JFileListSelectionType.EXACTLY_ONE_FILE,JFileListSelectionType.FILES_ONLY).contains(rightSelType));
+				keyGenerate.setEnabled(false);
+				keyExport.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_SECRET_KEY).contains(leftSelType));
+				keyImport.setEnabled(Set.of(JFileListSelectionType.EXACTLY_ONE_FILE).contains(rightSelType));
 				
-				crypto.setEnabled(Set.of(JFileListSelectionType.EXACTLY_ONE_FILE,JFileListSelectionType.FILES_ONLY).contains(rightSelType) && Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(leftSelType));
+				crypto.setEnabled(Set.of(JFileListSelectionType.EXACTLY_ONE_FILE,JFileListSelectionType.FILES_ONLY).contains(rightSelType) && Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY_PAIR,KeyStoreViewerSelectionType.EXACTLY_ONE_SECRET_KEY,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(leftSelType));
 				break;
 			case AS_KEYSTORE	:
 				final KeyStoreViewerSelectionType	selType = ((KeyStoreViewer)rightComponent).getSelectionType();
 				
 				editCopy.setEnabled(true);
 				editMove.setEnabled(true);
-				editRename.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(selType));
+				editRename.setEnabled(Set.of(KeyStoreViewerSelectionType.EXACTLY_ONE_KEY_PAIR,KeyStoreViewerSelectionType.EXACTLY_ONE_CERTIFICATE).contains(selType));
 				editDelete.setEnabled(selType != KeyStoreViewerSelectionType.NONE);
 				
 				kpGenerate.setEnabled(true);
@@ -309,8 +314,8 @@ public class PanelAndMenuManager {
 				certificatesSignRequest.setEnabled(false);
 				certificatesSelfSigned.setEnabled(true);
 				
-				desGenerate.setEnabled(true);
-				desImport.setEnabled(false);
+				keyGenerate.setEnabled(true);
+				keyImport.setEnabled(false);
 				
 				crypto.setEnabled(false);
 				break;
