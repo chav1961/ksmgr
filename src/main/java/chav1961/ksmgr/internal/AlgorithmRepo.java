@@ -69,4 +69,30 @@ public class AlgorithmRepo {
 			return providerAlgos.get(provider).get(service);
 		}
 	}
+	
+	public boolean exists(final String service, final String provider, final String algorithm) {
+		if (service == null || service.isEmpty()) {
+			throw new IllegalArgumentException("Service name can't be null or empty"); 
+		}
+		else if (provider == null || provider.isEmpty()) {
+			throw new IllegalArgumentException("Provider name can't be null or empty"); 
+		}
+		else if (algorithm == null || algorithm.isEmpty()) {
+			throw new IllegalArgumentException("Algorithm name can't be null or empty"); 
+		}
+		else if (!providerAlgos.containsKey(provider)) {
+			throw new IllegalArgumentException("Unknown provider name ["+provider+"]"); 
+		}
+		else if (!providerAlgos.get(provider).containsKey(service)) {
+			throw new IllegalArgumentException("Unknown service name ["+service+"] for provider ["+provider+"]"); 
+		}
+		else {
+			for (String item : getAlgorithms(service, provider)) {
+				if (algorithm.equals(item)) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
 }

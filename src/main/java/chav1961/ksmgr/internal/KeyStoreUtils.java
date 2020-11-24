@@ -1,7 +1,9 @@
 package chav1961.ksmgr.internal;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.math.BigInteger;
@@ -20,6 +22,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -61,13 +65,17 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.encoders.Base64;
 
+import chav1961.purelib.basic.Utils;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
 import chav1961.purelib.fsys.interfaces.FileSystemInterface;
-import chav1961.purelib.ui.interfaces.RefreshMode;
 
 public class KeyStoreUtils {
 	private static final String			DEFAULT_ENCODING = "UTF-8";
+
+	//
+	//		Service methods
+	//
 	
 	public static boolean isAliasInKeyStore(final String alias, final KeyStore ks) throws KeyStoreException, IllegalArgumentException, NullPointerException {
 		if (alias == null || alias.isEmpty()) {
@@ -77,22 +85,56 @@ public class KeyStoreUtils {
 			throw new NullPointerException("Key store can't be null"); 
 		}
 		else {
-			final Enumeration<String>	aliases = ks.aliases();
-				
-			while (aliases.hasMoreElements()) {
-				final String	name = aliases.nextElement();
-				
-				if (alias.equals(name)) {
-					return true;
-				}
-			}
-			return false;
+			return ks.containsAlias(alias);
+		}
+	}
+
+	public static String extractFileName(final String path) {
+		if (path == null || path.isEmpty()) {
+			throw new IllegalArgumentException("FIle path can't be null or empty"); 
+		}
+		else {
+			final int	index = path.lastIndexOf('/');
+			
+			return index == -1 ? path : path.substring(index+1);
 		}
 	}
 	
-	public static String keyPairsImport(final FileSystemInterface fsi, final LoggerFacade logger, final String from, final KeyStore to, final char[] password) {
+	public static String cutExtension(final String name) {
+		if (name == null || name.isEmpty()) {
+			throw new IllegalArgumentException("File name can't be null or empty"); 
+		}
+		else {
+			final int	dot = name.lastIndexOf('.');
+			
+			return dot == -1 ? name : name.substring(0,dot);
+		}
+	}
+
+	public static String buildUniqueAlias(final KeyStore ks, final String alias) throws KeyStoreException {
+		if (ks == null) {
+			throw new NullPointerException("Key store can't be null"); 
+		}
+		else if (alias == null || alias.isEmpty()) {
+			throw new IllegalArgumentException("Alias name can't be null or empty"); 
+		}
+		else {
+			String				currentAlias = alias;
+			int					suffix = 1;
+			
+			while (ks.containsAlias(currentAlias)) {
+				currentAlias = alias+'-'+suffix++; 
+			}
+			return currentAlias;
+		}
+	}
+	
+	//
+	//		Import methods
+	//
+	
+	public static void keyPairsImport(final FileSystemInterface fsi, final LoggerFacade logger, final String from, final KeyStore to, final String alias, final char[] password) {
 		final String	file = from;
-		final String	alias = file.substring(file.lastIndexOf('/')+1,file.lastIndexOf('.'));
 		
 		try(final FileSystemInterface	in = fsi.clone().open(file);
 			final Reader				rdr = in.charRead(DEFAULT_ENCODING);
@@ -101,7 +143,6 @@ public class KeyStoreUtils {
 
 			if (pair == null) {
 				logger.message(Severity.error,"Key pair ["+file+"]: read failed...");
-				return null;
 			}
 			else {
 				final JcaPEMKeyConverter 	converter = new JcaPEMKeyConverter();
@@ -124,27 +165,39 @@ public class KeyStoreUtils {
 				
 				if (kp != null) {
 					final Certificate	ss = createSelfSigned(kp);
-					String				currentAlias = alias;
-					int					suffix = 1;
 					
-					while (to.containsAlias(currentAlias)) {
-						currentAlias = alias+'-'+suffix++; 
-					}
-					
-					to.setKeyEntry(currentAlias, kp.getPrivate(), password, new Certificate[] {ss});
-					logger.message(Severity.info,"Key pair content was imported into keystore with alias ["+currentAlias+"]");
-					return currentAlias;
+					to.setKeyEntry(alias, kp.getPrivate(), password, new Certificate[] {ss});
+					logger.message(Severity.info,"Key pair content was successfully imported into keystore with alias ["+alias+"]");
 				}
 				else {
 					logger.message(Severity.error,"Key pair ["+file+"] was not identified as valid type");
-					return null;
 				}
 			}
 		} catch (IOException | KeyStoreException | OperatorCreationException | CertificateException e) {
 			logger.message(Severity.error,"Error importing key pair ["+file+"]: "+e.getLocalizedMessage());
-			return null;
 		}
 	}
+
+	public static void secretKeyImport(final FileSystemInterface fsi, final LoggerFacade logger, final String from, final String algorithm, final KeyStore to, final String alias, final char[] password) {
+		try(final FileSystemInterface	fs = fsi.clone().open(from);
+			final InputStream			is = fs.read();
+			final ByteArrayOutputStream	baos = new ByteArrayOutputStream()) {
+			
+			Utils.copyStream(is, baos);
+			baos.flush();
+			
+			final SecretKey			key = new SecretKeySpec(baos.toByteArray(), algorithm);
+			
+			to.setKeyEntry(alias, key, password, null);
+			logger.message(Severity.info,"Secret key for alias ["+alias+"] imported successfully");
+		} catch (IOException | KeyStoreException e) {
+			logger.message(Severity.error,"Error importing secret key for alias ["+alias+"]: "+e.getLocalizedMessage());
+		}
+	}	
+
+	//
+	//		Export methods
+	//
 	
 	public static boolean keyPairsExport(final FileSystemInterface fsi, final LoggerFacade logger, final KeyStore from, final String item, final String to, final char[] password) {
 		try{final Key			privK = from.getKey(item,password);
@@ -344,4 +397,5 @@ public class KeyStoreUtils {
 		    return Base64.decode(sb.toString());
 		}
 	}
+	
 }

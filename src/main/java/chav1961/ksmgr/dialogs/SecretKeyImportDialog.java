@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import chav1961.ksmgr.interfaces.CipherKeyLength;
-import chav1961.ksmgr.interfaces.ImportEntityType;
 import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.ksmgr.internal.KeyStoreUtils;
 import chav1961.purelib.basic.exceptions.FlowException;
@@ -20,9 +18,9 @@ import chav1961.purelib.ui.interfaces.FormManager;
 import chav1961.purelib.ui.interfaces.Format;
 import chav1961.purelib.ui.interfaces.RefreshMode;
 
-@LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.dialogs.KeyImportDialog/chav1961/ksmgr/i18n/i18n.xml")
-@LocaleResource(value="chav1961.ksmgr.dialogs.keyimportdialog",tooltip="chav1961.ksmgr.dialogs.keyimportdialog.tt",help="chav1961.ksmgr.dialogs.keyimportdialog.help")
-public class KeyImportDialog implements FormManager<Object, KeyImportDialog> {
+@LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.dialogs.SecretKeyImportDialog/chav1961/ksmgr/i18n/i18n.xml")
+@LocaleResource(value="chav1961.ksmgr.dialogs.secretkeyimportdialog",tooltip="chav1961.ksmgr.dialogs.secretkeyimportdialog.tt",help="chav1961.ksmgr.dialogs.secretkeyimportdialog.help")
+public class SecretKeyImportDialog implements FormManager<Object, SecretKeyImportDialog> {
 	private static final String	ALGORITHM_TYPE = "SecretKeyFactory";
 	
 	private final LoggerFacade 	facade;
@@ -30,19 +28,15 @@ public class KeyImportDialog implements FormManager<Object, KeyImportDialog> {
 	private final AlgorithmRepo	repo;
 	private final String		provider;
 
-	@LocaleResource(value="chav1961.ksmgr.dialogs.keyimportdialog.entitytype",tooltip="chav1961.ksmgr.dialogs.keyimportdialog.entitytype.tt")
-	@Format("30smd")
-	public ImportEntityType		type = ImportEntityType.CERTIFICATE;
-	
-	@LocaleResource(value="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm",tooltip="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm.tt")
+	@LocaleResource(value="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm",tooltip="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm.tt")
 	@Format("30smd")
 	public String				keyAlgorithm = "unknown";
 
-	@LocaleResource(value="chav1961.ksmgr.dialogs.keyimportdialog.alias",tooltip="chav1961.ksmgr.dialogs.keyimportdialog.alias.tt")
+	@LocaleResource(value="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias",tooltip="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias.tt")
 	@Format("30ms")
 	public String				alias = "myAlias";
 
-	public KeyImportDialog(final LoggerFacade facade, final KeyStore ks, final AlgorithmRepo repo, final String provider) {
+	public SecretKeyImportDialog(final LoggerFacade facade, final KeyStore ks, final AlgorithmRepo repo, final String provider) {
 		if (facade == null) {
 			throw new NullPointerException("Logger facade can't be null"); 
 		}
@@ -64,7 +58,7 @@ public class KeyImportDialog implements FormManager<Object, KeyImportDialog> {
 	}
 
 	@Override
-	public RefreshMode onField(final KeyImportDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
+	public RefreshMode onField(final SecretKeyImportDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
 		switch (fieldName) {
 			case "alias"	:
 				try{if (KeyStoreUtils.isAliasInKeyStore(alias, ks)) {
@@ -89,7 +83,7 @@ public class KeyImportDialog implements FormManager<Object, KeyImportDialog> {
 	}
 	
 	@Override
-	public <T> T[] getForEditorContent(final KeyImportDialog inst, final Object id, final String fieldName, final Object... parameters) throws FlowException {
+	public <T> T[] getForEditorContent(final SecretKeyImportDialog inst, final Object id, final String fieldName, final Object... parameters) throws FlowException {
 		switch (fieldName) {
 			case "keyAlgorithm"	: 
 				final Set<String>	algorithms = new HashSet<>();
@@ -108,4 +102,5 @@ public class KeyImportDialog implements FormManager<Object, KeyImportDialog> {
 				return null;
 		}
 	} 
+
 }

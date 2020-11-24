@@ -26,6 +26,8 @@ import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStore.SecretKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -103,8 +105,10 @@ import chav1961.ksmgr.dialogs.KeyCreateDialog;
 import chav1961.ksmgr.dialogs.KeyImportDialog;
 import chav1961.ksmgr.dialogs.KeyPairCreateDialog;
 import chav1961.ksmgr.dialogs.OpenKeystoreDialog;
+import chav1961.ksmgr.dialogs.SecretKeyImportDialog;
 import chav1961.ksmgr.dialogs.SelfSignedCertificateCreateDialog;
 import chav1961.ksmgr.dialogs.SignCertificateDialog;
+import chav1961.ksmgr.interfaces.ImportEntityType;
 import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.ksmgr.internal.KeyStoreUtils;
 import chav1961.ksmgr.internal.KeyStoreViewer;
@@ -152,6 +156,7 @@ import chav1961.purelib.ui.swing.useful.JFileContentManipulator.FileContentChang
 import chav1961.purelib.ui.swing.useful.JFileContentManipulator.FileContentChangedEvent;
 import chav1961.purelib.ui.swing.useful.JFileList;
 import chav1961.purelib.ui.swing.useful.JFileListItemDescriptor;
+import chav1961.purelib.ui.swing.useful.JFileSelectionDialog;
 import chav1961.purelib.ui.swing.useful.JStateString;
 
 // https://www.baeldung.com/java-bouncy-castle
@@ -355,35 +360,29 @@ public class Application extends JFrame implements LocaleChangeListener {
 						}
 					}
 					else if ((from instanceof JFileList) && ((to instanceof KeyStoreViewer) || (to instanceof JViewport))) {
-						final AskPasswordDialog	apd = new AskPasswordDialog(state);
-						
-						if (askPassword(apd,null)) {
-							final String 	item = KeyStoreUtils.keyPairsImport(fsi,state,((FromFileSystem)content).name,current,apd.password);
-							
-							passwords.storePasswordFor(item,apd.password);
-							pamm.getLeftComponent().refresh();
-						}
+						importIntoKeyStore(((FromFileSystem)content).name);
 					}
 					else if ((from instanceof KeyStoreViewer) && (to instanceof JFileList)) {
 						final FromKeyStore	fks = (FromKeyStore)content;
 						
-						try{
-							if (fks.ks.isKeyEntry(fks.name)) {
-								final AskPasswordDialog	apd = new AskPasswordDialog(state);
-								
-								if (askPassword(apd,((FromKeyStore)content).name)) {
-									KeyStoreUtils.keyPairsExport(fsi,state,((FromKeyStore)content).ks,((FromKeyStore)content).name,pamm.getRightContainer().getCurrentFileSystemPath(),apd.password);
-									pamm.refreshRightComponent();
-								}
-							}
-							else if (fks.ks.isCertificateEntry(fks.name)) {
-								KeyStoreUtils.certificateExport(fsi,state,((FromKeyStore)content).ks,((FromKeyStore)content).name,pamm.getRightContainer().getCurrentFileSystemPath());
-								pamm.refreshRightComponent();
-							}
-						} catch (KeyStoreException e) {
-							state.message(Severity.error,"Error exporting keystore: "+e.getLocalizedMessage());
-						}
-						
+						exportFromKeyStore(fks.ks,((FromKeyStore)content).name);
+//						try{
+//							if (fks.ks.isKeyEntry(fks.name)) {
+//								final AskPasswordDialog	apd = new AskPasswordDialog(state);
+//								
+//								if (askPassword(apd,((FromKeyStore)content).name)) {
+//									KeyStoreUtils.keyPairsExport(fsi,state,((FromKeyStore)content).ks,((FromKeyStore)content).name,pamm.getRightContainer().getCurrentFileSystemPath(),apd.password);
+//									pamm.refreshRightComponent();
+//								}
+//							}
+//							else if (fks.ks.isCertificateEntry(fks.name)) {
+//								KeyStoreUtils.certificateExport(fsi,state,((FromKeyStore)content).ks,((FromKeyStore)content).name,pamm.getRightContainer().getCurrentFileSystemPath());
+//								pamm.refreshRightComponent();
+//							}
+//						} catch (KeyStoreException e) {
+//							state.message(Severity.error,"Error exporting keystore: "+e.getLocalizedMessage());
+//						}
+//						
 					}
 				}
 			});
@@ -536,39 +535,33 @@ public class Application extends JFrame implements LocaleChangeListener {
 
 	@OnAction("action:/keyPairsExport")
 	private void keyPairsExport() {
-		final int[]		indices = pamm.getLeftComponent().getSelectionModel().getSelectedIndices();
+		final int[]	indices = pamm.getLeftComponent().getSelectionModel().getSelectedIndices();
 		
 		if (indices.length > 0) {
-			final AskPasswordDialog	apd = new AskPasswordDialog(state);
-			int						count = 0;
+			int		count = 0;
 			
 			for (int index = 0; index < indices.length; index++) {
 				final ItemDescriptor	desc = (ItemDescriptor) pamm.getLeftComponent().getModel().getValueAt(indices[index],0);
-				
-				try{state.message(Severity.info,"Export ["+desc.alias+"]...");
-					if (current.isKeyEntry(desc.alias) && askPassword(apd,desc.alias)) {
-						KeyStoreUtils.keyPairsExport(fsi, state, current, desc.alias, pamm.getRightContainer().getCurrentFileSystemPath(), apd.password);
-						count++;
-					}
-				} catch (KeyStoreException e) {
-					state.message(Severity.error,"Error exporting key pair for alias ["+desc.alias+"]: "+e.getLocalizedMessage());
-				}
+
+				exportFromKeyStore(current, desc.alias);
+				count++;
 			}
 			pamm.refreshRightComponent();
 			state.message(Severity.info,"Key pairs export completed, ["+count+"] item(s) exported");
 		}
 	}
-
+	
+	@OnAction("action:/keyPairsExportCert")
+	private void keyPairsExportCert() {
+	}
+	
 	@OnAction("action:/keyPairsImport")
 	private void keyPairsImport() {
-		final AskPasswordDialog	apd = new AskPasswordDialog(state);
+		final String	alias = KeyStoreUtils.cutExtension(pamm.getRightContainer().getCurrentFileSystemFile());
 		
-		if (askPassword(apd,null)) {
-			final String	item = KeyStoreUtils.keyPairsImport(fsi,state,pamm.getRightContainer().getCurrentFileSystemFile(),current,apd.password);
-			
-			passwords.storePasswordFor(item, apd.password);
-			state.message(Severity.info,"Key pairs import completed, ["+pamm.getRightContainer().getCurrentFileSystemFile()+"] item imported");
-			pamm.getLeftComponent().refresh();
+		try{importIntoKeyStore(pamm.getRightContainer().getCurrentFileSystemFile(), ImportEntityType.KEY_PAIR, "none", KeyStoreUtils.buildUniqueAlias(current,alias));
+		} catch (KeyStoreException e) {
+			state.message(Severity.error,"Error importing key pair for alias ["+alias+"]: "+e.getLocalizedMessage());
 		}
 	}	
 
@@ -592,6 +585,10 @@ public class Application extends JFrame implements LocaleChangeListener {
 				state.message(Severity.error,"Error creating key pair for alias ["+kpcd.alias+"]: "+e.getLocalizedMessage());
 			}
 		}
+	}
+
+	@OnAction("action:/keyPairsGenerateAndExportCert")
+	private void keyPairsGenerateAndExportCert() {
 	}
 	
 	@OnAction("action:/certificatesExport")
@@ -631,14 +628,22 @@ public class Application extends JFrame implements LocaleChangeListener {
 					throw new IOException("Invalid URI ["+serverUri+"] to get certificates: must be absoulte and can use 'https' schemes only");
 				}
 				else {
+					final Thread	t = new Thread(()-> {
+										try{if (!SocketUtils.collectSSLCertificates(serverUri, current)) {
+												state.message(Severity.warning,"No any certifictes on the ["+serverUri+"]");
+											}
+											else {
+												state.message(Severity.info,"Certificate loading complete");
+												pamm.getLeftComponent().refresh();
+											}
+										} catch (IOException exc) {
+											state.message(Severity.error,"Error getting certificates: "+exc.getLocalizedMessage());
+										}
+									});
+					
 					state.message(Severity.info,"Sending request to ["+serverUri+"], please wait...");
-					if (!SocketUtils.collectSSLCertificates(serverUri, current)) {
-						state.message(Severity.warning,"No any certifictes on the ["+serverUri+"]");
-					}
-					else {
-						state.message(Severity.info,"Certificate loading complete");
-						pamm.getLeftComponent().refresh();
-					}
+					t.setDaemon(true);
+					t.start();
 				}
 			} catch (IOException exc) {
 				state.message(Severity.error,"Error getting certificates: "+exc.getLocalizedMessage());
@@ -850,28 +855,16 @@ public class Application extends JFrame implements LocaleChangeListener {
 	
 	@OnAction("action:/keyImport")
 	private void keyImport() {
-		final KeyImportDialog			kid = new KeyImportDialog(state, current, algo, settings.preferredProvider);
+		final SecretKeyImportDialog		skid = new SecretKeyImportDialog(state, current, algo, settings.preferredProvider);
 		final JFileListItemDescriptor 	desc = ((JFileList)pamm.getRightComponent()).getSelectedValue();
-		final String					name = desc.getName().endsWith(".bin") ? desc.getName().substring(0,desc.getName().lastIndexOf('.')) : desc.getName();
+		final String					alias = KeyStoreUtils.cutExtension(desc.getName());
 		
-		kid.alias = name;
-		if (ask(kid,300,150)) {
-			try(final FileSystemInterface	fs = fsi.clone().open(desc.getPath());
-				final InputStream			is = fs.read();
-				final ByteArrayOutputStream	baos = new ByteArrayOutputStream()) {
-				
-				Utils.copyStream(is, baos);
-				baos.flush();
-				
-				final SecretKey			key = new SecretKeySpec(baos.toByteArray(), kid.keyAlgorithm);
-				
-				storeKey(kid.alias,key,kid.password);
-				passwords.storePasswordFor(kid.alias,kid.password);
-				pamm.getLeftComponent().refresh();
-				state.message(Severity.info,"Secret key for alias ["+kid.alias+"] imported successfully");
-			} catch (IOException | KeyStoreException e) {
-				state.message(Severity.error,"Error importing secret key for alias ["+kid.alias+"]: "+e.getLocalizedMessage());
+		try{skid.alias = KeyStoreUtils.buildUniqueAlias(current, alias);
+			if (ask(skid,300,100)) {
+				importIntoKeyStore(desc.getPath(), ImportEntityType.SECRET_KEY, skid.keyAlgorithm, skid.alias);
 			}
+		} catch (KeyStoreException e) {
+			state.message(Severity.error,"Error importing secret key for alias ["+alias+"]: "+e.getLocalizedMessage());
 		}
 	}	
 	
@@ -1124,7 +1117,11 @@ public class Application extends JFrame implements LocaleChangeListener {
 			state.message(Severity.error,e.getLocalizedMessage());
 		}
 	}
-	
+
+	//
+	//		Utility methods
+	//
+
 	private void openKeyStore(final String file) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
 		final File				from = new File(file).getAbsoluteFile();
 		final AskPasswordDialog	apd = new AskPasswordDialog(state);
@@ -1147,6 +1144,111 @@ public class Application extends JFrame implements LocaleChangeListener {
 		}
 	}
 	
+	private void importIntoKeyStore(final String path) {
+		final KeyImportDialog	kid = new KeyImportDialog(state, current, algo, settings.preferredProvider);
+		final String			name = KeyStoreUtils.cutExtension(KeyStoreUtils.extractFileName(path));
+		
+		try{kid.alias = KeyStoreUtils.buildUniqueAlias(current, name);
+			if (ask(kid,300,120)) {
+				importIntoKeyStore(path, kid.type, kid.keyAlgorithm, kid.alias);
+			}		
+		} catch (KeyStoreException e) {
+			state.message(Severity.error,"Error importing key for alias ["+name+"]: "+e.getLocalizedMessage());
+		}
+	}
+
+	private void importIntoKeyStore(final String path, final ImportEntityType type, final String algorithm, final String alias) {
+		final AskPasswordDialog		apd = new AskPasswordDialog(state);
+		
+		switch (type) {
+			case CERTIFICATE	:
+				break;
+			case KEY_PAIR		:
+				if (askPassword(apd,null)) {
+					KeyStoreUtils.keyPairsImport(fsi,state,path,current,alias,apd.password);
+					break;
+				}
+				else {
+					return;
+				}
+			case SECRET_KEY		:
+				if (askPassword(apd,null)) {
+					KeyStoreUtils.secretKeyImport(fsi,state,path,algorithm,current,alias,apd.password);
+					break;
+				}
+				else {
+					return;
+				}
+			default	:
+				throw new UnsupportedOperationException("Import entity type ["+type+"] is not supported yet");
+		}
+		passwords.storePasswordFor(alias, apd.password);
+		contentManipulator.setModificationFlag();
+		pamm.getLeftComponent().refresh();
+	}
+
+	private void exportFromKeyStore(final KeyStore ks, final String alias) {
+		final String[] 			fileName = new String[1];
+		
+		try{if (ks.isKeyEntry(alias)) {
+				final AskPasswordDialog	apd = new AskPasswordDialog(state);
+				
+				if (ks.entryInstanceOf(alias, SecretKeyEntry.class)) {
+					fileName[0] = alias+".bin";
+					
+					if (askReplaceFile(fsi,fileName,pamm.getRightContainer().getCurrentFileSystemPath()) && askPassword(apd,alias)) {
+						KeyStoreUtils.keyPairsExport(fsi,state,ks,alias,pamm.getRightContainer().getCurrentFileSystemFile(),apd.password);
+					}
+					else {
+						return;
+					}
+				}
+				else if (ks.entryInstanceOf(alias, PrivateKeyEntry.class)) {
+					fileName[0] = alias+".keys";
+					
+					if (askReplaceFile(fsi,fileName,pamm.getRightContainer().getCurrentFileSystemPath()) && askPassword(apd,alias)) {
+						KeyStoreUtils.keyPairsExport(fsi,state,ks,alias,pamm.getRightContainer().getCurrentFileSystemFile(),apd.password);
+					}
+					else {
+						return;
+					}
+				}
+				else {
+					throw new UnsupportedOperationException("Unknown key store item type");
+				}
+			}
+			else if (ks.isCertificateEntry(alias)) {
+				if (askReplaceFile(fsi,fileName,pamm.getRightContainer().getCurrentFileSystemPath())) {
+					KeyStoreUtils.certificateExport(fsi,state,ks,alias,pamm.getRightContainer().getCurrentFileSystemPath());
+				}
+				else {
+					return;
+				}
+			}
+			pamm.refreshRightComponent();
+		} catch (KeyStoreException e) {
+			state.message(Severity.error,"Error exporting keystore: "+e.getLocalizedMessage());
+		}
+	}
+	
+	private boolean askReplaceFile(final FileSystemInterface fsi, final String[] fileName, final String path) {
+		try(final FileSystemInterface	fs = fsi.clone().open(path).open(fileName[0])) {
+			if (!fs.exists()) {
+				return true;
+			}
+			else {
+				for (String name : JFileSelectionDialog.select(this, localizer, fs, JFileSelectionDialog.OPTIONS_FOR_SAVE | JFileSelectionDialog.OPTIONS_CAN_SELECT_FILE | JFileSelectionDialog.OPTIONS_CONFIRM_REPLACEMENT)) {
+					fileName[0] = name;
+					return true;
+				}
+				return false;
+			}
+		} catch (IOException | LocalizationException e) {
+			state.message(Severity.error,"I/O error on ["+path+"]: "+e.getLocalizedMessage());
+			return false;
+		}
+	}
+
 	private void storeKey(final String alias, final Key key, final char[] password, final Certificate... certs) throws KeyStoreException {
 		current.setKeyEntry(alias, key, password, certs == null || certs.length == 0 ? null : certs);
 		passwords.storePasswordFor(alias, password);
@@ -1182,10 +1284,13 @@ public class Application extends JFrame implements LocaleChangeListener {
 	}
 
 	private void refreshLeftPanel(final String fileName, final KeyStore ks, final char[] password) {
+		final KeyStoreViewer	ksv = new KeyStoreViewer(app.getRoot(),localizer,state,passwords,fileName,ks); 
+		
 		current = ks; 
 		currentPassword = settings.keepPasswords ? password : null;
-		pamm.setLeftComponent(new KeyStoreViewer(app.getRoot(),localizer,state,passwords,fileName,current));
+		pamm.setLeftComponent(ksv);
 		split.setDividerLocation(KeyStoreViewer.PREFERRED_WIDTH);
+		ksv.requestFocusInWindow();
 	}
 
 	private void changeState(final FileContentChangedEvent event) {

@@ -50,14 +50,18 @@
 		<key name="menu.tasks.tt">Execute typical tasks with keystore</key>
 		<key name="menu.tasks.keypairs">Key pairs</key>
 		<key name="menu.tasks.keypairs.tt">Key pairs manipulation</key>
-		<key name="menu.tasks.keypairs.generate">Create</key>
+		<key name="menu.tasks.keypairs.generate">Create key pair</key>
 		<key name="menu.tasks.keypairs.generate.tt">Create key pairs</key>
-		<key name="menu.tasks.keypairs.export">Export</key>
+		<key name="menu.tasks.keypairs.export">Export key pairs</key>
 		<key name="menu.tasks.keypairs.export.tt">Export key pairs from keystore</key>
+		<key name="menu.tasks.keypairs.exportcert">Export certificate</key>
+		<key name="menu.tasks.keypairs.exportcert.tt">Export certificate from key pair</key>
 		<key name="menu.tasks.keypairs.import">Import</key>
 		<key name="menu.tasks.keypairs.import.tt">Import key paits into keystore</key>
-		<key name="menu.tasks.keypairs.generateandexport">Create &amp; Export</key>
+		<key name="menu.tasks.keypairs.generateandexport">Create &amp; Export key pair</key>
 		<key name="menu.tasks.keypairs.generateandexport.tt">Create key pairs and export it</key>
+		<key name="menu.tasks.keypairs.generateandexportcert">Create &amp; Export certificate</key>
+		<key name="menu.tasks.keypairs.generateandexportcert.tt">Create key pairs and export certificate</key>
 		<key name="menu.tasks.certificates">Certificates</key>
 		<key name="menu.tasks.certificates.tt">Certiticates manipulation</key>
 		<key name="menu.tasks.certificates.export">Export</key>
@@ -131,6 +135,14 @@
 
 		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa">SHA1withRSA</key>
 		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa.tt">SHA1withRSA algorithm</key>
+
+		<key name="chav1961.ksmgr.interfaces.importentitytype.secretkey">Secret key</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.secretkey.tt">File to import contains secret key</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.keypair">Key pair</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.keypair.tt">File to import contains key pair</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate">Certificate</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate.tt">File to import contains certificate</key>
+
 		
 <!-- Localization for 'create keystore' dialog -->		
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Create key store</key>
@@ -256,12 +268,22 @@
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog">Import key</key>
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog.tt">Import secret key</key>
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog.help">uri(chav1961.ksmgr.dialogs.keyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.entitytype">File type</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.entitytype.tt">Content type, keeping in the file</key>
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm">Key algorithm</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm.tt">Encrypting algorithm for key</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.password">Password to store</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.password.tt">Password for the imported key in the key store</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm.tt">Encrypting algorithm for key (requires for secret keys only)</key>
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias">Alias name</key>
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias.tt">Alias name for key in the key store</key>
+
+<!-- Localization for 'import secret key' dialog -->		
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog">Secret key import</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.tt">Import secret key into repository</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.help">uri(chav1961.ksmgr.dialogs.secretkeyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm">Key algorithm</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm.tt">Encrypting algorithm for key</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias">Alias name</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias.tt">Alias name for key in the key store</key>
+
 
 <!-- Localization for 'encrypt file' dialog-->		
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog">Encrypt file</key>
@@ -335,14 +357,18 @@
 		<key name="menu.tasks.tt">Выполнение типовых задач по манипуляции ключами и репозитарием</key>
 		<key name="menu.tasks.keypairs">Пары ключей</key>
 		<key name="menu.tasks.keypairs.tt">Манипуляция парами ключей</key>
-		<key name="menu.tasks.keypairs.generate">Создать</key>
+		<key name="menu.tasks.keypairs.generate">Создать ключи</key>
 		<key name="menu.tasks.keypairs.generate.tt">Сгенерировать новую пару ключей</key>
-		<key name="menu.tasks.keypairs.export">Экспорт</key>
+		<key name="menu.tasks.keypairs.export">Экспорт ключей</key>
 		<key name="menu.tasks.keypairs.export.tt">Выгрузить пару ключей из репозитария</key>
-		<key name="menu.tasks.keypairs.import">Импорт</key>
+		<key name="menu.tasks.keypairs.exportcert">Экспорт сертификата</key>
+		<key name="menu.tasks.keypairs.exportcert.tt">Экспорт сертификата для пары ключей</key>
+		<key name="menu.tasks.keypairs.import">Импорт ключей</key>
 		<key name="menu.tasks.keypairs.import.tt">Загрузить пару ключей в репозитарий</key>
 		<key name="menu.tasks.keypairs.generateandexport">Создать и Выгрузить</key>
 		<key name="menu.tasks.keypairs.generateandexport.tt">Сгенерировать и выгрузить новую пару ключей</key>
+		<key name="menu.tasks.keypairs.generateandexportcert">Создать и выгрузить сертификат</key>
+		<key name="menu.tasks.keypairs.generateandexportcert.tt">Создать пару ключей и выгрузить ее сертификат</key>
 		<key name="menu.tasks.certificates">Сертификаты</key>
 		<key name="menu.tasks.certificates.tt">Манипуляция сертификатами</key>
 		<key name="menu.tasks.certificates.export">Экспорт</key>
@@ -416,6 +442,14 @@
 		
 		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa">SHA1withRSA</key>
 		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa.tt">Алгоритм SHA1withRSA</key>
+
+		<key name="chav1961.ksmgr.interfaces.importentitytype.secretkey">Секретный ключ</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.secretkey.tt">Импортируемый файл содержит секретный ключ</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.keypair">Пара ключей</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.keypair.tt">Импортируемый файл содержит пару ключей</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate">Сертификат</key>
+		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate.tt">Импортируемый файл содержит сертификат</key>
+
 		
 <!-- Локализация для диалога 'create keystore' -->		
 		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Создать репозитарий ключей</key>
@@ -539,15 +573,24 @@
 		<key name="chav1961.ksmgr.dialogs.keycreatedialog.alias.tt">Имя алиаса в памяти ключей</key>
 
 <!-- Локализация для диалога 'import key' -->		
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog">Импорт ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.tt">Импорт секретного ключа</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog">Импорт в репозитерий</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.tt">Импорт файла в репозитерий</key>
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog.help">uri(chav1961.ksmgr.dialogs.keyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.entitytype">Тип файла</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.entitytype.tt">Тип содержимого, хранящегося в файле</key>
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm">Алгоритм ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm.tt">Алгоритм шифрования ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.password">Пароль в репозитарии</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.password.tt">Пароль для импортируемого ключа в памяти ключей</key>
+		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm.tt">Алгоритм шифрования ключа (имеет смысл только для секретного ключа)</key>
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias">Имя ключа</key>
 		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias.tt">Имя алиаса в памяти ключей</key>
+
+<!-- Локализация для диалога 'import secret key' -->		
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog">Импорт секретного ключа</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.tt">Импорт секретного ключа в репозитарий</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.help">uri(chav1961.ksmgr.dialogs.secretkeyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm">Алгоритм ключа</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm.tt">Алгоритм шифрования ключа</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias">Имя ключа</key>
+		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias.tt">Имя алиаса в памяти ключей</key>
 
 <!-- Локализация для диалога 'encrypt file'-->		
 		<key name="chav1961.ksmgr.dialogs.encryptfiledialog">Зашифровать файл</key>

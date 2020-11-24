@@ -70,6 +70,17 @@ public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreD
 					getLogger().message(Severity.info,"Password and retype password identical");
 				}
 				return RefreshMode.DEFAULT;
+			case "type" :
+				if (!repo.exists(ALGORITHM_TYPE, provider, type)) {
+					if (beforeCommit) {
+						getLogger().message(Severity.error,"Unknown key store type ["+type+"]");
+						return RefreshMode.REJECT;
+					}
+					else {
+						getLogger().message(Severity.warning,"Unknown key store type ["+type+"]");
+					}
+				}
+				return RefreshMode.DEFAULT;
 			default :
 				return RefreshMode.DEFAULT;
 		}

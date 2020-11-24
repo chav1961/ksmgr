@@ -54,20 +54,14 @@ public class KeyPairCreateDialog implements FormManager<Object, KeyPairCreateDia
 	public RefreshMode onField(final KeyPairCreateDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException, LocalizationException {
 		switch (fieldName) {
 			case "alias"	:
-				try{final Enumeration<String>	aliases = ks.aliases();
-				
-				while (aliases.hasMoreElements()) {
-					final String	name = aliases.nextElement();
-					
-					if (alias.equals(name)) {
-						getLogger().message(Severity.warning,"Alias ["+alias+"] already exists in the store");
+				try{if (ks.containsAlias(alias)) {
+						getLogger().message(beforeCommit ? Severity.error : Severity.warning,"Alias ["+alias+"] already exists in the store");
 						return RefreshMode.REJECT;
 					}
+				} catch (KeyStoreException e) {
+					getLogger().message(Severity.error,e,"Error processing key store: "+e.getLocalizedMessage());
+					return RefreshMode.REJECT;
 				}
-			} catch (KeyStoreException e) {
-				getLogger().message(Severity.error,e,"Error processing key store: "+e.getLocalizedMessage());
-				return RefreshMode.REJECT;
-			}
 		}
 		return RefreshMode.DEFAULT;
 	}

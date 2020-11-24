@@ -18,7 +18,7 @@ public class AskServerURIDialog implements FormManager<Object, AskServerURIDialo
 	private final LoggerFacade	facade;
 	
 	@LocaleResource(value="chav1961.ksmgr.dialogs.askserveruridialog.uri",tooltip="chav1961.ksmgr.dialogs.askserveruridialog.uri.tt")
-	@Format("30s")
+	@Format("30sm")
 	public URI			serverURI = URI.create("https://someshit.com");
 
 	public AskServerURIDialog(final LoggerFacade facade) {
@@ -33,7 +33,7 @@ public class AskServerURIDialog implements FormManager<Object, AskServerURIDialo
 	@Override
 	public RefreshMode onField(AskServerURIDialog inst, Object id, String fieldName, Object oldValue, boolean beforeCommit) throws FlowException, LocalizationException {
 		if (serverURI.getPort() <= 0) {
-			getLogger().message(Severity.warning, "Port number missing (usually 433 required)");
+			getLogger().message(beforeCommit ? Severity.error : Severity.warning, "Port number missing (usually 433 required)");
 			return RefreshMode.REJECT;
 		}
 		else {

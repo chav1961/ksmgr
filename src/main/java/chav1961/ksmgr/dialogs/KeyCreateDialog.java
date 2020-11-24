@@ -89,7 +89,7 @@ public class KeyCreateDialog implements FormManager<Object, KeyCreateDialog> {
 		switch (fieldName) {
 			case "alias"	:
 				try{if (KeyStoreUtils.isAliasInKeyStore(alias, ks)) {
-						getLogger().message(Severity.warning,"Alias ["+alias+"] already exists in the store");
+						getLogger().message(beforeCommit ? Severity.error : Severity.warning,"Alias ["+alias+"] already exists in the store");
 						return RefreshMode.REJECT;
 					}
 					else {
@@ -101,7 +101,13 @@ public class KeyCreateDialog implements FormManager<Object, KeyCreateDialog> {
 				}
 			case "password" : case "passwordRetype" :
 				if (!Arrays.equals(password,passwordRetype)) {
-					getLogger().message(Severity.warning,"Password and retype password differ!");
+					if (beforeCommit) {
+						getLogger().message(Severity.error,"Password and retype password differ!");
+						return RefreshMode.REJECT;
+					}
+					else {
+						getLogger().message(Severity.warning,"Password and retype password differ!");
+					}
 				}
 				else {
 					getLogger().message(Severity.info,"Password and retype password identical");
