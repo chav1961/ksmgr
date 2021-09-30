@@ -24,7 +24,7 @@ import chav1961.purelib.ui.interfaces.Action;
 import chav1961.purelib.ui.interfaces.FormManager;
 import chav1961.purelib.ui.interfaces.Format;
 import chav1961.purelib.ui.interfaces.RefreshMode;
-import chav1961.purelib.ui.swing.useful.JFileContentManipulator.LRUPersistence;
+import chav1961.purelib.ui.swing.useful.interfaces.LRUPersistence;
 
 @LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.dialogs.CurrentSettingsDialog/chav1961/ksmgr/i18n/i18n.xml")
 @LocaleResource(value="chav1961.ksmgr.dialogs.settingsdialog",tooltip="chav1961.ksmgr.dialogs.settingsdialog.tt",help="help.aboutApplication")

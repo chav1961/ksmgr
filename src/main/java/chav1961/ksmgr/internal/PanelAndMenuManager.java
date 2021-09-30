@@ -24,7 +24,6 @@ import chav1961.purelib.fsys.interfaces.FileSystemInterface;
 import chav1961.purelib.i18n.interfaces.Localizer;
 import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.useful.JFileList;
-import chav1961.purelib.ui.swing.useful.JFileList.JFileListSelectionType;
 
 public class PanelAndMenuManager {
 	private final JMenuBar				menu;

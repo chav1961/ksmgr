@@ -151,13 +151,13 @@ import chav1961.purelib.ui.swing.interfaces.OnAction;
 import chav1961.purelib.ui.swing.useful.DnDManager;
 import chav1961.purelib.ui.swing.useful.DnDManager.DnDInterface;
 import chav1961.purelib.ui.swing.useful.DnDManager.DnDMode;
+import chav1961.purelib.ui.swing.useful.FileContentChangedEvent;
 import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
-import chav1961.purelib.ui.swing.useful.JFileContentManipulator.FileContentChangeListener;
-import chav1961.purelib.ui.swing.useful.JFileContentManipulator.FileContentChangedEvent;
+import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 import chav1961.purelib.ui.swing.useful.JFileList;
-import chav1961.purelib.ui.swing.useful.JFileListItemDescriptor;
 import chav1961.purelib.ui.swing.useful.JFileSelectionDialog;
 import chav1961.purelib.ui.swing.useful.JStateString;
+import chav1961.purelib.ui.swing.useful.interfaces.FileContentChangeListener;
 
 // https://www.baeldung.com/java-bouncy-castle
 public class Application extends JFrame implements LocaleChangeListener {
@@ -243,7 +243,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 
 			asFileSystem();
 			
-			this.contentManipulator = new JFileContentManipulator(fsi.clone(), this.localizer, InputStreamGetter.dummy(), OutputStreamGetter.dummy() ,this.settings) {
+			this.contentManipulator = new JFileContentManipulator(fsi.clone(), this.localizer, InputStreamGetter.dummy(), OutputStreamGetter.dummy()) {
 													@Override
 													protected void processLoad(final String fileName, final InputStream source, final ProgressIndicator progress) throws IOException {
 														try{
@@ -263,7 +263,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 													}
 												};
 			this.contentManipulator.addFileContentChangeListener(listener);
-			this.rightContentManipulator = new JFileContentManipulator(fsi.clone(),this.localizer, InputStreamGetter.dummy(), OutputStreamGetter.dummy(), this.settings);
+			this.rightContentManipulator = new JFileContentManipulator(fsi.clone(),this.localizer, InputStreamGetter.dummy(), OutputStreamGetter.dummy());
 			this.rightContentManipulator.addFileContentChangeListener(listener);
 
 			state.setAutomaticClearTime(Severity.error,1,TimeUnit.MINUTES);
@@ -288,7 +288,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 						final int	index = ((JFileList)component).locationToIndex(new Point(x,y)); 
 					
 						if (index >= 0) {
-							final JFileListItemDescriptor	desc = (((JFileList)component).getModel()).getElementAt(index);
+							final JFileItemDescriptor	desc = (((JFileList)component).getModel()).getElementAt(index);
 							
 							return desc.isDirectory() ? null : FromFileSystem.class;
 						}
@@ -309,7 +309,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 						final int	index = ((JFileList)from).locationToIndex(new Point(xFrom,yFrom)); 
 					
 						if (index >= 0) {
-							final JFileListItemDescriptor	desc = (((JFileList)from).getModel()).getElementAt(index);
+							final JFileItemDescriptor	desc = (((JFileList)from).getModel()).getElementAt(index);
 							
 							return desc.isDirectory() ? null : new FromFileSystem(desc.getPath());
 						}
@@ -856,7 +856,7 @@ public class Application extends JFrame implements LocaleChangeListener {
 	@OnAction("action:/keyImport")
 	private void keyImport() {
 		final SecretKeyImportDialog		skid = new SecretKeyImportDialog(state, current, algo, settings.preferredProvider);
-		final JFileListItemDescriptor 	desc = ((JFileList)pamm.getRightComponent()).getSelectedValue();
+		final JFileItemDescriptor 		desc = ((JFileList)pamm.getRightComponent()).getSelectedValue();
 		final String					alias = KeyStoreUtils.cutExtension(desc.getName());
 		
 		try{skid.alias = KeyStoreUtils.buildUniqueAlias(current, alias);
