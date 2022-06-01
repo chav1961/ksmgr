@@ -4,19 +4,32 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.datatransfer.DataFlavor;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
+import chav1961.ksmgr.dialogs.AskPasswordDialog;
+import chav1961.ksmgr.dialogs.CurrentSettingsDialog;
+import chav1961.ksmgr.internal.AlgorithmRepo;
+import chav1961.ksmgr.internal.JHighlightedScrollPane;
+import chav1961.ksmgr.internal.KeyStoreViewer;
+import chav1961.ksmgr.internal.PasswordsRepo;
 import chav1961.ksmgr.internal.PureLibClient;
 import chav1961.purelib.basic.ArgParser;
 import chav1961.purelib.basic.PureLibSettings;
@@ -30,6 +43,7 @@ import chav1961.purelib.basic.exceptions.PreparationException;
 import chav1961.purelib.basic.exceptions.SyntaxException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacadeOwner;
+import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
 import chav1961.purelib.i18n.LocalizerFactory;
 import chav1961.purelib.i18n.interfaces.Localizer;
 import chav1961.purelib.i18n.interfaces.Localizer.LocaleChangeListener;
@@ -37,6 +51,8 @@ import chav1961.purelib.i18n.interfaces.SupportedLanguages;
 import chav1961.purelib.model.ContentModelFactory;
 import chav1961.purelib.model.interfaces.ContentMetadataInterface;
 import chav1961.purelib.nanoservice.NanoServiceFactory;
+import chav1961.purelib.ui.interfaces.FormManager;
+import chav1961.purelib.ui.swing.AutoBuiltForm;
 import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.interfaces.OnAction;
 import chav1961.purelib.ui.swing.useful.JDropTargetPlaceholder;
@@ -52,6 +68,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	public static final String				TITLE_HELP_ABOUT_APPLICATION = "application.help.title";
 	public static final String				LEFT_PLACEHOLDER_APPLICATION = "application.placeholder.left";
 
+	public static final String				KEYSTORE_ITEM_ID = "<keystore>";
+	
+	
 	private final ContentMetadataInterface 	app;
 	private final Localizer					localizer;
 	private final int 						localHelpPort;
@@ -60,6 +79,10 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final JStateString				state;
 	private final JSplitPane				leftSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	private final JSplitPane				totalSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+	private final CurrentSettingsDialog		settings;
+	private final AlgorithmRepo				algo = new AlgorithmRepo();
+	private final PasswordsRepo				passwords;
+	private KeyStore						currentKeystore = null;
 	
 	public Application(final ContentMetadataInterface xda, final Localizer parent, final int helpPort, final String configFile, final CountDownLatch latch) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
 		if (xda == null) {
@@ -87,28 +110,21 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			this.menu = SwingUtils.toJComponent(app.byUIPath(URI.create("ui:/model/navigation.top.mainmenu")), JMenuBar.class);
 			SwingUtils.assignActionListeners(menu, this);
 			SwingUtils.assignExitMethod4MainWindow(this, ()->exitApplication());
-		
-			leftSplit.setLeftComponent(new JLabel("LEFT / LEFT"));
-			setPlaceHolder();
-			leftSplit.setRightComponent(new JDropTargetPlaceholder(localizer, LEFT_PLACEHOLDER_APPLICATION, DataFlavor.javaFileListFlavor) {
-				private static final long serialVersionUID = 1L;
 
-				@Override
-				protected boolean processDropOperation(final DataFlavor flavor, final Object content) throws ContentException, IOException {
-					leftSplit.setRightComponent(new JLabel("?????????????"));
-					leftSplit.setDividerLocation(0.5);
-					return true;
-				}
-			});
+			this.settings = new CurrentSettingsDialog(state, configFile, algo);
+			this.passwords = new PasswordsRepo(settings.keepPasswords);
+			
+			this.leftSplit.setLeftComponent(new JLabel("LEFT / LEFT"));
 			totalSplit.setLeftComponent(leftSplit);
 			totalSplit.setRightComponent(new JLabel("RIGHT / RIGHT"));
+			setPlaceHolder();
 			
 			getContentPane().add(menu, BorderLayout.NORTH);
 			getContentPane().add(totalSplit, BorderLayout.CENTER);
 			getContentPane().add(state, BorderLayout.SOUTH);
 			SwingUtils.centerMainWindow(this, 0.75f);
 			
-//			localizer.setCurrentLocale(Locale.forLanguageTag(settings.currentLang));
+			localizer.setCurrentLocale(Locale.forLanguageTag(settings.currentLang));
 			fillLocalizedStrings();
 		}
 	}
@@ -138,8 +154,14 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 	@OnAction("action:/closeKeystore")
 	private void closeKeyStore () {
-		setPlaceHolder();
-		leftSplit.setDividerLocation(0.5);
+		if (currentKeystore != null) {
+			if (settings.keepPasswords) {
+				passwords.deletePasswordFor(KEYSTORE_ITEM_ID);
+			}
+			currentKeystore = null;
+			setPlaceHolder();
+			leftSplit.setDividerLocation(0.5);
+		}
 	}
 	
 	@OnAction("action:/exit")
@@ -155,40 +177,13 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		final Locale				newLocale = newLang.getLocale();
 		
 		PureLibSettings.PURELIB_LOCALIZER.setCurrentLocale(newLocale);
+		settings.currentLang = newLang.getLocale().getLanguage();
 		localizer.setCurrentLocale(newLocale);
-//		settings.currentLang = newLang.getLocale().getLanguage();
 	}
-	
 	
 	@OnAction("action:/helpAbout")
 	private void showAboutScreen() {
 		SwingUtils.showAboutScreen(this, localizer, TITLE_HELP_ABOUT_APPLICATION, HELP_ABOUT_APPLICATION, URI.create("root://chav1961.ksmgr.Application/chav1961/ksmgr/avatar.jpg"), new Dimension(300,300));
-//		
-//		try{final JEditorPane 	pane = new JEditorPane("text/html",null);
-//			final Icon			icon = new ImageIcon(this.getClass().getResource("avatar.jpg"));
-//			
-//			try(final Reader	rdr = localizer.getContent(HELP_ABOUT_APPLICATION,new MimeType("text","x-wiki.creole"),new MimeType("text","html"))) {
-//				pane.read(rdr,null);
-//			}
-//			pane.setEditable(false);
-//			pane.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-//			pane.setPreferredSize(new Dimension(300,300));
-//			pane.addHyperlinkListener(new HyperlinkListener() {
-//								@Override
-//								public void hyperlinkUpdate(final HyperlinkEvent e) {
-//									if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-//										try{Desktop.getDesktop().browse(e.getURL().toURI());
-//										} catch (URISyntaxException | IOException exc) {
-//											exc.printStackTrace();
-//										}
-//									}
-//								}
-//			});
-//			
-//			JOptionPane.showMessageDialog(this,pane,localizer.getValue(TITLE_HELP_ABOUT_APPLICATION),JOptionPane.PLAIN_MESSAGE,icon);
-//		} catch (MimeParseException | IOException e) {
-//			state.message(Severity.error, e.getLocalizedMessage());
-//		}
 	}
 
 	private void setPlaceHolder() {
@@ -197,17 +192,72 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 			@Override
 			protected boolean processDropOperation(final DataFlavor flavor, final Object content) throws ContentException, IOException {
-				leftSplit.setRightComponent(new JLabel("?????????????"));
-				leftSplit.setDividerLocation(0.5);
-				return true;
+				if (flavor.equals(DataFlavor.javaFileListFlavor) && !((List<File>)content).isEmpty()) {
+					openKeystore(((List<File>)content).get(0));
+					leftSplit.setDividerLocation(0.5);
+					return true;
+				}
+				else {
+					return false;
+				}
 			}
 		});
+	}
+	
+	private void openKeystore(final File keystore) {
+		final AskPasswordDialog	apd = new AskPasswordDialog(state);
+		
+		if (askPassword(apd, KEYSTORE_ITEM_ID, 250, 50) && openKeystore(keystore, apd.password)) {
+			if (settings.keepPasswords) {
+				passwords.storePasswordFor(KEYSTORE_ITEM_ID, apd.password);
+			}
+		}
+	}
+
+	private boolean openKeystore(final File file, final char[] password) {
+		try{final KeyStore 			ks = KeyStore.getInstance(file, password);
+			final KeyStoreViewer	ksv = new KeyStoreViewer(app.getRoot(), localizer, state, passwords, file.getName(), ks); 
+			
+			currentKeystore = ks; 
+			leftSplit.setRightComponent(new JHighlightedScrollPane(ksv));
+			ksv.requestFocusInWindow();
+			return true;
+		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+			getLogger().message(Severity.error, e, "Keystore error: "+e.getLocalizedMessage());
+			return false;
+		}		
+	}
+
+	private boolean askPassword(final AskPasswordDialog dialog, final String item, final int width, final int height) {
+		if (item != null) {
+			if (passwords.hasPasswordFor(item)) {
+				dialog.password = passwords.getPasswordFor(item);
+				return true;
+			}
+		}
+		return askDialog(dialog, width, height);
+	}
+	
+	private <T,K> boolean askDialog(final T instance, final int width, final int height) {
+		try{final ContentMetadataInterface	mdi = ContentModelFactory.forAnnotatedClass(instance.getClass());
+			try(final AutoBuiltForm<T,K>	abf = new AutoBuiltForm<T,K>(mdi, localizer, PureLibSettings.INTERNAL_LOADER, instance, (FormManager<K,T>)instance)) {
+				
+				for (Module m : abf.getUnnamedModules()) {
+					instance.getClass().getModule().addExports(instance.getClass().getPackageName(),m);
+				}
+				abf.setPreferredSize(new Dimension(width,height));
+				return AutoBuiltForm.ask(this, localizer, abf);
+			}
+		} catch (LocalizationException | ContentException e) {
+			getLogger().message(Severity.error,e.getLocalizedMessage());
+			return false;
+		} 
 	}
 	
 	private void fillLocalizedStrings() throws LocalizationException, IllegalArgumentException {
 		setTitle(localizer.getValue(TITLE_APPLICATION));
 	}
-	
+
 	public static void main(final String[] args) throws IOException, EnvironmentException, FlowException, ContentException, HeadlessException, URISyntaxException {
 		final ArgParser		parser = new ApplicationArgParser().parse(args);
 		final SubstitutableProperties		props = new SubstitutableProperties(Utils.mkProps(

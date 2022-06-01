@@ -1360,7 +1360,7 @@ public class OldApplication extends JFrame implements LocaleChangeListener {
 			throw new NullPointerException("Password dialog can't be null");
 		}
 		else {
-			return application.askPassword(dialog,item,250,50);
+			return application.askPassword(dialog, item, 250, 50);
 		}
 	}
 	

@@ -76,7 +76,7 @@ public class KeyStoreViewer extends JTable {
 	private final KeyStore				store;
 	
 	public KeyStoreViewer(final ContentNodeMetadata meta, final Localizer localizer, final LoggerFacade logger, final PasswordsRepo repo, final String fileName, final KeyStore store) {
-		super(new KeyStoreModel(fileName,store,logger,repo));
+		super(new KeyStoreModel(fileName, store, logger, repo));
 		
 		if (meta == null) {
 			throw new NullPointerException("Node metadata can't be null"); 
