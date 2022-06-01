@@ -20,6 +20,8 @@
 		<key name="menu.file.saveKeyStore.tt">Save keystore</key>
 		<key name="menu.file.saveKeyStoreAs">Save keystore as...</key>
 		<key name="menu.file.saveKeyStoreAs.tt">Save keystore with different name</key>
+		<key name="menu.file.closeKeyStore">Close keystore</key>
+		<key name="menu.file.closeKeyStore.tt">Close keystore opened</key>
 		<key name="menu.file.changePassword">Change password</key>
 		<key name="menu.file.changePassword.tt">Change keystore password</key>
 		<key name="menu.file.exit">Exit</key>
@@ -327,6 +329,8 @@
 		<key name="menu.file.saveKeyStore.tt">Сохранить изменения в репозитарии</key>
 		<key name="menu.file.saveKeyStoreAs">Сохранить как...</key>
 		<key name="menu.file.saveKeyStoreAs.tt">Сохранить измененный репозитарий под новым именем</key>
+		<key name="menu.file.closeKeyStore">Закрыть репозитарий</key>
+		<key name="menu.file.closeKeyStore.tt">Закрыть открытый в данный момент репозитарий</key>
 		<key name="menu.file.changePassword">Смена пароля</key>
 		<key name="menu.file.changePassword.tt">Изменить пароль репозитария</key>
 		<key name="menu.file.exit">Выход</key>

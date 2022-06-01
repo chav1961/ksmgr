@@ -17,7 +17,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import chav1961.ksmgr.Application;
+import chav1961.ksmgr.OldApplication;
 import chav1961.ksmgr.internal.KeyStoreViewer.KeyStoreViewerSelectionType;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.fsys.interfaces.FileSystemInterface;
@@ -49,7 +49,7 @@ public class PanelAndMenuManager {
 	private JComponent					rightComponent = null;
 	private boolean						rightFocused = false; 
 									
-	public PanelAndMenuManager(final Application parent, final JMenuBar menu, final Localizer localizer, final LoggerFacade logger, final FileSystemInterface fsi, final JSplitPane splitter) {
+	public PanelAndMenuManager(final OldApplication parent, final JMenuBar menu, final Localizer localizer, final LoggerFacade logger, final FileSystemInterface fsi, final JSplitPane splitter) {
 		this.splitter = splitter;
 		this.rightContainer = new RightPanelContainer(parent, localizer, logger, fsi, splitter);
 		this.menu = menu;

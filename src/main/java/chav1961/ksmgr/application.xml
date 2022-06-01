@@ -11,6 +11,7 @@
 			<app:separator/>
 			<app:item name="menu.file.savekeystore" caption="menu.file.saveKeyStore" tooltip="menu.file.saveKeyStore.tt" action="saveKeyStore"/>
 			<app:item name="menu.file.savekeystoreas" caption="menu.file.saveKeyStoreAs" tooltip="menu.file.saveKeyStoreAs.tt" action="saveKeyStoreAs"/>
+			<app:item name="menu.file.closekeystore" caption="menu.file.closeKeyStore" tooltip="menu.file.closeKeyStore.tt" action="closeKeystore"/>
 			<app:separator/>
 			<app:item name="menu.file.changePassword" caption="menu.file.changePassword" tooltip="menu.file.changePassword.tt" action="changePassword"/>
 			<app:separator/>

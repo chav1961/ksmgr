@@ -39,7 +39,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import chav1961.ksmgr.Application;
+import chav1961.ksmgr.OldApplication;
 import chav1961.ksmgr.dialogs.AskPasswordDialog;
 import chav1961.ksmgr.internal.KeyStoreViewer.ItemDescriptor.ItemType;
 import chav1961.purelib.basic.exceptions.LocalizationException;
@@ -453,7 +453,7 @@ public class KeyStoreViewer extends JTable {
 				else if (ks.isKeyEntry(desc.alias)) {
 					final AskPasswordDialog	apd = new AskPasswordDialog(logger);
 					
-					if (Application.askPassword(apd,desc.alias)) {
+					if (OldApplication.askPassword(apd,desc.alias)) {
 						final Key 			key = ks.getKey(desc.alias, apd.password);
 						final Certificate[]	chain = ks.getCertificateChain(desc.alias);
 

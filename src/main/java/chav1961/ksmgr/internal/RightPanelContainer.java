@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import chav1961.ksmgr.Application;
+import chav1961.ksmgr.OldApplication;
 import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
@@ -27,7 +27,7 @@ public class RightPanelContainer implements AutoCloseable, LocaleChangeListener 
 		UNKNOWN
 	}
 	
-	private final Application 			app;
+	private final OldApplication 			app;
 	private final Localizer				localizer;
 	private final LoggerFacade			logger;
 	private final FileSystemInterface	fsi;
@@ -37,7 +37,7 @@ public class RightPanelContainer implements AutoCloseable, LocaleChangeListener 
 	private JComponent					component = new JLabel();
 	private KeyStore					keystore = null;
 	
-	public RightPanelContainer(final Application app, final Localizer localizer, final LoggerFacade logger, final FileSystemInterface fsi, final JSplitPane container) {
+	public RightPanelContainer(final OldApplication app, final Localizer localizer, final LoggerFacade logger, final FileSystemInterface fsi, final JSplitPane container) {
 		if (app == null) {
 			throw new NullPointerException("Application can't be null"); 
 		}
