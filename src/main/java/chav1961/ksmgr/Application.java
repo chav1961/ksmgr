@@ -28,9 +28,10 @@ import chav1961.ksmgr.dialogs.AskPasswordDialog;
 import chav1961.ksmgr.dialogs.CurrentSettingsDialog;
 import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.ksmgr.internal.JHighlightedScrollPane;
-import chav1961.ksmgr.internal.KeyStoreViewer;
-import chav1961.ksmgr.internal.PasswordsRepo;
 import chav1961.ksmgr.internal.PureLibClient;
+import chav1961.ksmgr.keystore.KeyStoreViewer;
+import chav1961.ksmgr.utils.GuiUtils;
+import chav1961.ksmgr.keystore.KeyStoreState;
 import chav1961.purelib.basic.ArgParser;
 import chav1961.purelib.basic.PureLibSettings;
 import chav1961.purelib.basic.SubstitutableProperties;
@@ -56,6 +57,7 @@ import chav1961.purelib.ui.swing.AutoBuiltForm;
 import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.interfaces.OnAction;
 import chav1961.purelib.ui.swing.useful.JDropTargetPlaceholder;
+import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
 import chav1961.purelib.ui.swing.useful.JStateString;
 
 public class Application extends JFrame implements LocaleChangeListener, LoggerFacadeOwner {
@@ -82,6 +84,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final CurrentSettingsDialog		settings;
 	private final AlgorithmRepo				algo = new AlgorithmRepo();
 	private final PasswordsRepo				passwords;
+//	private final JFileContentManipulator	contentManipulator;
 	private KeyStore						currentKeystore = null;
 	
 	public Application(final ContentMetadataInterface xda, final Localizer parent, final int helpPort, final String configFile, final CountDownLatch latch) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
@@ -107,6 +110,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			localizer.addLocaleChangeListener(this);
 			
 			this.state = new JStateString(this.localizer,10);
+			
 			this.menu = SwingUtils.toJComponent(app.byUIPath(URI.create("ui:/model/navigation.top.mainmenu")), JMenuBar.class);
 			SwingUtils.assignActionListeners(menu, this);
 			SwingUtils.assignExitMethod4MainWindow(this, ()->exitApplication());
@@ -125,6 +129,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			SwingUtils.centerMainWindow(this, 0.75f);
 			
 			localizer.setCurrentLocale(Locale.forLanguageTag(settings.currentLang));
+			refreshMenuState(KeyStoreState.MISSING);
 			fillLocalizedStrings();
 		}
 	}
@@ -142,6 +147,10 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		return state;
 	}
 	
+	public PasswordsRepo getPasswordsRepo() {
+		return passwords;
+	}
+	
 	@Override
 	public void setVisible(final boolean visible) {
 		super.setVisible(visible);
@@ -152,6 +161,21 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		}
 	}
 
+	public boolean askPassword(final AskPasswordDialog dialog, final String item, final int width, final int height) {
+		if (dialog == null) {
+			throw new NullPointerException("Ask apssword dialog can't be null");
+		}
+		else {
+			if (item != null) {
+				if (passwords.hasPasswordFor(item)) {
+					dialog.password = passwords.getPasswordFor(item);
+					return true;
+				}
+			}
+			return GuiUtils.askDialog(this, localizer, dialog, width, height);
+		}
+	}
+	
 	@OnAction("action:/closeKeystore")
 	private void closeKeyStore () {
 		if (currentKeystore != null) {
@@ -178,7 +202,6 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		
 		PureLibSettings.PURELIB_LOCALIZER.setCurrentLocale(newLocale);
 		settings.currentLang = newLang.getLocale().getLanguage();
-		localizer.setCurrentLocale(newLocale);
 	}
 	
 	@OnAction("action:/helpAbout")
@@ -228,32 +251,21 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		}		
 	}
 
-	private boolean askPassword(final AskPasswordDialog dialog, final String item, final int width, final int height) {
-		if (item != null) {
-			if (passwords.hasPasswordFor(item)) {
-				dialog.password = passwords.getPasswordFor(item);
-				return true;
-			}
+	
+	private void refreshMenuState(final KeyStoreState state) {
+		for (String item : state.getEnabledItems()) {
+			refreshMenuState(item, true);
 		}
-		return askDialog(dialog, width, height);
+		for (String item : state.getDisabledItems()) {
+			refreshMenuState(item, false);
+		}
 	}
 	
-	private <T,K> boolean askDialog(final T instance, final int width, final int height) {
-		try{final ContentMetadataInterface	mdi = ContentModelFactory.forAnnotatedClass(instance.getClass());
-			try(final AutoBuiltForm<T,K>	abf = new AutoBuiltForm<T,K>(mdi, localizer, PureLibSettings.INTERNAL_LOADER, instance, (FormManager<K,T>)instance)) {
-				
-				for (Module m : abf.getUnnamedModules()) {
-					instance.getClass().getModule().addExports(instance.getClass().getPackageName(),m);
-				}
-				abf.setPreferredSize(new Dimension(width,height));
-				return AutoBuiltForm.ask(this, localizer, abf);
-			}
-		} catch (LocalizationException | ContentException e) {
-			getLogger().message(Severity.error,e.getLocalizedMessage());
-			return false;
-		} 
+	private void refreshMenuState(final String modelName, final boolean enableState) {
+		// TODO Auto-generated method stub
+		
 	}
-	
+
 	private void fillLocalizedStrings() throws LocalizationException, IllegalArgumentException {
 		setTitle(localizer.getValue(TITLE_APPLICATION));
 	}

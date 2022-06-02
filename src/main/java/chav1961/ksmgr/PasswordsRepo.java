@@ -1,4 +1,4 @@
-package chav1961.ksmgr.internal;
+package chav1961.ksmgr;
 
 import java.util.HashMap;
 import java.util.Map;

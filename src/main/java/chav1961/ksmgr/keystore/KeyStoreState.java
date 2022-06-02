@@ -1,6 +1,6 @@
-package chav1961.ksmgr;
+package chav1961.ksmgr.keystore;
 
-public enum KeystoreState {
+public enum KeyStoreState {
 	MISSING(new String[]{"menu.file.newkeystore", "menu.file.openkeystore"}, new String[]{"menu.file.savekeystore", "menu.file.savekeystoreas", "menu.file.closekeystore"}),
 	NEW(new String[]{"menu.file.newkeystore", "menu.file.openkeystore", "menu.file.savekeystoreas", "menu.file.closekeystore"}, new String[]{"menu.file.savekeystore"}),
 	NEW_MODIFIED(new String[]{"menu.file.newkeystore", "menu.file.openkeystore", "menu.file.savekeystoreas", "menu.file.closekeystore"}, new String[]{"menu.file.savekeystore"}),
@@ -10,7 +10,7 @@ public enum KeystoreState {
 	private final String[] 	enabledItems;
 	private final String[] 	disabledItems;
 	
-	private KeystoreState(final String[] enabledItems, final String[] disabledItems) {
+	private KeyStoreState(final String[] enabledItems, final String[] disabledItems) {
 		this.enabledItems = enabledItems;
 		this.disabledItems = disabledItems;
 	}

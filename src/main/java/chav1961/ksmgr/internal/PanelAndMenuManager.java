@@ -18,7 +18,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import chav1961.ksmgr.OldApplication;
-import chav1961.ksmgr.internal.KeyStoreViewer.KeyStoreViewerSelectionType;
+import chav1961.ksmgr.keystore.KeyStoreViewer;
+import chav1961.ksmgr.keystore.KeyStoreViewer.KeyStoreViewerSelectionType;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.fsys.interfaces.FileSystemInterface;
 import chav1961.purelib.i18n.interfaces.Localizer;

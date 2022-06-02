@@ -1,4 +1,4 @@
-package chav1961.ksmgr.internal;
+package chav1961.ksmgr.keystore;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

@@ -10,6 +10,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 import chav1961.ksmgr.OldApplication;
+import chav1961.ksmgr.keystore.KeyStoreViewer;
 import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;

@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import chav1961.ksmgr.internal.AlgorithmRepo;
-import chav1961.ksmgr.internal.KeyStoreUtils;
+import chav1961.ksmgr.keystore.KeyStoreUtils;
 import chav1961.purelib.basic.exceptions.FlowException;
 import chav1961.purelib.basic.exceptions.LocalizationException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
