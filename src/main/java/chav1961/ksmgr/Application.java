@@ -44,6 +44,7 @@ import chav1961.purelib.basic.exceptions.PreparationException;
 import chav1961.purelib.basic.exceptions.SyntaxException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
 import chav1961.purelib.basic.interfaces.LoggerFacadeOwner;
+import chav1961.purelib.fsys.interfaces.FileSystemInterface;
 import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
 import chav1961.purelib.i18n.LocalizerFactory;
 import chav1961.purelib.i18n.interfaces.Localizer;
@@ -52,12 +53,14 @@ import chav1961.purelib.i18n.interfaces.SupportedLanguages;
 import chav1961.purelib.model.ContentModelFactory;
 import chav1961.purelib.model.interfaces.ContentMetadataInterface;
 import chav1961.purelib.nanoservice.NanoServiceFactory;
-import chav1961.purelib.ui.interfaces.FormManager;
-import chav1961.purelib.ui.swing.AutoBuiltForm;
 import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.interfaces.OnAction;
 import chav1961.purelib.ui.swing.useful.JDropTargetPlaceholder;
-import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
+import chav1961.purelib.ui.swing.useful.JFileList;
+import chav1961.purelib.ui.swing.useful.JFileList.ContentViewType;
+import chav1961.purelib.ui.swing.useful.JFileList.SelectedObjects;
+import chav1961.purelib.ui.swing.useful.JFileList.SelectionType;
+import chav1961.purelib.ui.swing.useful.JFileTree;
 import chav1961.purelib.ui.swing.useful.JStateString;
 
 public class Application extends JFrame implements LocaleChangeListener, LoggerFacadeOwner {
@@ -84,6 +87,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final CurrentSettingsDialog		settings;
 	private final AlgorithmRepo				algo = new AlgorithmRepo();
 	private final PasswordsRepo				passwords;
+	private final FileSystemInterface		root = FileSystemInterface.Factory.newInstance(URI.create(FileSystemInterface.FILESYSTEM_URI_SCHEME+":file:/")); 
+	private final JFileTree					leftTree;
+	private final JFileList					rightList;
 //	private final JFileContentManipulator	contentManipulator;
 	private KeyStore						currentKeystore = null;
 	
@@ -117,11 +123,27 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 			this.settings = new CurrentSettingsDialog(state, configFile, algo);
 			this.passwords = new PasswordsRepo(settings.keepPasswords);
+			this.leftTree = new JFileTree(getLogger(), root, false) {
+									private static final long serialVersionUID = 1L;
+
+									@Override
+									public void refreshLinkedContent(FileSystemInterface content) {
+										// TODO Auto-generated method stub
+										try {
+//											System.err.println("In: "+content.getPath());
+											rightList.refreshContent(content.getPath());
+										} catch (IOException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+									}
+								};
+			this.rightList = new JFileList(localizer, getLogger(), root, false, SelectionType.MULTIPLE, SelectedObjects.FILES, ContentViewType.AS_TABLE);
 			
-			this.leftSplit.setLeftComponent(new JLabel("LEFT / LEFT"));
-			totalSplit.setLeftComponent(leftSplit);
-			totalSplit.setRightComponent(new JLabel("RIGHT / RIGHT"));
+			this.leftSplit.setLeftComponent(new JScrollPane(leftTree));
 			setPlaceHolder();
+			totalSplit.setLeftComponent(leftSplit);
+			totalSplit.setRightComponent(new JScrollPane(rightList));
 			
 			getContentPane().add(menu, BorderLayout.NORTH);
 			getContentPane().add(totalSplit, BorderLayout.CENTER);
@@ -216,7 +238,10 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			@Override
 			protected boolean processDropOperation(final DataFlavor flavor, final Object content) throws ContentException, IOException {
 				if (flavor.equals(DataFlavor.javaFileListFlavor) && !((List<File>)content).isEmpty()) {
-					openKeystore(((List<File>)content).get(0));
+					for (File item : (List<File>)content) {
+						openKeystore(item);
+						break;
+					}
 					leftSplit.setDividerLocation(0.5);
 					return true;
 				}

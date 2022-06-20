@@ -5,7 +5,7 @@
 		<key name="application.title">(c) 2020, A.V.Chernomyrdin, Key store manager V.R.=1.0</key>
 		<key name="application.help.title">About...</key>
 		<key name="application.help">uri(aboutApplication.cre)</key>
-		<key name="application.placeholder.left">Open or create key store for left panel...\nYou can also drag key store file from the right panel to left one</key>		
+		<key name="application.placeholder.left">Open or create key store for left panel...\\nYou can also drag key store file from the right panel here</key>		
 
 <!-- Localization for application menu --> 
 		<key name="menu.file">File</key>
@@ -314,7 +314,7 @@
 		<key name="application.title">(c) 2020, А.В.Черномырдин, Менеджер репозитариев ключей V.R.=1.0</key>
 		<key name="application.help.title">О программе...</key>
 		<key name="application.help">uri(aboutApplication.cre)</key>
-		<key name="application.placeholder.left">Создайте или откройте репозитарий ключей для левой панели\n Можно также перетащить сюда файл репозитария с правой панели</key>		
+		<key name="application.placeholder.left">Создайте или откройте репозитарий ключей для левой панели\\nМожно также перетащить сюда файл репозитария с правой панели</key>		
 
 <!-- Локализация меню приложения --> 
 		<key name="menu.file">Файл</key>
