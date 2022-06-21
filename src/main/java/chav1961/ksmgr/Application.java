@@ -137,8 +137,26 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 											e.printStackTrace();
 										}
 									}
+
+									@Override
+									public void placeFileContent(final Iterable<File> content) {
+										// TODO Auto-generated method stub
+										for(File f : content) {
+											System.err.println("Drop left "+f.getAbsolutePath());									
+										}
+									}
 								};
-			this.rightList = new JFileList(localizer, getLogger(), root, false, SelectionType.MULTIPLE, SelectedObjects.FILES, ContentViewType.AS_TABLE);
+			this.rightList = new JFileList(localizer, getLogger(), root, false, SelectionType.MULTIPLE, SelectedObjects.FILES, ContentViewType.AS_LARGE_ICONS) {
+									private static final long serialVersionUID = -1076235686454398505L;
+					
+									@Override
+									public void placeFileContent(Iterable<File> content) {
+										// TODO Auto-generated method stub
+										for(File f : content) {
+											System.err.println("Drop right "+f.getAbsolutePath());									
+										}
+									}
+								};
 			
 			this.leftSplit.setLeftComponent(new JScrollPane(leftTree));
 			setPlaceHolder();
