@@ -146,7 +146,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 										}
 									}
 								};
-			this.rightList = new JFileList(localizer, getLogger(), root, false, SelectionType.MULTIPLE, SelectedObjects.FILES, ContentViewType.AS_LARGE_ICONS) {
+			this.rightList = new JFileList(localizer, getLogger(), root, false, SelectionType.MULTIPLE, SelectedObjects.FILES, ContentViewType.AS_ICONS) {
 									private static final long serialVersionUID = -1076235686454398505L;
 					
 									@Override

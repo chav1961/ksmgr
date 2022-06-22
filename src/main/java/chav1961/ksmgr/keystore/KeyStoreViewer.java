@@ -490,10 +490,10 @@ public class KeyStoreViewer extends JTable {
 	
 	public static class ItemDescriptor {
 		public enum ItemType {
-			CERTIFICATE("certificate.png"),
-			KEY_PAIR("keypair.png"),
-			SECRET_KEY("key.png"),
-			UNKNOWN("unknown.png");
+			CERTIFICATE("/images/certificate.png"),
+			KEY_PAIR("/images/keypair.png"),
+			SECRET_KEY("/images/key.png"),
+			UNKNOWN("/images/unknown.png");
 			
 			private final String iconName; 
 			
