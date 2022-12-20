@@ -45,6 +45,11 @@
 			<artifactId>purelib</artifactId>
 			<version>0.0.6</version>
 		</dependency>		
+  		<dependency>
+			<groupId>com.github.chav1961</groupId>
+			<artifactId>bt.security</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>		
 		<dependency>
 		    <groupId>org.bouncycastle</groupId>
 		    <artifactId>bcpkix-jdk15on</artifactId>

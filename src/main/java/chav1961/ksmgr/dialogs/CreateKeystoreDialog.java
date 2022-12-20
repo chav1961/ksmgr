@@ -1,9 +1,13 @@
 package chav1961.ksmgr.dialogs;
 
+import java.security.Provider;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import chav1961.bt.security.AlgorithmUtils;
+import chav1961.bt.security.AlgorithmUtils.AlgorithmDescriptor;
+import chav1961.bt.security.interfaces.AlgorithmType;
 import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.purelib.basic.exceptions.FlowException;
 import chav1961.purelib.basic.exceptions.LocalizationException;
@@ -22,7 +26,7 @@ public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreD
 	
 	private final LoggerFacade	facade;
 	private final AlgorithmRepo	repo;
-	private final String		provider;
+	private final Provider		provider;
 	
 	@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog.type",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt")
 	@Format("30msd")
@@ -36,7 +40,7 @@ public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreD
 	@Format("30ms")
 	public char[]				passwordRetype = null;
 
-	public CreateKeystoreDialog(final LoggerFacade facade, final AlgorithmRepo repo, final String provider) {
+	public CreateKeystoreDialog(final LoggerFacade facade, final AlgorithmRepo repo, final Provider provider) {
 		if (facade == null) {
 			throw new NullPointerException("Logger facade can't be null"); 
 		}
@@ -71,7 +75,7 @@ public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreD
 				}
 				return RefreshMode.DEFAULT;
 			case "type" :
-				if (!repo.exists(ALGORITHM_TYPE, provider, type)) {
+				if (!AlgorithmUtils.exists(provider, AlgorithmType.KEY_STORE, type)) {
 					if (beforeCommit) {
 						getLogger().message(Severity.error,"Unknown key store type ["+type+"]");
 						return RefreshMode.REJECT;
@@ -98,9 +102,9 @@ public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreD
 				final Set<String>	algorithms = new HashSet<>();
 				final String		prefix = ((String)parameters[0]).toUpperCase();
 
-				for (String item : repo.getAlgorithms(ALGORITHM_TYPE,provider)) {
-					if (item.toUpperCase().startsWith(prefix)) {
-						algorithms.add(item);
+				for(AlgorithmDescriptor item : AlgorithmUtils.getAlgorithms(provider, AlgorithmType.KEY_STORE)) {
+					if (item.getName().startsWith(prefix)) {
+						algorithms.add(item.getName());
 					}
 				}
 				final String[]		result = algorithms.toArray(new String[algorithms.size()]); 

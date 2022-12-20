@@ -23,7 +23,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
+import chav1961.bt.security.keystore.KeyStoreController;
 import chav1961.ksmgr.dialogs.AskPasswordDialog;
+import chav1961.ksmgr.dialogs.CreateKeystoreDialog;
 import chav1961.ksmgr.dialogs.CurrentSettingsDialog;
 import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.ksmgr.internal.JHighlightedScrollPane;
@@ -214,6 +216,29 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			return GuiUtils.askDialog(this, localizer, dialog, width, height);
 		}
 	}
+	
+	@OnAction("action:/newKeyStore")
+	private void newKeystore() {
+		final CreateKeystoreDialog	cks = new CreateKeystoreDialog(state, algo, PureLibClient.PROVIDER);
+		
+		if (GuiUtils.askDialog(this, localizer, cks, 300, 100)) {
+//			try{final KeyStoreController	ks = new KeyStoreController();
+//				ks.load(null,cks.password);
+//				
+//				contentManipulator.newFile();
+//				contentManipulator.setModificationFlag();
+//				
+//				final KeyStore	ks = KeyStore.getInstance(cks.type);
+//				ks.load(null,cks.password);
+//				
+//				refreshLeftPanel("<new>",ks,cks.password);
+//				state.message(Severity.info,"New ["+cks.type+"] key store created");
+//			} catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException e) {
+//				state.message(Severity.error,"Error creating keystore: "+e.getLocalizedMessage());
+//			}
+		}
+	}
+	
 	
 	@OnAction("action:/closeKeystore")
 	private void closeKeyStore () {
