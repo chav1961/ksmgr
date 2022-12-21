@@ -22,10 +22,7 @@ import chav1961.purelib.ui.interfaces.RefreshMode;
 @LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.dialogs.CreateKeystoreDialog/chav1961/ksmgr/i18n/i18n.xml")
 @LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.tt",help="chav1961.ksmgr.dialogs.createkeystoredialog.help")
 public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreDialog> {
-	private static final String	ALGORITHM_TYPE = "KeyStore";
-	
 	private final LoggerFacade	facade;
-	private final AlgorithmRepo	repo;
 	private final Provider		provider;
 	
 	@LocaleResource(value="chav1961.ksmgr.dialogs.createkeystoredialog.type",tooltip="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt")
@@ -40,19 +37,15 @@ public class CreateKeystoreDialog implements FormManager<Object, CreateKeystoreD
 	@Format("30ms")
 	public char[]				passwordRetype = null;
 
-	public CreateKeystoreDialog(final LoggerFacade facade, final AlgorithmRepo repo, final Provider provider) {
+	public CreateKeystoreDialog(final LoggerFacade facade, final Provider provider) {
 		if (facade == null) {
 			throw new NullPointerException("Logger facade can't be null"); 
-		}
-		else if (repo == null) {
-			throw new NullPointerException("Algorithm repo can't be null"); 
 		}
 		else if (provider == null || provider.isEmpty()) {
 			throw new IllegalArgumentException("preferred provider can't be null or empty"); 
 		}
 		else {
 			this.facade = facade;
-			this.repo = repo;
 			this.provider = provider;
 		}
 	}

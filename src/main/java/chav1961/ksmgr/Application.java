@@ -23,7 +23,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import chav1961.bt.security.keystore.KeyStoreController;
 import chav1961.ksmgr.dialogs.AskPasswordDialog;
 import chav1961.ksmgr.dialogs.CreateKeystoreDialog;
 import chav1961.ksmgr.dialogs.CurrentSettingsDialog;
@@ -63,7 +62,7 @@ import chav1961.purelib.ui.swing.useful.JFileList.SelectedObjects;
 import chav1961.purelib.ui.swing.useful.JFileList.SelectionType;
 import chav1961.purelib.ui.swing.useful.JFileTree;
 import chav1961.purelib.ui.swing.useful.JStateString;
-
+ 
 public class Application extends JFrame implements LocaleChangeListener, LoggerFacadeOwner {
 	private static final long serialVersionUID = -1812854125768597438L;
 	public static final String				ARG_HELP_PORT = "port";
@@ -219,7 +218,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	
 	@OnAction("action:/newKeyStore")
 	private void newKeystore() {
-		final CreateKeystoreDialog	cks = new CreateKeystoreDialog(state, algo, PureLibClient.PROVIDER);
+		final CreateKeystoreDialog	cks = new CreateKeystoreDialog(state, PureLibClient.PROVIDER);
 		
 		if (GuiUtils.askDialog(this, localizer, cks, 300, 100)) {
 //			try{final KeyStoreController	ks = new KeyStoreController();
