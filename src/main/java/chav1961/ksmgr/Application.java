@@ -3,6 +3,7 @@ package chav1961.ksmgr;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
+import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.io.IOException;
@@ -139,7 +140,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 									}
 
 									@Override
-									public void placeFileContent(final Iterable<File> content) {
+									public void placeFileContent(final Point location, final Iterable<File> content) {
 										// TODO Auto-generated method stub
 										for(File f : content) {
 											System.err.println("Drop left "+f.getAbsolutePath());									
@@ -150,7 +151,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 									private static final long serialVersionUID = -1076235686454398505L;
 					
 									@Override
-									public void placeFileContent(Iterable<File> content) {
+									public void placeFileContent(final Point location, Iterable<File> content) {
 										// TODO Auto-generated method stub
 										for(File f : content) {
 											System.err.println("Drop right "+f.getAbsolutePath());									
