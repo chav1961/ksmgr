@@ -31,7 +31,6 @@
   	<properties>
 	    <github.global.server>github</github.global.server>
 	</properties>
-
   
 	<dependencies>
 		<dependency>
@@ -44,11 +43,6 @@
 			<groupId>com.github.chav1961</groupId>
 			<artifactId>purelib</artifactId>
 			<version>0.0.7</version>
-		</dependency>		
-  		<dependency>
-			<groupId>com.github.chav1961</groupId>
-			<artifactId>bt.security</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
 		</dependency>		
 		<dependency>
 		    <groupId>org.bouncycastle</groupId>
@@ -103,7 +97,7 @@
            <plugin>
                <groupId>org.apache.maven.plugins</groupId>
                <artifactId>maven-jar-plugin</artifactId>
-               <version>2.6</version>
+               <version>3.2.0</version>
                <inherited>true</inherited>
                <configuration>
                    <archive>
