@@ -62,27 +62,20 @@ import chav1961.purelib.i18n.interfaces.Localizer.LocaleChangeListener;
 import chav1961.purelib.i18n.interfaces.SupportedLanguages;
 import chav1961.purelib.model.ContentModelFactory;
 import chav1961.purelib.model.interfaces.ContentMetadataInterface;
-<<<<<<< HEAD
-=======
 import chav1961.purelib.ui.interfaces.FormManager;
 import chav1961.purelib.ui.interfaces.LRUPersistence;
 import chav1961.purelib.ui.swing.AutoBuiltForm;
->>>>>>> branch 'master' of https://github.com/chav1961/ksmgr.git
 import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.interfaces.OnAction;
-<<<<<<< HEAD
+import chav1961.purelib.ui.swing.useful.DnDManager.DnDMode;
 import chav1961.purelib.ui.swing.useful.JDropTargetPlaceholder;
+import chav1961.purelib.ui.swing.useful.JEnableMaskManipulator;
+import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
 import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 import chav1961.purelib.ui.swing.useful.JFileList;
 import chav1961.purelib.ui.swing.useful.JFileList.ContentViewType;
 import chav1961.purelib.ui.swing.useful.JFileList.SelectedObjects;
 import chav1961.purelib.ui.swing.useful.JFileList.SelectionType;
-=======
-import chav1961.purelib.ui.swing.useful.DnDManager.DnDMode;
-import chav1961.purelib.ui.swing.useful.JEnableMaskManipulator;
-import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
-import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
->>>>>>> branch 'master' of https://github.com/chav1961/ksmgr.git
 import chav1961.purelib.ui.swing.useful.JFileTree;
 import chav1961.purelib.ui.swing.useful.JPlaceHolder;
 import chav1961.purelib.ui.swing.useful.JStateString;
@@ -181,36 +174,11 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				public void placeFileContent(final Point location, final Iterable<JFileItemDescriptor> content) {
 				}
 
-<<<<<<< HEAD
-									@Override
- 								    public void placeFileContent(Point location, java.lang.Iterable<chav1961.purelib.ui.swing.useful.JFileItemDescriptor> content) {
-										for( JFileItemDescriptor f : content) {
-											System.err.println("Drop left "+f.getPath());									
-										}
-								    }
-								};
-			this.rightList = new JFileList(localizer, getLogger(), root, false, SelectionType.MULTIPLE, SelectedObjects.FILES, ContentViewType.AS_ICONS) {
-									private static final long serialVersionUID = -1076235686454398505L;
-					
-									@Override
- 								    public void placeFileContent(Point location, java.lang.Iterable<chav1961.purelib.ui.swing.useful.JFileItemDescriptor> content) {
-										for( JFileItemDescriptor f : content) {
-											System.err.println("Drop right "+f.getPath());									
-										}
-								    }
-								};
-			
-			this.leftSplit.setLeftComponent(new JScrollPane(leftTree));
-			setPlaceHolder();
-			totalSplit.setLeftComponent(leftSplit);
-			totalSplit.setRightComponent(new JScrollPane(rightList));
-=======
 				@Override
 				public void refreshLinkedContent(final FileSystemInterface content) {
 				}
 			}));			
 			selectCurrentPanel(SelectedWindows.BOTTOM);
->>>>>>> branch 'master' of https://github.com/chav1961/ksmgr.git
 			
 			getContentPane().add(menu, BorderLayout.NORTH);
 			getContentPane().add(totalSplit, BorderLayout.CENTER);
@@ -512,20 +480,11 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	public static void main(final String[] args) throws IOException, EnvironmentException, FlowException, ContentException, HeadlessException, URISyntaxException {
 		final ArgParser		parser = new ApplicationArgParser().parse(args);
 		
-<<<<<<< HEAD
-		try(final InputStream				is = Application.class.getResourceAsStream("application.xml")) {
-=======
 		try(final InputStream		is = Application.class.getResourceAsStream("application.xml")) {
->>>>>>> branch 'master' of https://github.com/chav1961/ksmgr.git
 			final ContentMetadataInterface	xda = ContentModelFactory.forXmlDescription(is);
 			final Application		application = new Application(xda, PureLibSettings.PURELIB_LOCALIZER, parser.getValue(ARG_LOCAL_CONFIG, File.class));
 			
 			application.setVisible(true);
-<<<<<<< HEAD
-			latch.await();
-		} catch (InterruptedException e) {
-=======
->>>>>>> branch 'master' of https://github.com/chav1961/ksmgr.git
 		}
 	}
 	
