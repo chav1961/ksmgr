@@ -53,10 +53,10 @@ import chav1961.purelib.i18n.interfaces.Localizer.LocaleChangeListener;
 import chav1961.purelib.i18n.interfaces.SupportedLanguages;
 import chav1961.purelib.model.ContentModelFactory;
 import chav1961.purelib.model.interfaces.ContentMetadataInterface;
-import chav1961.purelib.nanoservice.NanoServiceFactory;
 import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.interfaces.OnAction;
 import chav1961.purelib.ui.swing.useful.JDropTargetPlaceholder;
+import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 import chav1961.purelib.ui.swing.useful.JFileList;
 import chav1961.purelib.ui.swing.useful.JFileList.ContentViewType;
 import chav1961.purelib.ui.swing.useful.JFileList.SelectedObjects;
@@ -140,23 +140,21 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 									}
 
 									@Override
-									public void placeFileContent(final Point location, final Iterable<File> content) {
-										// TODO Auto-generated method stub
-										for(File f : content) {
-											System.err.println("Drop left "+f.getAbsolutePath());									
+ 								    public void placeFileContent(Point location, java.lang.Iterable<chav1961.purelib.ui.swing.useful.JFileItemDescriptor> content) {
+										for( JFileItemDescriptor f : content) {
+											System.err.println("Drop left "+f.getPath());									
 										}
-									}
+								    }
 								};
 			this.rightList = new JFileList(localizer, getLogger(), root, false, SelectionType.MULTIPLE, SelectedObjects.FILES, ContentViewType.AS_ICONS) {
 									private static final long serialVersionUID = -1076235686454398505L;
 					
 									@Override
-									public void placeFileContent(final Point location, Iterable<File> content) {
-										// TODO Auto-generated method stub
-										for(File f : content) {
-											System.err.println("Drop right "+f.getAbsolutePath());									
+ 								    public void placeFileContent(Point location, java.lang.Iterable<chav1961.purelib.ui.swing.useful.JFileItemDescriptor> content) {
+										for( JFileItemDescriptor f : content) {
+											System.err.println("Drop right "+f.getPath());									
 										}
-									}
+								    }
 								};
 			
 			this.leftSplit.setLeftComponent(new JScrollPane(leftTree));
@@ -339,15 +337,8 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 	public static void main(final String[] args) throws IOException, EnvironmentException, FlowException, ContentException, HeadlessException, URISyntaxException {
 		final ArgParser		parser = new ApplicationArgParser().parse(args);
-		final SubstitutableProperties		props = new SubstitutableProperties(Utils.mkProps(
-												 NanoServiceFactory.NANOSERVICE_PORT, ""+parser.getValue(ARG_HELP_PORT,int.class)
-												,NanoServiceFactory.NANOSERVICE_ROOT, "fsys:xmlReadOnly:root://chav1961.ksmgr.Application/chav1961/ksmgr/helptree.xml"
-												,NanoServiceFactory.NANOSERVICE_CREOLE_PROLOGUE_URI, OldApplication.class.getResource("prolog.cre").toString() 
-												,NanoServiceFactory.NANOSERVICE_CREOLE_EPILOGUE_URI, OldApplication.class.getResource("epilog.cre").toString() 
-											));
 		
-		try(final InputStream				is = Application.class.getResourceAsStream("application.xml");
-			final NanoServiceFactory		service = new NanoServiceFactory(PureLibSettings.CURRENT_LOGGER,props)) {
+		try(final InputStream				is = Application.class.getResourceAsStream("application.xml")) {
 			final ContentMetadataInterface	xda = ContentModelFactory.forXmlDescription(is);
 			final CountDownLatch			latch = new CountDownLatch(1);
 			
@@ -356,9 +347,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			final Application	application = new Application(xda,PureLibSettings.PURELIB_LOCALIZER,parser.getValue(ARG_HELP_PORT,int.class), parser.isTyped(ARG_LOCAL_CONFIG) ? parser.getValue(ARG_LOCAL_CONFIG,String.class) : ARG_LOCAL_CONFIG_DEFAULT, latch);
 			
 			application.setVisible(true);
-			service.start();
 			latch.await();
-			service.stop();
 		} catch (InterruptedException e) {
 		}
 	}
