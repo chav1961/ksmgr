@@ -3,7 +3,11 @@
 	<app:i18n location="i18n:xml:root://chav1961.ksmgr.Application/chav1961/ksmgr/i18n/i18n.xml"/>
 	<app:menu id="mainmenu">
 		<app:submenu name="menu.file" caption="menu.file" tooltip="menu.file.tt">
-			<app:item name="menu.file.newkeystore" caption="menu.file.newKeyStore" tooltip="menu.file.newKeyStore.tt" action="newKeyStore"/>
+			<app:submenu name="menu.file.newkeystore" caption="menu.file.newKeyStore" tooltip="menu.file.newKeyStore.tt">
+				<app:item name="menu.file.newkeystore.jceks" caption="menu.file.newKeyStore.jceks" tooltip="menu.file.newKeyStore.jceks.tt" action="newKeyStoreJCEKS"/>
+				<app:item name="menu.file.newkeystore.jks" caption="menu.file.newKeyStore.jks" tooltip="menu.file.newKeyStore.jks.tt" action="newKeyStoreJKS"/>
+				<app:item name="menu.file.newkeystore.pkcs12" caption="menu.file.newKeyStore.pkcs12" tooltip="menu.file.newKeyStore.pkcs12.tt" action="newKeyStorePKCS12"/>
+			</app:submenu>
 			<app:item name="menu.file.openkeystore" caption="menu.file.openKeyStore" tooltip="menu.file.openKeyStore.tt" action="openKeyStore"/>
 			<app:submenu name="menu.file.lru" caption="menu.file.lru" tooltip="menu.file.lru.tt">
 				<app:placeholder/>

@@ -5,13 +5,18 @@
 		<key name="application.title">(c) 2020, A.V.Chernomyrdin, Key store manager V.R.=1.0</key>
 		<key name="application.help.title">About...</key>
 		<key name="application.help">uri(aboutApplication.cre)</key>
-		<key name="application.placeholder.left">Open or create key store for left panel...\\nYou can also drag key store file from the right panel here</key>		
 
 <!-- Localization for application menu --> 
 		<key name="menu.file">File</key>
 		<key name="menu.file.tt">File</key>
 		<key name="menu.file.newKeyStore">New keystore</key>
 		<key name="menu.file.newKeyStore.tt">Create new keystore and open it</key>
+		<key name="menu.file.newKeyStore.jceks">JCEKS keystore</key>
+		<key name="menu.file.newKeyStore.jceks.tt">JCEKS keystore</key>
+		<key name="menu.file.newKeyStore.jks">JKS keystore</key>
+		<key name="menu.file.newKeyStore.jks.tt">JKS keystore</key>
+		<key name="menu.file.newKeyStore.pkcs12">PKCS12 keystore</key>
+		<key name="menu.file.newKeyStore.pkcs12.tt">PKCS12 keystore</key>
 		<key name="menu.file.openKeyStore">Open keystore</key>
 		<key name="menu.file.openKeyStore.tt">Open existent keystore</key>
 		<key name="menu.file.lru">Open last used...</key>
@@ -145,163 +150,170 @@
 		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate">Certificate</key>
 		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate.tt">File to import contains certificate</key>
 
+<!-- Localization for placeholder --> 
+		<key name="chav1961.ksmgr.placeholder.text">To start editing, drag keystore file here</key>
+		<key name="chav1961.ksmgr.placeholder.tt">To start editing, drag keystore file here</key>
+
+<!-- Localization for keystore editor KeyStoreEditor: --> 
+		<key name="chav1961.ksmgr.gui.KeyStoreEditor.newFile">New keystore (%1$s)</key>
+		<key name="chav1961.ksmgr.gui.KeyStoreEditor.newFile.tt">Early created key store is not saved yet</key>
 		
 <!-- Localization for 'create keystore' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Create key store</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.tt">Create new key store with the given type and password</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.help">uri(chav1961.ksmgr.dialogs.createkeystoredialog.cre)</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type">Keystore type</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt">Type of the key store</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password">Password</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password.tt">Password of the keystore</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype">Retype password</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype.tt">Retype password to check</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog">Create key store</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.tt">Create new key store with the given type and password</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.help">uri(chav1961.ksmgr.gui.createkeystoredialog.cre)</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.type">Keystore type</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.type.tt">Type of the key store</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.password">Password</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.password.tt">Password of the keystore</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.passwordretype">Retype password</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.passwordretype.tt">Retype password to check</key>
 
 <!-- Localization for 'ask password' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.askpassworddialog">Ask password</key>
-		<key name="chav1961.ksmgr.dialogs.askpassworddialog.tt">Ask password for keystore</key>
-		<key name="chav1961.ksmgr.dialogs.askpassworddialog.password">Keystore password</key>
-		<key name="chav1961.ksmgr.dialogs.askpassworddialog.password.tt">Type keystore password</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog">Ask password</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog.tt">Ask password for keystore</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog.password">Keystore password</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog.password.tt">Type keystore password</key>
 		
 <!-- Localization for 'change password password' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog">Change password</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.tt">Change password for keystore opened</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.password">Old password</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.password.tt">Type old password for repository</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype">Retype old password</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype.tt">Repeat old password for repository for checking</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword">New password</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword.tt">Type new password for repository</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog">Change password</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.tt">Change password for keystore opened</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.password">Old password</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.password.tt">Type old password for repository</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.passwordretype">Retype old password</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.passwordretype.tt">Repeat old password for repository for checking</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.newpassword">New password</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.newpassword.tt">Type new password for repository</key>
 
 <!-- Localization for 'settings' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.settingsdialog">Application settings</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.tt">Application settings</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords">Keep passwords</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords.tt">Keep passwords for current session to exclude password typing on every password request</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider">Preferred provider</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider.tt">Select preferred security provider from available list</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname">Principal name</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt">Default principal name (used in self-signed certificates, certificate requests etc...)</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt">Default salt</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt.tt">Default salt to use in encryption/decryption tasks</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed">Default random seed</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed.tt">Default random seed to use in encryption/decryption tasks</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog">Application settings</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.tt">Application settings</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords">Keep passwords</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords.tt">Keep passwords for current session to exclude password typing on every password request</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider">Preferred provider</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider.tt">Select preferred security provider from available list</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.principalname">Principal name</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.principalname.tt">Default principal name (used in self-signed certificates, certificate requests etc...)</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.currentsalt">Default salt</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.currentsalt.tt">Default salt to use in encryption/decryption tasks</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed">Default random seed</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed.tt">Default random seed to use in encryption/decryption tasks</key>
 
 <!-- Localization for 'key pair/generate' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog">Key pair generation</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.tt">Create RSA key pair</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.keylength">Key length</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.keylength.tt">Select key length for pair to generate</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.usesecurerandom">Insert RANDOM</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.usesecurerandom.tt">Insert random into key pair to generate</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.alias">Repository name</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.alias.tt">Type key pair name in the repository</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog">Key pair generation</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.tt">Create RSA key pair</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.keylength">Key length</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.keylength.tt">Select key length for pair to generate</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.usesecurerandom">Insert RANDOM</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.usesecurerandom.tt">Insert random into key pair to generate</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.alias">Repository name</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.alias.tt">Type key pair name in the repository</key>
 
 <!-- Localization for 'certificate/self-signed' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog">Self-signed certificate generation</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.tt">Creta self-signed certificate</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.algorithm">Key pair algorithm</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.algorithm.tt">Algorithm for pair generation using</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.keylength">Key length</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.keylength.tt">Key length for key pairs</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.usesecurerandom">Insert RANDOM</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.usesecurerandom.tt">Insert random into key pair to generate</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.principalname">Principal name</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.principalname.tt">Type principal name</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.serialnumber">Serial #</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.serialnumber.tt">Type serial number</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.issuername">Issuer name</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.issuername.tt">Type issuer name</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.subject">Subject name</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.subject.tt">Type subject name</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.datefrom">Date from</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.datefrom.tt">Type start date for certificate</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.dateto">Date to</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.dateto.tt">Type end date for certificate</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.alias">Repository name</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.alias.tt">Type certificate name in the repository</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog">Self-signed certificate generation</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.tt">Creta self-signed certificate</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.algorithm">Key pair algorithm</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.algorithm.tt">Algorithm for pair generation using</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.keylength">Key length</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.keylength.tt">Key length for key pairs</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.usesecurerandom">Insert RANDOM</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.usesecurerandom.tt">Insert random into key pair to generate</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.principalname">Principal name</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.principalname.tt">Type principal name</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.serialnumber">Serial #</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.serialnumber.tt">Type serial number</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.issuername">Issuer name</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.issuername.tt">Type issuer name</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.subject">Subject name</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.subject.tt">Type subject name</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.datefrom">Date from</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.datefrom.tt">Type start date for certificate</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.dateto">Date to</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.dateto.tt">Type end date for certificate</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.alias">Repository name</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.alias.tt">Type certificate name in the repository</key>
 
 <!-- Localization for 'open key store' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog">Open keystore</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.tt">Open key store</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.file">Keystore file</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.file.tt">Key store file name</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password">Password</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password.tt">password to access key store selected</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog">Open keystore</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.tt">Open key store</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.file">Keystore file</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.file.tt">Key store file name</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.password">Password</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.password.tt">password to access key store selected</key>
 
 <!-- Localization for 'sign request' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog">Sign request</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.tt">Sign certificate request by you certificate</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.algorithm">Signature algorithm</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.algorithm.tt">Select signature algorithm required</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.serialnumber">Serial #</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.serialnumber.tt">Serial number of signed certificate</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom">Date from</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom.tt">Start date of signed certificate</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto">Date to</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto.tt">End date of signed certificate</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog">Sign request</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.tt">Sign certificate request by you certificate</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.algorithm">Signature algorithm</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.algorithm.tt">Select signature algorithm required</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.serialnumber">Serial #</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.serialnumber.tt">Serial number of signed certificate</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.datefrom">Date from</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.datefrom.tt">Start date of signed certificate</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.dateto">Date to</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.dateto.tt">End date of signed certificate</key>
 
 <!-- Localization for 'ask server URI' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.askserveruridialog">Load certificates</key>
-		<key name="chav1961.ksmgr.dialogs.askserveruridialog.tt">Load certificates from server</key>
-		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri">Server URI</key>
-		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri.tt">Serve URI to get certificated from. Must be absolute and have 'https:' scheme</key>
+		<key name="chav1961.ksmgr.gui.askserveruridialog">Load certificates</key>
+		<key name="chav1961.ksmgr.gui.askserveruridialog.tt">Load certificates from server</key>
+		<key name="chav1961.ksmgr.gui.askserveruridialog.uri">Server URI</key>
+		<key name="chav1961.ksmgr.gui.askserveruridialog.uri.tt">Serve URI to get certificated from. Must be absolute and have 'https:' scheme</key>
 
 <!-- Localization for 'create key' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog">Create key</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.tt">Create secret key</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.help">uri(chav1961.ksmgr.dialogs.keycreatedialog.cre)</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keyalgorithm">Key algorithm</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keyalgorithm.tt">Encrypting algorithm for key</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keylength">Block size</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keylength.tt">Size of encrypted data block</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.iterations">Number of iterations</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.iterations.tt">Number of encryption iterations</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.currentsalt">Salt</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.currentsalt.tt">Salt for key to generate</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.password">Password</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.password.tt">Key password</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.passwordretype">Retype password</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.passwordretype.tt">Retype key password</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.alias">Alias name</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.alias.tt">Alias name for key in the key store</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog">Create key</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.tt">Create secret key</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.help">uri(chav1961.ksmgr.gui.keycreatedialog.cre)</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.keyalgorithm">Key algorithm</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.keyalgorithm.tt">Encrypting algorithm for key</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.keylength">Block size</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.keylength.tt">Size of encrypted data block</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.iterations">Number of iterations</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.iterations.tt">Number of encryption iterations</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.currentsalt">Salt</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.currentsalt.tt">Salt for key to generate</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.password">Password</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.password.tt">Key password</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.passwordretype">Retype password</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.passwordretype.tt">Retype key password</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.alias">Alias name</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.alias.tt">Alias name for key in the key store</key>
 
 <!-- Localization for 'import key' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog">Import key</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.tt">Import secret key</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.help">uri(chav1961.ksmgr.dialogs.keyimportdialog.cre)</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.entitytype">File type</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.entitytype.tt">Content type, keeping in the file</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm">Key algorithm</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm.tt">Encrypting algorithm for key (requires for secret keys only)</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias">Alias name</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias.tt">Alias name for key in the key store</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog">Import key</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.tt">Import secret key</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.help">uri(chav1961.ksmgr.gui.keyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.entitytype">File type</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.entitytype.tt">Content type, keeping in the file</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.keyalgorithm">Key algorithm</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.keyalgorithm.tt">Encrypting algorithm for key (requires for secret keys only)</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.alias">Alias name</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.alias.tt">Alias name for key in the key store</key>
 
 <!-- Localization for 'import secret key' dialog -->		
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog">Secret key import</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.tt">Import secret key into repository</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.help">uri(chav1961.ksmgr.dialogs.secretkeyimportdialog.cre)</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm">Key algorithm</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm.tt">Encrypting algorithm for key</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias">Alias name</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias.tt">Alias name for key in the key store</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog">Secret key import</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.tt">Import secret key into repository</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.help">uri(chav1961.ksmgr.gui.secretkeyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.keyalgorithm">Key algorithm</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.keyalgorithm.tt">Encrypting algorithm for key</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.alias">Alias name</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.alias.tt">Alias name for key in the key store</key>
 
 
 <!-- Localization for 'encrypt file' dialog-->		
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog">Encrypt file</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.tt">Encrypt selected file(s) with selected key</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithm">Cipher algorithm</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithm.tt">Select cipher algorithm. Ctrl+space hits list of algorithms</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithmsuffix">Cipher algorithm suffix</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithmsuffix.tt">Suffix for cipher algorithm</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipherkeylength">Key length</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipherkeylength.tt">Cipher key length</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations"># of interations</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations.tt">Number of cipher iterations</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt">Encrypted salt</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt.tt">Salt for encryption</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed">Random seed</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed.tt">Random seed for encryption</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog">Encrypt file</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.tt">Encrypt selected file(s) with selected key</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipheralgorithm">Cipher algorithm</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipheralgorithm.tt">Select cipher algorithm. Ctrl+space hits list of algorithms</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipheralgorithmsuffix">Cipher algorithm suffix</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipheralgorithmsuffix.tt">Suffix for cipher algorithm</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipherkeylength">Key length</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipherkeylength.tt">Cipher key length</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.iterations"># of interations</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.iterations.tt">Number of cipher iterations</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentsalt">Encrypted salt</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentsalt.tt">Salt for encryption</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentrandomseed">Random seed</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentrandomseed.tt">Random seed for encryption</key>
 
 <!-- Localization for KeyStoreViewer keys -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Confirm deletion...</key>
@@ -314,13 +326,18 @@
 		<key name="application.title">(c) 2020, А.В.Черномырдин, Менеджер репозитариев ключей V.R.=1.0</key>
 		<key name="application.help.title">О программе...</key>
 		<key name="application.help">uri(aboutApplication.cre)</key>
-		<key name="application.placeholder.left">Создайте или откройте репозитарий ключей для левой панели\\nМожно также перетащить сюда файл репозитария с правой панели</key>		
 
 <!-- Локализация меню приложения --> 
 		<key name="menu.file">Файл</key>
 		<key name="menu.file.tt">Файл</key>
 		<key name="menu.file.newKeyStore">Новый репозитарий</key>
 		<key name="menu.file.newKeyStore.tt">Создать новый репозитарий и открыть его</key>
+		<key name="menu.file.newKeyStore.jceks">Новый JCEKS репозитарий</key>
+		<key name="menu.file.newKeyStore.jceks.tt">Новый JCEKS репозитарий</key>
+		<key name="menu.file.newKeyStore.jks">Новый JKS репозитарий</key>
+		<key name="menu.file.newKeyStore.jks.tt">Новый JKS репозитарий</key>
+		<key name="menu.file.newKeyStore.pkcs12">Новый PKCS12 репозитарий</key>
+		<key name="menu.file.newKeyStore.pkcs12.tt">Новый PKCS12 репозитарий</key>
 		<key name="menu.file.openKeyStore">Открыть репозитарий</key>
 		<key name="menu.file.openKeyStore.tt">Открыть существующий репозитарий</key>
 		<key name="menu.file.lru">Открыть последние...</key>
@@ -454,163 +471,170 @@
 		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate">Сертификат</key>
 		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate.tt">Импортируемый файл содержит сертификат</key>
 
+<!-- Локализация местоблюстителя --> 
+		<key name="chav1961.ksmgr.placeholder.text">Для начала редактирования перетащите файл репозитария сюда</key>
+		<key name="chav1961.ksmgr.placeholder.tt">Для начала редактирования перетащите файл репозитария сюда</key>
+		
+<!-- Локализация редактора рапозитария KeyStoreEditor: --> 
+		<key name="chav1961.ksmgr.gui.KeyStoreEditor.newFile">Новый репозитарий (%1$s)</key>
+		<key name="chav1961.ksmgr.gui.KeyStoreEditor.newFile.tt">Вновь созданный репощзитарий, который пока неще не был сохранен</key>
 		
 <!-- Локализация для диалога 'create keystore' -->		
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog">Создать репозитарий ключей</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.tt">Создать репозитарий ключей с указанным типом и паролем</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.help">uri(chav1961.ksmgr.dialogs.createkeystoredialog.cre)</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type">Тип репозитария</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.type.tt">Тип репозитария</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password">Пароль</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.password.tt">Пароль репозитария</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype">Повторите пароль</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.passwordretype.tt">Повторно введите пароль для целей контроля</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog">Создать репозитарий ключей</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.tt">Создать репозитарий ключей с указанным типом и паролем</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.help">uri(chav1961.ksmgr.gui.createkeystoredialog.cre)</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.type">Тип репозитария</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.type.tt">Тип репозитария</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.password">Пароль</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.password.tt">Пароль репозитария</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.passwordretype">Повторите пароль</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.passwordretype.tt">Повторно введите пароль для целей контроля</key>
 	
 <!-- Локализация для диалога 'ask password' -->		
-		<key name="chav1961.ksmgr.dialogs.askpassworddialog">Укажите пароль</key>
-		<key name="chav1961.ksmgr.dialogs.askpassworddialog.tt">Ввести пароль для репозитарий ключей</key>
-		<key name="chav1961.ksmgr.dialogs.askpassworddialog.password">Пароль репозитария</key>
-		<key name="chav1961.ksmgr.dialogs.askpassworddialog.password.tt">Введите пароль репозитария</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog">Укажите пароль</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog.tt">Ввести пароль для репозитарий ключей</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog.password">Пароль репозитария</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog.password.tt">Введите пароль репозитария</key>
 	
 <!-- Локализация для диалога 'change password password' -->		
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog">Изменить пароль</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.tt">Изменить пароль открытого репозитария</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.password">Старый пароль</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.password.tt">Укажите прежний пароль репозитария</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype">Повторите старый пароль</key>
-		<key name="chav1961.ksmgr.dialogs.changepassworddialog.passwordretype.tt">Повторно укажите прежний пароль репозитария для проверки</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword">Новый пароль</key>
-		<key name="chav1961.ksmgr.dialogs.createkeystoredialog.newpassword.tt">Задайте новый пароль репозитария</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog">Изменить пароль</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.tt">Изменить пароль открытого репозитария</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.password">Старый пароль</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.password.tt">Укажите прежний пароль репозитария</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.passwordretype">Повторите старый пароль</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.passwordretype.tt">Повторно укажите прежний пароль репозитария для проверки</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.newpassword">Новый пароль</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.newpassword.tt">Задайте новый пароль репозитария</key>
 	
 <!-- Локализация для диалога 'settings' -->		
-		<key name="chav1961.ksmgr.dialogs.settingsdialog">Настройки приложения</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.tt">Настройки приложения</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords">Запоминать пароли</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.keeppasswords.tt">Зпоминать пароли на время работы приложения, чтобы не вводить их каждый раз, когда они требуются</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider">Предпочитаемый провайдер</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.preferredprovider.tt">Выбрать предпочитаемого провайдера безопасности из имеющегося списка</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname">Имя принципала</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.principalname.tt">Имя принципала по умолчанию (используется в самоподписанных сертификатах, запросах сертификатов и т.д.)</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt">Соль по умолчанию</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentsalt.tt">Значение соли по умолчанию для операций шифрования/дешифрования</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed">Random seed по умолчанию</key>
-		<key name="chav1961.ksmgr.dialogs.settingsdialog.currentrandomseed.tt">Значение Random seed по умолчанию для операций шифрования/дешифрования</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog">Настройки приложения</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.tt">Настройки приложения</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords">Запоминать пароли</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords.tt">Зпоминать пароли на время работы приложения, чтобы не вводить их каждый раз, когда они требуются</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider">Предпочитаемый провайдер</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider.tt">Выбрать предпочитаемого провайдера безопасности из имеющегося списка</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.principalname">Имя принципала</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.principalname.tt">Имя принципала по умолчанию (используется в самоподписанных сертификатах, запросах сертификатов и т.д.)</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.currentsalt">Соль по умолчанию</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.currentsalt.tt">Значение соли по умолчанию для операций шифрования/дешифрования</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed">Random seed по умолчанию</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed.tt">Значение Random seed по умолчанию для операций шифрования/дешифрования</key>
 
 	
 <!-- Локализация для диалога 'key pair/generate' -->		
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog">Генерация пары ключей</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.tt">Создать пару ключей</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.keylength">Длина ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.keylength.tt">Выберите длину ключа в генерируемой паре</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.usesecurerandom">Включить RANDOM</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.usesecurerandom.tt">Добавить случайное число в генерируемую пару</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.alias">Имя в репозитарии</key>
-		<key name="chav1961.ksmgr.dialogs.keypaircreatedialog.alias.tt">Задайте имя паре ключей, под которым она будет храниться в репозитарии</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog">Генерация пары ключей</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.tt">Создать пару ключей</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.keylength">Длина ключа</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.keylength.tt">Выберите длину ключа в генерируемой паре</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.usesecurerandom">Включить RANDOM</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.usesecurerandom.tt">Добавить случайное число в генерируемую пару</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.alias">Имя в репозитарии</key>
+		<key name="chav1961.ksmgr.gui.keypaircreatedialog.alias.tt">Задайте имя паре ключей, под которым она будет храниться в репозитарии</key>
 	
 <!-- Локализация для диалога 'certificate/self-signed' -->		
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog">Генерация самоподписанного сертификата</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.tt">Создать самоподписанный сертификат</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.algorithm">Алгоритм генерации</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.algorithm.tt">Используемый для генерации пары ключей алгоритм</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.keylength">Длина ключа</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.keylength.tt">Выберите длину ключа в генерируемой паре ключей</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.usesecurerandom">Включить RANDOM</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.usesecurerandom.tt">Добавить случайное число в генерируемую пару ключей</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.principalname">Имя принципала</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.principalname.tt">Задайте имя принципала</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.serialnumber">Серийный номер</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.serialnumber.tt">Задайте серийный номер</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.issuername">Имя выпускающего</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.issuername.tt">Задайте имя выпускающего</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.subject">Имя субъекта</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.subject.tt">Задайте имя субъекта</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.datefrom">Дата начала</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.datefrom.tt">Дата начала действия сертификата</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.dateto">Дата окончания</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.dateto.tt">дата окончания действия сертификата</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.alias">Имя в репозитарии</key>
-		<key name="chav1961.ksmgr.dialogs.selfsignedcertificatecreatedialog.alias.tt">Задайте имя сертификату, под которым он будет храниться в репозитарии</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog">Генерация самоподписанного сертификата</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.tt">Создать самоподписанный сертификат</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.algorithm">Алгоритм генерации</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.algorithm.tt">Используемый для генерации пары ключей алгоритм</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.keylength">Длина ключа</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.keylength.tt">Выберите длину ключа в генерируемой паре ключей</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.usesecurerandom">Включить RANDOM</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.usesecurerandom.tt">Добавить случайное число в генерируемую пару ключей</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.principalname">Имя принципала</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.principalname.tt">Задайте имя принципала</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.serialnumber">Серийный номер</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.serialnumber.tt">Задайте серийный номер</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.issuername">Имя выпускающего</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.issuername.tt">Задайте имя выпускающего</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.subject">Имя субъекта</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.subject.tt">Задайте имя субъекта</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.datefrom">Дата начала</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.datefrom.tt">Дата начала действия сертификата</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.dateto">Дата окончания</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.dateto.tt">дата окончания действия сертификата</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.alias">Имя в репозитарии</key>
+		<key name="chav1961.ksmgr.gui.selfsignedcertificatecreatedialog.alias.tt">Задайте имя сертификату, под которым он будет храниться в репозитарии</key>
 
 <!-- Локализация для диалога 'open key store' -->		
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog">Открыть репозитарий ключей</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.tt">Открыть репозитарий ключей</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.file">Файл репозитария</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.file.tt">Имя файла репозитария</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password">Пароль</key>
-		<key name="chav1961.ksmgr.dialogs.openkeystoredialog.password.tt">Пароль для доступа к файлу репозитария</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog">Открыть репозитарий ключей</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.tt">Открыть репозитарий ключей</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.file">Файл репозитария</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.file.tt">Имя файла репозитария</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.password">Пароль</key>
+		<key name="chav1961.ksmgr.gui.openkeystoredialog.password.tt">Пароль для доступа к файлу репозитария</key>
 	
 <!-- Локализация для диалога 'sign request' -->		
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog">Подписать запрос</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.tt">Подписать азпрос сертификата своим сертификатом</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.algorithm">Алгоритм сигнатуры</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.algorithm.tt">Выбрать требуемый алгоритм сигнатуры</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.serialnumber">Серийный номер</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.serialnumber.tt">Серийны номр подписанного сертификата</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom">Дата от</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.datefrom.tt">Начало даты действия подписи</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto">Дата до</key>
-		<key name="chav1961.ksmgr.dialogs.signcertificatedialog.dateto.tt">Окончание даты дествия подписи</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog">Подписать запрос</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.tt">Подписать азпрос сертификата своим сертификатом</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.algorithm">Алгоритм сигнатуры</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.algorithm.tt">Выбрать требуемый алгоритм сигнатуры</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.serialnumber">Серийный номер</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.serialnumber.tt">Серийны номр подписанного сертификата</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.datefrom">Дата от</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.datefrom.tt">Начало даты действия подписи</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.dateto">Дата до</key>
+		<key name="chav1961.ksmgr.gui.signcertificatedialog.dateto.tt">Окончание даты дествия подписи</key>
 	
 <!-- Локализация для диалога 'ask server URI'-->		
-		<key name="chav1961.ksmgr.dialogs.askserveruridialog">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.dialogs.askserveruridialog.tt">Загрузить сертификаты с сервера</key>
-		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri">URI сервера</key>
-		<key name="chav1961.ksmgr.dialogs.askserveruridialog.uri.tt">Адрес сервера, откуда грузить сертификаты. Долежен быть абсолютным и иметь схему 'https:'</key>
+		<key name="chav1961.ksmgr.gui.askserveruridialog">Загрузить сертификаты</key>
+		<key name="chav1961.ksmgr.gui.askserveruridialog.tt">Загрузить сертификаты с сервера</key>
+		<key name="chav1961.ksmgr.gui.askserveruridialog.uri">URI сервера</key>
+		<key name="chav1961.ksmgr.gui.askserveruridialog.uri.tt">Адрес сервера, откуда грузить сертификаты. Долежен быть абсолютным и иметь схему 'https:'</key>
 
 <!-- Локализация для диалога 'create key'-->		
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog">Создать ключ</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.tt">Создать секретный ключ</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.help">uri(chav1961.ksmgr.dialogs.keycreatedialog.cre)</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keyalgorithm">Алгоритм ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keyalgorithm.tt">Алгоритм шифрования ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keylength">Длина блока</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.keylength.tt">Длина шифруемого блока данных</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.iterations">Число итераций</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.iterations.tt">Число итераций шифрования</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.currentsalt">Соль шифра</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.currentsalt.tt">Соль генерируемого ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.password">Пароль</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.password.tt">Пароль ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.passwordretype">Повторить пароль</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.passwordretype.tt">Повторить пароль ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.alias">Имя ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keycreatedialog.alias.tt">Имя алиаса в памяти ключей</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog">Создать ключ</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.tt">Создать секретный ключ</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.help">uri(chav1961.ksmgr.gui.keycreatedialog.cre)</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.keyalgorithm">Алгоритм ключа</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.keyalgorithm.tt">Алгоритм шифрования ключа</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.keylength">Длина блока</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.keylength.tt">Длина шифруемого блока данных</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.iterations">Число итераций</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.iterations.tt">Число итераций шифрования</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.currentsalt">Соль шифра</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.currentsalt.tt">Соль генерируемого ключа</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.password">Пароль</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.password.tt">Пароль ключа</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.passwordretype">Повторить пароль</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.passwordretype.tt">Повторить пароль ключа</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.alias">Имя ключа</key>
+		<key name="chav1961.ksmgr.gui.keycreatedialog.alias.tt">Имя алиаса в памяти ключей</key>
 
 <!-- Локализация для диалога 'import key' -->		
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog">Импорт в репозитерий</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.tt">Импорт файла в репозитерий</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.help">uri(chav1961.ksmgr.dialogs.keyimportdialog.cre)</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.entitytype">Тип файла</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.entitytype.tt">Тип содержимого, хранящегося в файле</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm">Алгоритм ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.keyalgorithm.tt">Алгоритм шифрования ключа (имеет смысл только для секретного ключа)</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias">Имя ключа</key>
-		<key name="chav1961.ksmgr.dialogs.keyimportdialog.alias.tt">Имя алиаса в памяти ключей</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog">Импорт в репозитерий</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.tt">Импорт файла в репозитерий</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.help">uri(chav1961.ksmgr.gui.keyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.entitytype">Тип файла</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.entitytype.tt">Тип содержимого, хранящегося в файле</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.keyalgorithm">Алгоритм ключа</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.keyalgorithm.tt">Алгоритм шифрования ключа (имеет смысл только для секретного ключа)</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.alias">Имя ключа</key>
+		<key name="chav1961.ksmgr.gui.keyimportdialog.alias.tt">Имя алиаса в памяти ключей</key>
 
 <!-- Локализация для диалога 'import secret key' -->		
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog">Импорт секретного ключа</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.tt">Импорт секретного ключа в репозитарий</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.help">uri(chav1961.ksmgr.dialogs.secretkeyimportdialog.cre)</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm">Алгоритм ключа</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.keyalgorithm.tt">Алгоритм шифрования ключа</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias">Имя ключа</key>
-		<key name="chav1961.ksmgr.dialogs.secretkeyimportdialog.alias.tt">Имя алиаса в памяти ключей</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog">Импорт секретного ключа</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.tt">Импорт секретного ключа в репозитарий</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.help">uri(chav1961.ksmgr.gui.secretkeyimportdialog.cre)</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.keyalgorithm">Алгоритм ключа</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.keyalgorithm.tt">Алгоритм шифрования ключа</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.alias">Имя ключа</key>
+		<key name="chav1961.ksmgr.gui.secretkeyimportdialog.alias.tt">Имя алиаса в памяти ключей</key>
 
 <!-- Локализация для диалога 'encrypt file'-->		
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog">Зашифровать файл</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.tt">Зашифровать выбранные файлы выбранным ключом</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithm">Алгоритм шифрования</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithm.tt">Выбрать алгоритм шифрования. Ctrl+пробел вызывает подсказку по алгоритмам</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithmsuffix">Суффикс алгоритма</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipheralgorithmsuffix.tt">Суффикс алгоритма шифрования</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipherkeylength">Длина ключа</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.cipherkeylength.tt">Длина ключа шифрования</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations">Число итераций</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.iterations.tt">Число итерация шифрования</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt">Соль шифра</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentsalt.tt">Соль шифра</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed">Random seed</key>
-		<key name="chav1961.ksmgr.dialogs.encryptfiledialog.currentrandomseed.tt">Random seed для шифрования</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog">Зашифровать файл</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.tt">Зашифровать выбранные файлы выбранным ключом</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipheralgorithm">Алгоритм шифрования</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipheralgorithm.tt">Выбрать алгоритм шифрования. Ctrl+пробел вызывает подсказку по алгоритмам</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipheralgorithmsuffix">Суффикс алгоритма</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipheralgorithmsuffix.tt">Суффикс алгоритма шифрования</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipherkeylength">Длина ключа</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.cipherkeylength.tt">Длина ключа шифрования</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.iterations">Число итераций</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.iterations.tt">Число итерация шифрования</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentsalt">Соль шифра</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentsalt.tt">Соль шифра</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentrandomseed">Random seed</key>
+		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentrandomseed.tt">Random seed для шифрования</key>
 	
 <!-- локализация для ключей KeyStoreViewer -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Подтвердить удаление...</key>
