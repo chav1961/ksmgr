@@ -6,6 +6,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.File;
@@ -46,6 +49,7 @@ import chav1961.ksmgr.gui.AskNewPassword;
 import chav1961.ksmgr.gui.AskPassword;
 import chav1961.ksmgr.gui.AskSecureKeyParameters;
 import chav1961.ksmgr.gui.KeyStoreEditor;
+import chav1961.ksmgr.gui.SettingsDialog;
 import chav1961.ksmgr.internal.KeyStoreWrapper;
 import chav1961.ksmgr.utils.PasswordsRepo;
 import chav1961.purelib.basic.ArgParser;
@@ -114,6 +118,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	
 	private final ContentMetadataInterface 	app;
 	private final SubstitutableProperties	props;
+	private final File						propsLocation;
 	private final Localizer					parentLocalizer;
 	private final Localizer					localizer;
 	private final JMenuBar					menu;
@@ -128,6 +133,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final JFileContentManipulator	fcm;
 	private final KeyStoreEditor[]			ksList = new KeyStoreEditor[2];
 	private final AtomicInteger				unique = new AtomicInteger(1);
+	private final SettingsDialog			settings;
 	private SelectedWindows					selected = SelectedWindows.BOTTOM; 
 	
 	public Application(final ContentMetadataInterface xda, final Localizer parent, final File props) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
@@ -142,6 +148,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		}
 		else {
 			this.app = xda;
+			this.propsLocation = props;
 			this.props = SubstitutableProperties.of(props);
 			this.parentLocalizer = parent;
 			this.localizer = LocalizerFactory.getLocalizer(app.getRoot().getLocalizerAssociated());
@@ -149,6 +156,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			parent.push(localizer);
 			localizer.addLocaleChangeListener(this);
 			this.state = new JStateString(this.localizer, 10);
+			this.settings = new SettingsDialog(state);
+			
+			settings.loadSettings(this.props);			
 			this.pers = LRUPersistence.of(props, "LRU.item"); 
 			this.fcm = new JFileContentManipulator("system", root, localizer, this, this, this.pers, lruFiles);
 			this.fcm.addFileContentChangeListener((e)->processLRU(e));
@@ -350,12 +360,24 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		
 		parentLocalizer.setCurrentLocale(newLocale);
 	}
+
+	@OnAction("action:/settings")
+	private void showSettings() {
+		if (ask(settings, 300, 160)) {
+			try {
+				settings.storeSettings(props);
+				props.store(propsLocation);
+			} catch (IOException e) {
+				getLogger().message(Severity.error, e.getLocalizedMessage());
+			}
+		}
+	}
 	
 	@OnAction("action:/helpAbout")
 	private void showAboutScreen() {
 		SwingUtils.showAboutScreen(this, localizer, TITLE_HELP_ABOUT_APPLICATION, HELP_ABOUT_APPLICATION, URI.create("root://chav1961.ksmgr.Application/chav1961/ksmgr/avatar.jpg"), new Dimension(300,300));
 	}
-
+  
 	private void newKeystore(final String keyStoreType) {
 		final int		keyStoreId = unique.incrementAndGet();
 		final String	keyStoreString = KeyStoreWrapper.PASSWD_PREFIX+"."+keyStoreId;
@@ -605,18 +627,31 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		private static final long serialVersionUID = 1L;
 		
 		public KSPlaceHolder(final Localizer localizer) {
-			super(localizer, PLACEHOLDER_TEXT, PLACEHOLDER_TOOLTIP);
-			getDnDManager().selectDnDMode(DnDMode.COPY);
+			super(localizer, PLACEHOLDER_TEXT, PLACEHOLDER_TOOLTIP, (tr, df)->tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor));
 		}
-
+		
 		@Override
-		public boolean canReceive(DnDMode currentMode, Component from, int xFrom, int yFrom, Component to, int xTo, int yTo, Class<?> contentClass) {
-			return JFileItemDescriptor.class.isAssignableFrom(contentClass) || List.class.isAssignableFrom(contentClass);
-		}
-
-		@Override
-		public void complete(final DnDMode currentMode, final Component from, final int xFrom, final int yFrom, final Component to, final int xTo, final int yTo, final Object content) {
-			System.err.println("Completed");
+		public boolean acceptDrop(final Transferable trans) throws IOException {
+			if (trans.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+				try {
+					for(Object item : (List<?>)trans.getTransferData(DataFlavor.javaFileListFlavor)) {
+						if (item instanceof File) {
+							
+							return true;
+						}
+						else if (item instanceof JFileItemDescriptor) {
+							
+							return true;
+						}
+					}
+				} catch (UnsupportedFlavorException e) {
+					throw new IOException(e);
+				}
+				return false;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 	

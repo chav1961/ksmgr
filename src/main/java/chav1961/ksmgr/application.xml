@@ -65,10 +65,6 @@
 			</app:submenu>
 		</app:submenu>
 		<app:submenu name="menu.settings" caption="menu.settings" tooltip="menu.settings.tt">
-			<app:submenu name="menu.settings.view" caption="menu.settings.view" tooltip="menu.settings.view.tt">
-				<app:item name="menu.settings.view.filesystem" caption="menu.settings.view.filesystem" tooltip="menu.settings.view.filesystem.tt" group="view" action="asFileSystem"/>
-				<app:item name="menu.settings.view.keystore" caption="menu.settings.view.keystore" tooltip="menu.settings.view.keystore.tt" group="view" action="asKeyStore"/>
-			</app:submenu>
 			<app:builtinSubmenu name="builtin.languages" caption="menu.settings.languages" tooltip="menu.settings.languages.tt"/>
 			<app:separator/>
 			<app:item name="menu.settings.settings" caption="menu.settings.settings" tooltip="menu.settings.settings.tt" action="settings"/>

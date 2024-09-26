@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.crypto.SecretKey;
 import javax.swing.DefaultListModel;
+import javax.swing.DropMode;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -33,8 +34,11 @@ import chav1961.purelib.basic.interfaces.LoggerFacadeOwner;
 import chav1961.purelib.i18n.interfaces.Localizer;
 import chav1961.purelib.i18n.interfaces.Localizer.LocaleChangeListener;
 import chav1961.purelib.i18n.interfaces.LocalizerOwner;
+import chav1961.purelib.ui.swing.useful.DnDManager;
+import chav1961.purelib.ui.swing.useful.DnDManager.DnDInterface;
+import chav1961.purelib.ui.swing.useful.DnDManager.DnDMode;
 
-public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, LocalizerOwner, LocaleChangeListener {
+public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, LocalizerOwner, LocaleChangeListener, DnDInterface {
 	private static final String			TITLE_NEW_FILE = "chav1961.ksmgr.gui.KeyStoreEditor.newFile";
 	private static final String			TITLE_NEW_FILE_TT = "chav1961.ksmgr.gui.KeyStoreEditor.newFile.tt";
 	private static final long 			serialVersionUID = 1L;
@@ -45,6 +49,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 	private final PasswordsRepo			repo;
 	private final JLabel				caption = new JLabel();
 	private final JList<AliasKeeper>	content = new JList<>();
+	private final DnDManager			mgr = new DnDManager(this, this);
 
 	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final KeyStoreWrapper wrapper, final PasswordsRepo repo) {
 		super(new BorderLayout());
@@ -87,9 +92,12 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 					}
 				}
 			});
+			content.setDragEnabled(true);
+			content.setDropMode(DropMode.INSERT);
 			
 			content.setModel(new DefaultListModel<AliasKeeper>());
 			content.setCellRenderer(this::getListCellRendererComponent);
+			mgr.selectDnDMode(DnDMode.COPY);
 			fillContent(content, wrapper.keyStore);
 			fillLocalizedStrings();
 		}
@@ -134,6 +142,31 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			return item.passwordId;
 		}
 	}
+
+	@Override
+	public Class<?> getSourceContentClass(DnDMode currentMode, Component component, int x, int y) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object getSourceContent(DnDMode currentMode, Component from, int xFrom, int yFrom, Component to, int xTo, int yTo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean canReceive(DnDMode currentMode, Component from, int xFrom, int yFrom, Component to, int xTo, int yTo, Class<?> contentClass) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void complete(DnDMode currentMode, Component from, int xFrom, int yFrom, Component to, int xTo, int yTo, Object content) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	
 	private void fillContent(final JList<AliasKeeper> content, final KeyStore keyStore) {
 		try {

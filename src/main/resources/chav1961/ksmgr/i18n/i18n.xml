@@ -43,12 +43,6 @@
 		<key name="menu.edit.rename.tt">Change keystore item alias</key>
 		<key name="menu.settings">Settings</key>
 		<key name="menu.settings.tt">Application settings</key>
-		<key name="menu.settings.view">Right panel</key>
-		<key name="menu.settings.view.tt">Change right panel view format</key>
-		<key name="menu.settings.view.filesystem">...as file system</key>
-		<key name="menu.settings.view.filesystem.tt">Use right panel as file system navigator</key>
-		<key name="menu.settings.view.keystore">...as keystore</key>
-		<key name="menu.settings.view.keystore.tt">Use right panel as keystore content</key>
 		<key name="menu.settings.languages">Languages</key>
 		<key name="menu.settings.languages.tt">Select language for application</key>		
 		<key name="menu.settings.settings">Parameters</key>
@@ -194,6 +188,7 @@
 <!-- Localization for 'settings' dialog -->		
 		<key name="chav1961.ksmgr.gui.settingsdialog">Application settings</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.tt">Application settings</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.help">Application settings</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords">Keep passwords</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords.tt">Keep passwords for current session to exclude password typing on every password request</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider">Preferred provider</key>
@@ -387,12 +382,6 @@
 		<key name="menu.edit.rename.tt">Изменить имя компонента в репозитарии</key>
 		<key name="menu.settings">Настройки</key>
 		<key name="menu.settings.tt">Настройки приложения</key>
-		<key name="menu.settings.view">Правая панель</key>
-		<key name="menu.settings.view.tt">Изменить формат правой панели</key>
-		<key name="menu.settings.view.filesystem">...в виде файловой системы</key>
-		<key name="menu.settings.view.filesystem.tt">Представить правую панель в виде навигатора по файловой системе</key>
-		<key name="menu.settings.view.keystore">...в виде репозитария</key>
-		<key name="menu.settings.view.keystore.tt">Представить правую панель в виде содержимого репозитария</key>
 		<key name="menu.settings.settings">Параметры</key>
 		<key name="menu.settings.settings.tt">Изменить настройки приложения</key>
 		<key name="menu.settings.languages">Язык</key>
@@ -534,6 +523,7 @@
 <!-- Локализация для диалога 'settings' -->		
 		<key name="chav1961.ksmgr.gui.settingsdialog">Настройки приложения</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.tt">Настройки приложения</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.help">Настройки приложения</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords">Запоминать пароли</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords.tt">Зпоминать пароли на время работы приложения, чтобы не вводить их каждый раз, когда они требуются</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider">Предпочитаемый провайдер</key>
