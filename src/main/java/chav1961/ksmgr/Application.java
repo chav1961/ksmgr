@@ -8,7 +8,6 @@ import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,13 +17,21 @@ import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,7 +42,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.LineBorder;
 
+import chav1961.ksmgr.gui.AskNewPassword;
 import chav1961.ksmgr.gui.AskPassword;
+import chav1961.ksmgr.gui.AskSecureKeyParameters;
 import chav1961.ksmgr.gui.KeyStoreEditor;
 import chav1961.ksmgr.internal.KeyStoreWrapper;
 import chav1961.ksmgr.utils.PasswordsRepo;
@@ -50,15 +59,15 @@ import chav1961.purelib.basic.exceptions.PreparationException;
 import chav1961.purelib.basic.exceptions.SyntaxException;
 import chav1961.purelib.basic.interfaces.InputStreamGetter;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
+import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
 import chav1961.purelib.basic.interfaces.LoggerFacadeOwner;
 import chav1961.purelib.basic.interfaces.ModuleAccessor;
 import chav1961.purelib.basic.interfaces.OutputStreamGetter;
-import chav1961.purelib.basic.interfaces.LoggerFacade.Severity;
 import chav1961.purelib.fsys.interfaces.FileSystemInterface;
 import chav1961.purelib.i18n.LocalizerFactory;
 import chav1961.purelib.i18n.interfaces.Localizer;
-import chav1961.purelib.i18n.interfaces.LocalizerOwner;
 import chav1961.purelib.i18n.interfaces.Localizer.LocaleChangeListener;
+import chav1961.purelib.i18n.interfaces.LocalizerOwner;
 import chav1961.purelib.i18n.interfaces.SupportedLanguages;
 import chav1961.purelib.model.ContentModelFactory;
 import chav1961.purelib.model.interfaces.ContentMetadataInterface;
@@ -68,7 +77,6 @@ import chav1961.purelib.ui.swing.AutoBuiltForm;
 import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.interfaces.OnAction;
 import chav1961.purelib.ui.swing.useful.DnDManager.DnDMode;
-import chav1961.purelib.ui.swing.useful.JEnableMaskManipulator;
 import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
 import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 import chav1961.purelib.ui.swing.useful.JFileTree;
@@ -98,7 +106,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private static final long 				FILE_SAVE_AS = 1L << 2;
 
 	
-	private static enum SelectedWindows {
+	static enum SelectedWindows {
 		LEFT,
 		RIGHT,
 		BOTTOM
@@ -110,7 +118,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final Localizer					localizer;
 	private final JMenuBar					menu;
 	private final JStateString				state;
-	private final JEnableMaskManipulator	emm;
+	private final MainMenuManager			emm;
 	private final JSplitPane				topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JLabel(), new JLabel());
 	private final JSplitPane				totalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JLabel(), new JLabel());
 	private final FileSystemInterface		root = FileSystemInterface.Factory.newInstance(URI.create(FileSystemInterface.FILESYSTEM_URI_SCHEME+":file:/"));
@@ -118,7 +126,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final List<String>				lruFiles = new ArrayList<>();
 	private final LRUPersistence			pers;
 	private final JFileContentManipulator	fcm;
-	private final KeyStoreWrapper[]			ksList = new KeyStoreWrapper[2];
+	private final KeyStoreEditor[]			ksList = new KeyStoreEditor[2];
 	private final AtomicInteger				unique = new AtomicInteger(1);
 	private SelectedWindows					selected = SelectedWindows.BOTTOM; 
 	
@@ -149,7 +157,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			this.fcm.appendNewFileSupport();
 			
 			this.menu = SwingUtils.toJComponent(app.byUIPath(URI.create("ui:/model/navigation.top.mainmenu")), JMenuBar.class);
-			this.emm = new JEnableMaskManipulator(MENUS, true, menu);
+			this.emm = new MainMenuManager(menu);
 			SwingUtils.assignActionListeners(menu, this);
 			SwingUtils.assignExitMethod4MainWindow(this, ()->exitApplication());
 
@@ -250,16 +258,91 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 	
 	@OnAction("action:/closeKeystore")
-	private void closeKeyStore () {
+	private void closeKeyStore() {
 		setCurrentPanel(new KSPlaceHolder(localizer));
 	}
 	
 	@OnAction("action:/exit")
-	private void exitApplication () {
+	private void exitApplication() {
 		setVisible(false);
 		dispose();
 	}
 
+	
+	@OnAction("action:/keyGenerate")
+	private void createSymmetricKey() {
+		final AskSecureKeyParameters	askp = new AskSecureKeyParameters(getLogger());
+		char[]	passwd = new char[0];
+		
+		if (ask(askp, 250, 200)) {
+			if (!askp.usePassword || (passwd = askNewPassword()) != null) {
+				try {
+					final String	cipher = "AES";
+					final int		keySize = askp.length.getKeyLength();
+					final SecretKey	key;
+					
+					if (askp.usePassword) {
+						final byte[]	salt = new byte[100];
+						
+						if (askp.useSecureRandom) {
+							final SecureRandom	random = new SecureRandom();
+						    
+							random.nextBytes(salt);
+						    final PBEKeySpec 	pbeKeySpec = new PBEKeySpec(passwd, salt, 1000, keySize);
+						    final SecretKey 	pbeKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(pbeKeySpec);
+						    
+						    key = new SecretKeySpec(pbeKey.getEncoded(), cipher);					
+						}
+						else {
+						    final Random 		random = new Random();
+						    
+						    random.nextBytes(salt);
+						    final PBEKeySpec 	pbeKeySpec = new PBEKeySpec(passwd, salt, 1000, keySize);
+						    final SecretKey 	pbeKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(pbeKeySpec);
+						    
+						    key = new SecretKeySpec(pbeKey.getEncoded(), cipher);					
+						}
+					}
+					else {
+						if (askp.useSecureRandom) {
+							final byte[]		secureRandomKeyBytes = new byte[keySize / 8];
+							final SecureRandom 	secureRandom = new SecureRandom();
+							
+						    secureRandom.nextBytes(secureRandomKeyBytes);
+						    key = new SecretKeySpec(secureRandomKeyBytes, cipher);
+						}
+						else {
+							final byte[] 	randomKeyBytes = new byte[keySize / 8];
+						    final Random 	random = new Random();
+						    
+						    random.nextBytes(randomKeyBytes);
+						    key = new SecretKeySpec(randomKeyBytes, cipher);
+						}
+					}
+					final int	passwordId;
+					switch (selected) {
+						case BOTTOM	:
+							passwordId = 0;
+							break;
+						case LEFT	:
+							passwordId = ksList[0].placeSecretKey(askp.name, key, passwd, true);
+							break;
+						case RIGHT	:
+							passwordId = ksList[1].placeSecretKey(askp.name, key, passwd, true);
+							break;
+						default :
+							throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet"); 
+					}
+					if (passwords.isKeepedPasswords()) {
+						passwords.storePasswordFor("SecretKey."+passwordId, passwd);
+					}
+				} catch (InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException e) {
+					getLogger().message(Severity.error, e.getLocalizedMessage());
+				}
+			}
+		}
+	}
+	
 	@OnAction("action:builtin:/builtin.languages")
 	private void selectLang(final Hashtable<String,String[]> langs) {
 		final SupportedLanguages	newLang = SupportedLanguages.valueOf(langs.get("lang")[0]);
@@ -275,7 +358,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 	private void newKeystore(final String keyStoreType) {
 		final int		keyStoreId = unique.incrementAndGet();
-		final String	keyStoreString = "keystore."+keyStoreId;
+		final String	keyStoreString = KeyStoreWrapper.PASSWD_PREFIX+"."+keyStoreId;
 		final char[]	passwd = askPassword(keyStoreString);
 		
 		if (passwd != null) {
@@ -374,7 +457,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 
 	private char[] askPassword(final String passwordId) {
-		final AskPassword	ap = new AskPassword(state);
+		final AskPassword	ap = new AskPassword(getLogger());
 
 		if (passwords.isKeepedPasswords() && passwords.hasPasswordFor(passwordId)) {
 			ap.password = passwords.getPasswordFor(passwordId);
@@ -390,15 +473,32 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			return null;
 		}
 	}
+
+	private char[] askNewPassword() {
+		final AskNewPassword	anp = new AskNewPassword(getLogger(), getLocalizer());
+
+		if (ask(anp, 250, 70)) {
+			if (!Arrays.equals(anp.password, anp.duplicate)) {
+				getLogger().message(Severity.error, localizer.getValue(AskNewPassword.ERROR_DIFFERENT_PASSWORDS));
+				return null;
+			}
+			else {
+				return anp.password;
+			}
+		}
+		else {
+			return null;
+		}
+	}	
 	
 	private <T> boolean ask(final T instance, final int width, final int height) {
 		try{final ContentMetadataInterface	mdi = ContentModelFactory.forAnnotatedClass(instance.getClass());
 		
-			try(final AutoBuiltForm<T,?>	abf = new AutoBuiltForm<>(mdi, localizer, state, PureLibSettings.INTERNAL_LOADER, instance, (FormManager<Object,T>)instance)) {
+			try(final AutoBuiltForm<T,?>	abf = new AutoBuiltForm<>(mdi, getLocalizer(), getLogger(), PureLibSettings.INTERNAL_LOADER, instance, (FormManager<Object,T>)instance)) {
 				
 				((ModuleAccessor)instance).allowUnnamedModuleAccess(abf.getUnnamedModules());
 				abf.setPreferredSize(new Dimension(width,height));
-				return AutoBuiltForm.ask(this, localizer, abf);
+				return AutoBuiltForm.ask(this, getLocalizer(), abf);
 			}
 		} catch (ContentException e) {
 			getLogger().message(Severity.error,e.getLocalizedMessage());
@@ -426,23 +526,26 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			default :
 				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
 		}
+		emm.setSelection(selected);
 	}
 	
 	private void setCurrentPanel(final KeyStoreWrapper wrapper) {
-		final KeyStoreEditor	editor = new KeyStoreEditor(localizer, state, wrapper);
+		final KeyStoreEditor	editor = new KeyStoreEditor(getLocalizer(), getLogger(), wrapper, passwords);
 		
 		switch (selected) {
 			case BOTTOM	:
 				throw new IllegalStateException("Current panel is not keystore keeper");
 			case LEFT	:
-				ksList[0] = wrapper;
+				ksList[0] = editor;
 				topSplit.setLeftComponent(editor);
 				editor.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.LEFT)));
+				emm.enableLeftRepo(true);
 				break;
 			case RIGHT:
-				ksList[1] = wrapper;
+				ksList[1] = editor;
 				topSplit.setRightComponent(editor);
 				editor.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.RIGHT)));
+				emm.enableRightRepo(true);
 				break;
 			default :
 				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
@@ -457,11 +560,13 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				ksList[0] = null;
 				topSplit.setLeftComponent(holder);
 				holder.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.LEFT)));
+				emm.enableLeftRepo(false);
 				break;
 			case RIGHT:
 				ksList[1] = null;
 				topSplit.setRightComponent(holder);
 				holder.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.RIGHT)));
+				emm.enableRightRepo(false);
 				break;
 			default :
 				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
@@ -506,7 +611,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 		@Override
 		public boolean canReceive(DnDMode currentMode, Component from, int xFrom, int yFrom, Component to, int xTo, int yTo, Class<?> contentClass) {
-			return contentClass == JFileItemDescriptor.class;
+			return JFileItemDescriptor.class.isAssignableFrom(contentClass) || List.class.isAssignableFrom(contentClass);
 		}
 
 		@Override

@@ -4,9 +4,11 @@ import java.io.File;
 import java.security.KeyStore;
 
 public class KeyStoreWrapper {
+	public static final String	PASSWD_PREFIX = "keystore";
+	
 	public final int		entryId;
-	public File				file = null;
 	public final KeyStore	keyStore;
+	public File				file = null;
 
 	public KeyStoreWrapper(final int entryId, final File file, final KeyStore keyStore) {
 		this.entryId = entryId;
