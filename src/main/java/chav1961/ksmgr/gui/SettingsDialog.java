@@ -2,7 +2,10 @@ package chav1961.ksmgr.gui;
 
 import java.security.Provider;
 import java.security.Security;
+import java.util.ArrayList;
+import java.util.List;
 
+import chav1961.ksmgr.internal.AlgorithmRepo;
 import chav1961.purelib.basic.SubstitutableProperties;
 import chav1961.purelib.basic.exceptions.FlowException;
 import chav1961.purelib.basic.interfaces.LoggerFacade;
@@ -121,13 +124,12 @@ public class SettingsDialog implements FormManager<Object, SettingsDialog>, Modu
 	@Override
 	public <T> T[] getForEditorContent(final SettingsDialog inst, final Object id, final String fieldName, final Object... parameters) throws FlowException {
 		if ("preferredProvider".equalsIgnoreCase(fieldName)) {
-			final Provider[] 	providers = Security.getProviders();
-			final String[]		names = new String[providers.length];
+			final List<String>	result = new ArrayList<>();
 			
-			for(int index = 0; index < names.length; index++) {
-				names[index] = providers[index].getName();
+			for(String item : AlgorithmRepo.getInstance().getProviders()) {
+				result.add(item);
 			}
-			return (T[]) names;
+			return (T[]) result.toArray(new String[result.size()]);
 		}
 		else {
 			return null;

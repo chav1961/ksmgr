@@ -118,6 +118,10 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		return logger;
 	}
 
+	public KeyStoreWrapper getKeyStoreWrapper() {
+		return wrapper;
+	}
+	
 	public int placeSecretKey(final String entryName, final SecretKey secretKey, final char[] password, final boolean testUniqueName) throws KeyStoreException {
 		if (Utils.checkEmptyOrNullString(entryName)) {
 			throw new IllegalArgumentException("Enry name to place can't be null or empty");

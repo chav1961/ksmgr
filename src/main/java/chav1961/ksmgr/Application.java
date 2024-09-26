@@ -117,24 +117,24 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 	
 	private final ContentMetadataInterface 	app;
-	private final SubstitutableProperties	props;
-	private final File						propsLocation;
-	private final Localizer					parentLocalizer;
-	private final Localizer					localizer;
-	private final JMenuBar					menu;
-	private final JStateString				state;
-	private final MainMenuManager			emm;
-	private final JSplitPane				topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JLabel(), new JLabel());
-	private final JSplitPane				totalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JLabel(), new JLabel());
+	private final SubstitutableProperties		props;
+	private final File								propsLocation;
+	private final Localizer						parentLocalizer;
+	private final Localizer						localizer;
+	private final JMenuBar						menu;
+	private final JStateString					state;
+	private final MainMenuManager		emm;
+	private final JSplitPane						topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JLabel(), new JLabel());
+	private final JSplitPane						totalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JLabel(), new JLabel());
 	private final FileSystemInterface		root = FileSystemInterface.Factory.newInstance(URI.create(FileSystemInterface.FILESYSTEM_URI_SCHEME+":file:/"));
-	private final PasswordsRepo				passwords = new PasswordsRepo(false);
+	private final PasswordsRepo			passwords = new PasswordsRepo(false);
 	private final List<String>				lruFiles = new ArrayList<>();
 	private final LRUPersistence			pers;
 	private final JFileContentManipulator	fcm;
 	private final KeyStoreEditor[]			ksList = new KeyStoreEditor[2];
 	private final AtomicInteger				unique = new AtomicInteger(1);
-	private final SettingsDialog			settings;
-	private SelectedWindows					selected = SelectedWindows.BOTTOM; 
+	private final SettingsDialog				settings;
+	private SelectedWindows				selected = SelectedWindows.BOTTOM; 
 	
 	public Application(final ContentMetadataInterface xda, final Localizer parent, final File props) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
 		if (xda == null) {
@@ -281,74 +281,33 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	
 	@OnAction("action:/keyGenerate")
 	private void createSymmetricKey() {
-		final AskSecureKeyParameters	askp = new AskSecureKeyParameters(getLogger());
+		final KeyStore								ks = ksList[selected == SelectedWindows.LEFT ? 0 : 1].getKeyStoreWrapper().keyStore;
+		final AskSecureKeyParameters	askp = new AskSecureKeyParameters(getLogger(), ks, settings.preferredProvider, settings.currentSalt);
 		char[]	passwd = new char[0];
 		
 		if (ask(askp, 250, 200)) {
-			if (!askp.usePassword || (passwd = askNewPassword()) != null) {
-				try {
-					final String	cipher = "AES";
-					final int		keySize = askp.length.getKeyLength();
-					final SecretKey	key;
-					
-					if (askp.usePassword) {
-						final byte[]	salt = new byte[100];
-						
-						if (askp.useSecureRandom) {
-							final SecureRandom	random = new SecureRandom();
-						    
-							random.nextBytes(salt);
-						    final PBEKeySpec 	pbeKeySpec = new PBEKeySpec(passwd, salt, 1000, keySize);
-						    final SecretKey 	pbeKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(pbeKeySpec);
-						    
-						    key = new SecretKeySpec(pbeKey.getEncoded(), cipher);					
-						}
-						else {
-						    final Random 		random = new Random();
-						    
-						    random.nextBytes(salt);
-						    final PBEKeySpec 	pbeKeySpec = new PBEKeySpec(passwd, salt, 1000, keySize);
-						    final SecretKey 	pbeKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(pbeKeySpec);
-						    
-						    key = new SecretKeySpec(pbeKey.getEncoded(), cipher);					
-						}
-					}
-					else {
-						if (askp.useSecureRandom) {
-							final byte[]		secureRandomKeyBytes = new byte[keySize / 8];
-							final SecureRandom 	secureRandom = new SecureRandom();
-							
-						    secureRandom.nextBytes(secureRandomKeyBytes);
-						    key = new SecretKeySpec(secureRandomKeyBytes, cipher);
-						}
-						else {
-							final byte[] 	randomKeyBytes = new byte[keySize / 8];
-						    final Random 	random = new Random();
-						    
-						    random.nextBytes(randomKeyBytes);
-						    key = new SecretKeySpec(randomKeyBytes, cipher);
-						}
-					}
-					final int	passwordId;
-					switch (selected) {
-						case BOTTOM	:
-							passwordId = 0;
-							break;
-						case LEFT	:
-							passwordId = ksList[0].placeSecretKey(askp.name, key, passwd, true);
-							break;
-						case RIGHT	:
-							passwordId = ksList[1].placeSecretKey(askp.name, key, passwd, true);
-							break;
-						default :
-							throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet"); 
-					}
-					if (passwords.isKeepedPasswords()) {
-						passwords.storePasswordFor("SecretKey."+passwordId, passwd);
-					}
-				} catch (InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException e) {
-					getLogger().message(Severity.error, e.getLocalizedMessage());
+			try {
+				final SecretKey		key = askp.createSecretKey();
+				final int					passwordId;
+				
+				switch (selected) {
+					case BOTTOM	:
+						passwordId = 0;
+						break;
+					case LEFT	:
+						passwordId = ksList[0].placeSecretKey(askp.alias, key, passwd, true);
+						break;
+					case RIGHT	:
+						passwordId = ksList[1].placeSecretKey(askp.alias, key, passwd, true);
+						break;
+					default :
+						throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet"); 
 				}
+				if (passwords.isKeepedPasswords()) {
+					passwords.storePasswordFor("SecretKey."+passwordId, passwd);
+				}
+			} catch (InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException e) {
+				getLogger().message(Severity.error, e.getLocalizedMessage());
 			}
 		}
 	}
@@ -363,7 +322,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 	@OnAction("action:/settings")
 	private void showSettings() {
-		if (ask(settings, 300, 160)) {
+		if (ask(settings, 450, 160)) {
 			try {
 				settings.storeSettings(props);
 				props.store(propsLocation);
