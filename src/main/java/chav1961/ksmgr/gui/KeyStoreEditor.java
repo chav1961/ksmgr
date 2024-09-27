@@ -214,9 +214,8 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		return label;
 	}
 	
-	
 	private void fillLocalizedStrings() {
-		final String	passwdId = KeyStoreWrapper.PASSWD_PREFIX+"."+wrapper.entryId;
+		final String	passwdId = PasswordsRepo.KEY_STORE_PREFIX+'.'+wrapper.entryId;
 		
 		if (wrapper.file == null) {
 			caption.setText(localizer.getValue(TITLE_NEW_FILE, wrapper.keyStore.getType()));

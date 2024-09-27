@@ -106,9 +106,9 @@
 		<key name="menu.help.about">About</key>
 		<key name="menu.help.about.tt">Help about application</key>
 
-<!-- Localization for application errors and warninga --> 
+<!-- Localization for application errors, warnings and informations --> 
 		<key name="error.asknewpassword.different.passwords">Passwords are different, retype them</key>
-
+		<key name="info.asknewpassword.identical.passwords">Passwords are identical, all OK</key>
 		
 <!-- Localization for enumerations -->		
 		<key name="chav1961.ksmgr.interfaces.keylength.1024">1024 bit</key>
@@ -165,7 +165,7 @@
 		<key name="chav1961.ksmgr.gui.createkeystoredialog.password">Password</key>
 		<key name="chav1961.ksmgr.gui.createkeystoredialog.password.tt">Password of the keystore</key>
 		<key name="chav1961.ksmgr.gui.createkeystoredialog.passwordretype">Retype password</key>
-		<key name="chav1961.ksmgr.gui.createkeystoredialog.passwordretype.tt">Retype password to check</key>
+		<key name="chav1961.ksmgr.gui.createkeystoredialog.passwordretype.tt">Retype password to check input</key>
 
 <!-- Localization for 'ask password' dialog -->		
 		<key name="chav1961.ksmgr.gui.askpassworddialog">Ask password</key>
@@ -174,6 +174,15 @@
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password.tt">Type password here</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.duplicate">Retype password</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.duplicate.tt">Retype password here</key>
+
+<!-- Локализация для диалога 'ask new password' -->		
+		<key name="chav1961.ksmgr.gui.asknewpassword">Create new password</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.tt">Create new password for entity</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.help">Create new password for entity</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.password">Type password</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.password.tt">Type password</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.duplicate">Retype password</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.duplicate.tt">Retype password for checking input purpose (using copy/paste is not recommended)</key>
 		
 <!-- Localization for 'change password password' dialog -->		
 		<key name="chav1961.ksmgr.gui.changepassworddialog">Change password</key>
@@ -195,8 +204,8 @@
 		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider.tt">Select preferred security provider from available list</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.principalname">Principal name</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.principalname.tt">Default principal name (used in self-signed certificates, certificate requests etc...)</key>
-		<key name="chav1961.ksmgr.gui.settingsdialog.currentsalt">Default salt</key>
-		<key name="chav1961.ksmgr.gui.settingsdialog.currentsalt.tt">Default salt to use in encryption/decryption tasks</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt">Default salt</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt.tt">Default salt to use in encryption/decryption tasks</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed">Default random seed</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed.tt">Default random seed to use in encryption/decryption tasks</key>
 
@@ -261,35 +270,29 @@
 		<key name="chav1961.ksmgr.gui.askserveruridialog.uri.tt">Serve URI to get certificated from. Must be absolute and have 'https:' scheme</key>
 
 <!-- Localization for 'create key' dialog -->
-
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.tt">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.dialogs.asksecurekeyparametersdialog.help">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.name">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.name.tt">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.length">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.length.tt">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.useSecureRandom">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.useSecureRandom.tt">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.usePassword">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.usePassword.tt">Загрузить сертификаты</key>
-
-		
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters">Create key</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.tt">Create secret key</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters">Create symmetric key</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.tt">Create symmetric secret key</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.help">uri(chav1961.ksmgr.gui.asksecurekeyparameters.cre)</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyprovider">Service provider</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyprovider.tt">Service provider</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyalgorithm">Key algorithm</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyalgorithm.tt">Encrypting algorithm for key</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keylength">Block size</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keylength.tt">Size of encrypted data block</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.iterations">Number of iterations</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.iterations.tt">Number of encryption iterations</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.usepassword">Use password &amp; salt</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.usepassword.tt">Use password &amp; salt</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.currentsalt">Salt</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.currentsalt.tt">Salt for key to generate</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.password">Password</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.password.tt">Key password</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.passwordretype">Retype password</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.passwordretype.tt">Retype key password</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.securityrandomprovider">Secure random provider</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.securityrandomprovider.tt">Secure random provider</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.securityrandomalgorithm">Secure random algorithm</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.securityrandomalgorithm.tt">Secure random algorithm</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.alias">Alias name</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.alias.tt">Alias name for key in the key store</key>
 
@@ -342,8 +345,9 @@
 		<key name="application.help.title">О программе...</key>
 		<key name="application.help">uri(aboutApplication.cre)</key>
 
-<!-- Долализация ошибок и предупреждения приложения --> 
-		<key name="error.asknewpassword.different.passwords">Пароли в полях отличаются, введите их еще раз</key>
+<!-- Локализация ошибок, предупреждений и информации приложения --> 
+		<key name="error.asknewpassword.different.passwords">Пароли в полях различаются, введите их еще раз</key>
+		<key name="info.asknewpassword.identical.passwords">Пароли совпадают</key>
 
 <!-- Локализация меню приложения --> 
 		<key name="menu.file">Файл</key>
@@ -509,6 +513,15 @@
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password.tt">Введите пароль</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.duplicate">Повторите пароль</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.duplicate.tt">Повторите пароль</key>
+
+<!-- Локализация для диалога 'ask new password' -->		
+		<key name="chav1961.ksmgr.gui.asknewpassword">Создайте пароль</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.tt">Создайте новый пароль для сущности</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.help">Создайте новый пароль для сущности</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.password">Введите пароль</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.password.tt">Введите пароль</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.duplicate">Повторите пароль</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword.duplicate.tt">Повторите пароль для проверки правильности ввода (не рекомендуется использовать копирование/вставку)</key>
 	
 <!-- Локализация для диалога 'change password password' -->		
 		<key name="chav1961.ksmgr.gui.changepassworddialog">Изменить пароль</key>
@@ -530,8 +543,8 @@
 		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider.tt">Выбрать предпочитаемого провайдера безопасности из имеющегося списка</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.principalname">Имя принципала</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.principalname.tt">Имя принципала по умолчанию (используется в самоподписанных сертификатах, запросах сертификатов и т.д.)</key>
-		<key name="chav1961.ksmgr.gui.settingsdialog.currentsalt">Соль по умолчанию</key>
-		<key name="chav1961.ksmgr.gui.settingsdialog.currentsalt.tt">Значение соли по умолчанию для операций шифрования/дешифрования</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt">Соль по умолчанию</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt.tt">Значение соли по умолчанию для операций шифрования/дешифрования</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed">Random seed по умолчанию</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed.tt">Значение Random seed по умолчанию для операций шифрования/дешифрования</key>
 
@@ -597,36 +610,31 @@
 		<key name="chav1961.ksmgr.gui.askserveruridialog.uri.tt">Адрес сервера, откуда грузить сертификаты. Долежен быть абсолютным и иметь схему 'https:'</key>
 
 <!-- Локализация для диалога 'create key'-->		
-
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.tt">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.dialogs.asksecurekeyparametersdialog.help">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.name">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.name.tt">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.length">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.length.tt">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.useSecureRandom">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.useSecureRandom.tt">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.usePassword">Загрузить сертификаты</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparametersdialog.usePassword.tt">Загрузить сертификаты</key>
-
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters">Создать ключ</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.tt">Создать секретный ключ</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters">Создать симметричный ключ</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.tt">Создать симметричный секретный ключ</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.help">uri(chav1961.ksmgr.gui.asksecurekeyparameters.cre)</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyalgorithm">Алгоритм ключа</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyalgorithm.tt">Алгоритм шифрования ключа</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyprovider">Провайдер симметричного ключа</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyprovider.tt">Провайдер симметричного ключа</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyalgorithm">Алгоритм симметричного ключа</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keyalgorithm.tt">Алгоритм шифрования симметричного ключа</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keylength">Длина блока</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.keylength.tt">Длина шифруемого блока данных</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.iterations">Число итераций</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.iterations.tt">Число итераций шифрования</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.currentsalt">Соль шифра</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.currentsalt.tt">Соль генерируемого ключа</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.usepassword">Использовать пароль и 'соль'</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.usepassword.tt">Использовать пароль и 'соль'</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.currentsalt">'Соль' шифра</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.currentsalt.tt">'Соль' генерируемого ключа</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.password">Пароль</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.password.tt">Пароль ключа</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.passwordretype">Повторить пароль</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.passwordretype.tt">Повторить пароль ключа</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.passwordretype.tt">Повторить пароль ключа для целей контроля</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.securityrandomprovider">Провайдер безопасного случайного</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.securityrandomprovider.tt">Провайдер безопасного случайного</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.securityrandomalgorithm">Алгоритм безопасного случайного</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.securityrandomalgorithm.tt">Алгоритм безопасного случайного</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.alias">Имя ключа</key>
-		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.alias.tt">Имя алиаса в памяти ключей</key>
+		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.alias.tt">Имя алиаса в репозитарии ключей</key>
 
 <!-- Локализация для диалога 'import key' -->		
 		<key name="chav1961.ksmgr.gui.keyimportdialog">Импорт в репозитерий</key>

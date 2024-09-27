@@ -31,23 +31,23 @@ public class SettingsDialog implements FormManager<Object, SettingsDialog>, Modu
 	
 	@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog.keeppasswords",tooltip="chav1961.ksmgr.gui.settingsdialog.keeppasswords.tt")
 	@Format("30ms")
-	public boolean				keepPasswords = false;
+	public boolean		keepPasswords = false;
 
 	@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog.preferredprovider",tooltip="chav1961.ksmgr.gui.settingsdialog.preferredprovider.tt")
 	@Format("30msd")
-	public String				preferredProvider = "";
+	public String		preferredProvider = "";
 
 	@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog.principalname",tooltip="chav1961.ksmgr.gui.settingsdialog.principalname.tt")
 	@Format("30ms")
-	public String				principalName = System.getProperty("user.name");
+	public String		principalName = System.getProperty("user.name");
 
-	@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog.currentsalt",tooltip="chav1961.ksmgr.gui.settingsdialog.currentsalt.tt")
+	@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog.preferredsalt",tooltip="chav1961.ksmgr.gui.settingsdialog.preferredsalt.tt")
 	@Format("30ms")
-	public String				currentSalt = "";
+	public String		preferredSalt = "";
 
 	@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog.currentrandomseed",tooltip="chav1961.ksmgr.gui.settingsdialog.currentrandomseed.tt")
 	@Format("30ms")
-	public long					currentRandomSeed = 0;
+	public long			currentRandomSeed = 0;
 
 	public SettingsDialog(final LoggerFacade facade) {
 		if (facade == null) {
@@ -90,7 +90,7 @@ public class SettingsDialog implements FormManager<Object, SettingsDialog>, Modu
 				principalName = props.getProperty(SETTINGS_PRINCIPAL_NAME, String.class);
 			}
 			if (props.containsKey(SETTINGS_CURRENT_SALT)) {
-				currentSalt = props.getProperty(SETTINGS_CURRENT_SALT, String.class);
+				preferredSalt = props.getProperty(SETTINGS_CURRENT_SALT, String.class);
 			}
 			if (props.containsKey(SETTINGS_CURRENT_RANDOM_SEED)) {
 				currentRandomSeed = props.getProperty(SETTINGS_CURRENT_RANDOM_SEED, long.class);
@@ -106,7 +106,7 @@ public class SettingsDialog implements FormManager<Object, SettingsDialog>, Modu
 			props.setProperty(SETTINGS_KEEP_PASSWORD, String.valueOf(keepPasswords));
 			props.setProperty(SETTINGS_PREFERRED_PROVIDER, preferredProvider);
 			props.setProperty(SETTINGS_PRINCIPAL_NAME, principalName);
-			props.setProperty(SETTINGS_CURRENT_SALT, currentSalt);
+			props.setProperty(SETTINGS_CURRENT_SALT, preferredSalt);
 			props.setProperty(SETTINGS_CURRENT_RANDOM_SEED, String.valueOf(currentRandomSeed));
 		}
 	}

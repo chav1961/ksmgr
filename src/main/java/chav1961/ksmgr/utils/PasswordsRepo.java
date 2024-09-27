@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PasswordsRepo {
+	public static final String		KEY_STORE_PREFIX = "KeyStore";
+	public static final String		KEY_STORE_ITEM_PREFIX = "KeyStoreItem";
+	public static final String		SECRET_KEY_PREFIX = "SecretKey";
+	
 	private final Map<String,char[]>	passwords = new HashMap<>();
 	private boolean						keepPasswords; 
 	

@@ -2,7 +2,6 @@ package chav1961.ksmgr;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Point;
@@ -15,12 +14,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
@@ -28,13 +27,9 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -80,7 +75,6 @@ import chav1961.purelib.ui.interfaces.LRUPersistence;
 import chav1961.purelib.ui.swing.AutoBuiltForm;
 import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.interfaces.OnAction;
-import chav1961.purelib.ui.swing.useful.DnDManager.DnDMode;
 import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
 import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 import chav1961.purelib.ui.swing.useful.JFileTree;
@@ -99,11 +93,6 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	public static final String				KEYSTORE_ITEM_ID = "<keystore>";
 	
 	private static final String				MENU_FILE_LRU = "menu.main.file.lru";
-	private static final String				MENU_FILE_SAVE = "menu.main.file.lru";
-	private static final String				MENU_FILE_SAVE_AS = "menu.main.file.lru";
-	private static final String[]			MENUS = {MENU_FILE_LRU,
-												     MENU_FILE_SAVE,
-												     MENU_FILE_SAVE_AS};
 	
 	private static final long 				FILE_LRU = 1L << 0;
 	private static final long 				FILE_SAVE = 1L << 1;
@@ -117,24 +106,24 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 	
 	private final ContentMetadataInterface 	app;
-	private final SubstitutableProperties		props;
-	private final File								propsLocation;
-	private final Localizer						parentLocalizer;
-	private final Localizer						localizer;
-	private final JMenuBar						menu;
-	private final JStateString					state;
-	private final MainMenuManager		emm;
-	private final JSplitPane						topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JLabel(), new JLabel());
-	private final JSplitPane						totalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JLabel(), new JLabel());
+	private final SubstitutableProperties	props;
+	private final File						propsLocation;
+	private final Localizer					parentLocalizer;
+	private final Localizer					localizer;
+	private final JMenuBar					menu;
+	private final JStateString				state;
+	private final MainMenuManager			emm;
+	private final JSplitPane				topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JLabel(), new JLabel());
+	private final JSplitPane				totalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JLabel(), new JLabel());
 	private final FileSystemInterface		root = FileSystemInterface.Factory.newInstance(URI.create(FileSystemInterface.FILESYSTEM_URI_SCHEME+":file:/"));
-	private final PasswordsRepo			passwords = new PasswordsRepo(false);
+	private final PasswordsRepo				passwords = new PasswordsRepo(false);
 	private final List<String>				lruFiles = new ArrayList<>();
 	private final LRUPersistence			pers;
 	private final JFileContentManipulator	fcm;
 	private final KeyStoreEditor[]			ksList = new KeyStoreEditor[2];
 	private final AtomicInteger				unique = new AtomicInteger(1);
-	private final SettingsDialog				settings;
-	private SelectedWindows				selected = SelectedWindows.BOTTOM; 
+	private final SettingsDialog			settings;
+	private SelectedWindows					selected = SelectedWindows.BOTTOM; 
 	
 	public Application(final ContentMetadataInterface xda, final Localizer parent, final File props) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
 		if (xda == null) {
@@ -281,33 +270,35 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	
 	@OnAction("action:/keyGenerate")
 	private void createSymmetricKey() {
-		final KeyStore								ks = ksList[selected == SelectedWindows.LEFT ? 0 : 1].getKeyStoreWrapper().keyStore;
-		final AskSecureKeyParameters	askp = new AskSecureKeyParameters(getLogger(), ks, settings.preferredProvider, settings.currentSalt);
-		char[]	passwd = new char[0];
+		final int	ksIndex = selected == SelectedWindows.LEFT ? 0 : 1;
+		final KeyStore					ks = ksList[ksIndex].getKeyStoreWrapper().keyStore;
+		final AskSecureKeyParameters	askp = new AskSecureKeyParameters(getLogger(), ks, settings.preferredProvider, settings.preferredSalt);
 		
-		if (ask(askp, 250, 200)) {
-			try {
-				final SecretKey		key = askp.createSecretKey();
-				final int					passwordId;
-				
-				switch (selected) {
-					case BOTTOM	:
-						passwordId = 0;
-						break;
-					case LEFT	:
-						passwordId = ksList[0].placeSecretKey(askp.alias, key, passwd, true);
-						break;
-					case RIGHT	:
-						passwordId = ksList[1].placeSecretKey(askp.alias, key, passwd, true);
-						break;
-					default :
-						throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet"); 
+		if (ask(askp, 400, 300)) {
+			final char[]	password = askNewPassword();
+			
+			if (password != null) {
+				try {
+					final SecretKey		key = askp.createSecretKey();
+					final int			passwordId;
+					
+					switch (selected) {
+						case BOTTOM	:
+							passwordId = 0;
+							break;
+						case LEFT : case RIGHT :
+							passwordId = ksList[ksIndex].placeSecretKey(askp.alias, key, password, true);
+							break;
+						default :
+							throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet"); 
+					}
+					if (passwordId != 0 && passwords.isKeepedPasswords()) {
+						passwords.storePasswordFor(PasswordsRepo.KEY_STORE_ITEM_PREFIX+'.'+passwordId, password);
+						passwords.storePasswordFor(PasswordsRepo.SECRET_KEY_PREFIX+'.'+passwordId, askp.password);
+					}
+				} catch (InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException | UnsupportedEncodingException e) {
+					getLogger().message(Severity.error, e.getLocalizedMessage());
 				}
-				if (passwords.isKeepedPasswords()) {
-					passwords.storePasswordFor("SecretKey."+passwordId, passwd);
-				}
-			} catch (InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException e) {
-				getLogger().message(Severity.error, e.getLocalizedMessage());
 			}
 		}
 	}
@@ -339,8 +330,8 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
   
 	private void newKeystore(final String keyStoreType) {
 		final int		keyStoreId = unique.incrementAndGet();
-		final String	keyStoreString = KeyStoreWrapper.PASSWD_PREFIX+"."+keyStoreId;
-		final char[]	passwd = askPassword(keyStoreString);
+		final String	keyStoreString = PasswordsRepo.KEY_STORE_PREFIX+'.'+keyStoreId;
+		final char[]	passwd = askNewPassword();
 		
 		if (passwd != null) {
 			try{
@@ -350,6 +341,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 					
 					ks.load(null, passwd);
 					setCurrentPanel(wrapper);
+					if (passwords.isKeepedPasswords()) {
+						passwords.storePasswordFor(keyStoreString, passwd);
+					}
 				}
 			} catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
 				getLogger().message(Severity.error, e, e.getLocalizedMessage());
