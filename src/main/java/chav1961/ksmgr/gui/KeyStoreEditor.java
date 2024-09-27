@@ -202,7 +202,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 	}
 
 	private Component getListCellRendererComponent(final JList<? extends AliasKeeper> list, final AliasKeeper value, final int index, final boolean isSelected, final boolean cellHasFocus) {
-		final JLabel	label = new JLabel(value.name, value.type.getIcon(), JLabel.TRAILING);
+		final JLabel	label = new JLabel(value.name, value.type.getIcon(), JLabel.LEADING);
 		final String	passwordId = AliasKeeper.PASSWD_PREFIX+"."+value.passwordId; 
 		
 		label.setForeground(repo.hasPasswordFor(passwordId) ? Color.RED : Color.blue);

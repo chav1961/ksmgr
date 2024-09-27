@@ -5,6 +5,8 @@ import java.util.function.Predicate;
 import javax.swing.JComponent;
 
 import chav1961.ksmgr.Application.SelectedWindows;
+import chav1961.ksmgr.gui.SettingsDialog;
+import chav1961.purelib.basic.Utils;
 import chav1961.purelib.ui.swing.useful.JEnableMaskManipulator;
 
 class MainMenuManager extends JEnableMaskManipulator {
@@ -94,29 +96,36 @@ class MainMenuManager extends JEnableMaskManipulator {
 												EDIT | EDIT_COPY | EDIT_MOVE | EDIT_RENAME | EDIT_DELETE),
 										new Template((m)->m.currentSelection == SelectedWindows.LEFT && m.leftRepo && !m.leftRepoSelected || m.currentSelection == SelectedWindows.RIGHT && m.rightRepo && !m.rightRepoSelected,
 												TASKS | TASKS_KEYS | TASKS_KEYS_GENERATE | TASKS_KEYS_IMPORT),
-										
+										new Template((m)->m.settings.keepPasswords && (m.currentSelection == SelectedWindows.LEFT && m.leftRepo || m.currentSelection == SelectedWindows.RIGHT && m.rightRepo),
+												FILE_CHANGE_PASSWD),
 									};
 
 	
-	private final long		allClears;
-	private boolean			leftRepo = false;
-	private boolean			leftRepoSelected = false;
-	private boolean			leftRepoFileNameDefined = false;
-	private boolean			rightRepo = false;
-	private boolean			rightRepoSelected = false;
-	private boolean			rightRepoFileNameDefined = false;
-	private SelectedWindows	currentSelection = SelectedWindows.BOTTOM;
+	private final SettingsDialog	settings;
+	private final long				allClears;
+	private boolean					leftRepo = false;
+	private boolean					leftRepoSelected = false;
+	private boolean					leftRepoFileNameDefined = false;
+	private boolean					rightRepo = false;
+	private boolean					rightRepoSelected = false;
+	private boolean					rightRepoFileNameDefined = false;
+	private SelectedWindows			currentSelection = SelectedWindows.BOTTOM;
 	
-	
-	MainMenuManager(JComponent... components) throws IllegalArgumentException {
+	MainMenuManager(final SettingsDialog settings, final JComponent... components) throws IllegalArgumentException {
 		super(MENUS, true, components);
-		long		clears = 0;
-		
-		for(Template item : TEMPLATES) {
-			clears |= item.enables;
+		if (settings == null) {
+			throw new NullPointerException("Settings can't be null"); 
 		}
-		this.allClears = clears;
-		setEnableMaskOff(clears);
+		else {
+			this.settings = settings;
+			long		clears = 0;
+			
+			for(Template item : TEMPLATES) {
+				clears |= item.enables;
+			}
+			this.allClears = clears;
+			setEnableMaskOff(clears);
+		}
 	}
 	
 	void enableLeftRepo(final boolean enabled) {

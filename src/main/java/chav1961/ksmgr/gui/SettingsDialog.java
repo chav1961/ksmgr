@@ -22,6 +22,7 @@ import chav1961.purelib.ui.interfaces.UIFormManager;
 @LocaleResource(value="chav1961.ksmgr.gui.settingsdialog",tooltip="chav1961.ksmgr.gui.settingsdialog.tt",help="chav1961.ksmgr.dialogs.settingsdialog.help")
 public class SettingsDialog implements FormManager<Object, SettingsDialog>, ModuleAccessor, UIFormManager<Object, SettingsDialog> {
 	public static final String	SETTINGS_KEEP_PASSWORD = "keepPassword";
+	public static final String	SETTINGS_SILENTLY_SUBSTITUTE_PASSWORD = "silentlySubstitutePassword";
 	public static final String	SETTINGS_PREFERRED_PROVIDER = "preferredProvider";
 	public static final String	SETTINGS_PRINCIPAL_NAME = "principalName";
 	public static final String	SETTINGS_CURRENT_SALT = "currentSalt";
@@ -33,6 +34,10 @@ public class SettingsDialog implements FormManager<Object, SettingsDialog>, Modu
 	@Format("30ms")
 	public boolean		keepPasswords = false;
 
+	@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog.silentlysubstitutepasswords",tooltip="chav1961.ksmgr.gui.settingsdialog.silentlysubstitutepasswords.tt")
+	@Format("30ms")
+	public boolean		silentlySubstitutePasswords = false;
+	
 	@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog.preferredprovider",tooltip="chav1961.ksmgr.gui.settingsdialog.preferredprovider.tt")
 	@Format("30msd")
 	public String		preferredProvider = "";
@@ -60,7 +65,15 @@ public class SettingsDialog implements FormManager<Object, SettingsDialog>, Modu
 	
 	@Override
 	public RefreshMode onField(final SettingsDialog inst, final Object id, final String fieldName, final Object oldValue, final boolean beforeCommit) throws FlowException {
-		return RefreshMode.DEFAULT;
+		switch (fieldName) {
+			case "keepPasswords" :
+				if (!keepPasswords) {
+					silentlySubstitutePasswords = false;
+				}
+				return RefreshMode.RECORD_ONLY;
+			default :
+				return RefreshMode.DEFAULT;
+		}
 	}
 
 	@Override
@@ -83,6 +96,9 @@ public class SettingsDialog implements FormManager<Object, SettingsDialog>, Modu
 			if (props.containsKey(SETTINGS_KEEP_PASSWORD)) {
 				keepPasswords = props.getProperty(SETTINGS_KEEP_PASSWORD, boolean.class);
 			}
+			if (props.containsKey(SETTINGS_SILENTLY_SUBSTITUTE_PASSWORD)) {
+				silentlySubstitutePasswords = props.getProperty(SETTINGS_SILENTLY_SUBSTITUTE_PASSWORD, boolean.class);
+			}
 			if (props.containsKey(SETTINGS_PREFERRED_PROVIDER)) {
 				preferredProvider = props.getProperty(SETTINGS_PREFERRED_PROVIDER, String.class);
 			}
@@ -104,6 +120,7 @@ public class SettingsDialog implements FormManager<Object, SettingsDialog>, Modu
 		}
 		else {
 			props.setProperty(SETTINGS_KEEP_PASSWORD, String.valueOf(keepPasswords));
+			props.setProperty(SETTINGS_SILENTLY_SUBSTITUTE_PASSWORD, String.valueOf(silentlySubstitutePasswords));
 			props.setProperty(SETTINGS_PREFERRED_PROVIDER, preferredProvider);
 			props.setProperty(SETTINGS_PRINCIPAL_NAME, principalName);
 			props.setProperty(SETTINGS_CURRENT_SALT, preferredSalt);
@@ -113,7 +130,12 @@ public class SettingsDialog implements FormManager<Object, SettingsDialog>, Modu
 
 	@Override
 	public AvailableAndVisible getItemState(final ContentNodeMetadata meta) {
-		return AvailableAndVisible.DEFAULT;
+		switch (meta.getName()) {
+			case "silentlySubstitutePasswords" :
+				return keepPasswords ? AvailableAndVisible.AVAILABLE : AvailableAndVisible.NOTAVAILABLE;
+			default :
+				return AvailableAndVisible.DEFAULT;
+		}
 	}
 
 	@Override

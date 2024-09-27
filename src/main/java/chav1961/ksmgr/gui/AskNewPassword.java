@@ -1,7 +1,6 @@
 package chav1961.ksmgr.gui;
 
 
-import java.security.KeyStoreException;
 import java.util.Arrays;
 
 import chav1961.purelib.basic.exceptions.FlowException;

@@ -146,6 +146,19 @@ public class AskSecureKeyParameters implements FormManager<Object, AskSecureKeyP
 					getLogger().message(Severity.info,"Passwords are identical");
 				}
 				return RefreshMode.DEFAULT;
+			case "keyProvider" : case "keyAlgorithm" :
+				if (beforeCommit) {
+					if (!AlgorithmRepo.getInstance().exists(keyProvider, KEY_SERVICE_TYPE, keyAlgorithm)) {
+						getLogger().message(Severity.error,"Provider ["+keyProvider+"] doesn't support secret key algorithm ["+keyAlgorithm+"]");
+						return RefreshMode.REJECT;
+					}
+					else {
+						return RefreshMode.DEFAULT;
+					}
+				}
+				else {
+					return RefreshMode.DEFAULT;
+				}
 			default :
 				return RefreshMode.DEFAULT;
 		}

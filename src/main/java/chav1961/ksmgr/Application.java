@@ -156,7 +156,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			this.fcm.appendNewFileSupport();
 			
 			this.menu = SwingUtils.toJComponent(app.byUIPath(URI.create("ui:/model/navigation.top.mainmenu")), JMenuBar.class);
-			this.emm = new MainMenuManager(menu);
+			this.emm = new MainMenuManager(settings, menu);
 			SwingUtils.assignActionListeners(menu, this);
 			SwingUtils.assignExitMethod4MainWindow(this, ()->exitApplication());
 
@@ -313,7 +313,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 	@OnAction("action:/settings")
 	private void showSettings() {
-		if (ask(settings, 450, 160)) {
+		if (ask(settings, 450, 180)) {
 			try {
 				settings.storeSettings(props);
 				props.store(propsLocation);
@@ -436,6 +436,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 		if (passwords.isKeepedPasswords() && passwords.hasPasswordFor(passwordId)) {
 			ap.password = passwords.getPasswordFor(passwordId);
+			if (settings.silentlySubstitutePasswords) {
+				return ap.password; 
+			}
 		}
 		
 		if (ask(ap, 250, 50)) {
@@ -468,7 +471,6 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	
 	private <T> boolean ask(final T instance, final int width, final int height) {
 		try{final ContentMetadataInterface	mdi = ContentModelFactory.forAnnotatedClass(instance.getClass());
-		
 			try(final AutoBuiltForm<T,?>	abf = new AutoBuiltForm<>(mdi, getLocalizer(), getLogger(), PureLibSettings.INTERNAL_LOADER, instance, (FormManager<Object,T>)instance)) {
 				
 				((ModuleAccessor)instance).allowUnnamedModuleAccess(abf.getUnnamedModules());

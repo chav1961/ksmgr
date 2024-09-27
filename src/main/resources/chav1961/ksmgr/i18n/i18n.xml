@@ -28,7 +28,7 @@
 		<key name="menu.file.closeKeyStore">Close keystore</key>
 		<key name="menu.file.closeKeyStore.tt">Close keystore opened</key>
 		<key name="menu.file.changePassword">Change password</key>
-		<key name="menu.file.changePassword.tt">Change keystore password</key>
+		<key name="menu.file.changePassword.tt">Change kept password for any entity. This action is enabled only when 'keep passwords' flag is set in the 'Parameters' dialog and any entity (key store or key store item) is selected now</key>
 		<key name="menu.file.exit">Exit</key>
 		<key name="menu.exit.tt">Exit application</key>
 		<key name="menu.edit">Edit</key>
@@ -200,12 +200,14 @@
 		<key name="chav1961.ksmgr.gui.settingsdialog.help">Application settings</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords">Keep passwords</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords.tt">Keep passwords for current session to exclude password typing on every password request</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.silentlysubstitutepasswords">Silently substitute passwords</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.silentlysubstitutepasswords.tt">Silently use password if found</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider">Preferred provider</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider.tt">Select preferred security provider from available list</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.principalname">Principal name</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.principalname.tt">Default principal name (used in self-signed certificates, certificate requests etc...)</key>
-		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt">Default salt</key>
-		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt.tt">Default salt to use in encryption/decryption tasks</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt">Preferred salt</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt.tt">Preferred salt to use in encryption/decryption tasks</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed">Default random seed</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed.tt">Default random seed to use in encryption/decryption tasks</key>
 
@@ -371,7 +373,7 @@
 		<key name="menu.file.closeKeyStore">Закрыть репозитарий</key>
 		<key name="menu.file.closeKeyStore.tt">Закрыть открытый в данный момент репозитарий</key>
 		<key name="menu.file.changePassword">Смена пароля</key>
-		<key name="menu.file.changePassword.tt">Изменить пароль репозитария</key>
+		<key name="menu.file.changePassword.tt">Изменить пароль сущности. Этот режим доступен только если в диалоге настройке установлен флаг 'Сохранять пароли' и какая-либо сущность (репозитарий ключей или его элемент) выбрана</key>
 		<key name="menu.file.exit">Выход</key>
 		<key name="menu.exit.tt">Завершение работы приложения</key>
 		<key name="menu.edit">Правка</key>
@@ -539,12 +541,14 @@
 		<key name="chav1961.ksmgr.gui.settingsdialog.help">Настройки приложения</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords">Запоминать пароли</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.keeppasswords.tt">Зпоминать пароли на время работы приложения, чтобы не вводить их каждый раз, когда они требуются</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.silentlysubstitutepasswords">Использовать пароль молча</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.silentlysubstitutepasswords.tt">Если для данной сущности найден пароль, возвращать его значение без выдачи диалогового окна ввода пароля</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider">Предпочитаемый провайдер</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.preferredprovider.tt">Выбрать предпочитаемого провайдера безопасности из имеющегося списка</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.principalname">Имя принципала</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.principalname.tt">Имя принципала по умолчанию (используется в самоподписанных сертификатах, запросах сертификатов и т.д.)</key>
-		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt">Соль по умолчанию</key>
-		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt.tt">Значение соли по умолчанию для операций шифрования/дешифрования</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt">Предпочитаемая 'соль' для ключа</key>
+		<key name="chav1961.ksmgr.gui.settingsdialog.preferredsalt.tt">Значение предпочитаемой 'соли' ключа для операций шифрования/дешифрования</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed">Random seed по умолчанию</key>
 		<key name="chav1961.ksmgr.gui.settingsdialog.currentrandomseed.tt">Значение Random seed по умолчанию для операций шифрования/дешифрования</key>
 
