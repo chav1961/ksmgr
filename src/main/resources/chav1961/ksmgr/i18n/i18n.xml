@@ -109,6 +109,8 @@
 <!-- Localization for application errors, warnings and informations --> 
 		<key name="error.asknewpassword.different.passwords">Passwords are different, retype them</key>
 		<key name="info.asknewpassword.identical.passwords">Passwords are identical, all OK</key>
+		<key name="error.askchangepassword.different.passwords">Passwords are different, retype them</key>
+		<key name="info.askchangepassword.identical.passwords">Passwords are identical, all OK</key>
 		
 <!-- Localization for enumerations -->		
 		<key name="chav1961.ksmgr.interfaces.keylength.1024">1024 bit</key>
@@ -184,15 +186,16 @@
 		<key name="chav1961.ksmgr.gui.asknewpassword.duplicate">Retype password</key>
 		<key name="chav1961.ksmgr.gui.asknewpassword.duplicate.tt">Retype password for checking input purpose (using copy/paste is not recommended)</key>
 		
-<!-- Localization for 'change password password' dialog -->		
+<!-- Localization for 'change password password' dialog -->
 		<key name="chav1961.ksmgr.gui.changepassworddialog">Change password</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.tt">Change password for keystore opened</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.password">Old password</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.password.tt">Type old password for repository</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.passwordretype">Retype old password</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.passwordretype.tt">Repeat old password for repository for checking</key>
-		<key name="chav1961.ksmgr.gui.createkeystoredialog.newpassword">New password</key>
-		<key name="chav1961.ksmgr.gui.createkeystoredialog.newpassword.tt">Type new password for repository</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.tt">Change password for entity opened</key>
+		<key name="chav1961.ksmgr.dialogs.askchangepassword.help">Change password for entity opened</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.oldpassword">Old password</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.oldpassword.tt">Type old password for entity</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.password">New password</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.password.tt">Type new password for entity</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.duplicate">Retype new password</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.duplicate.tt">Repeat new password for checking</key>
 
 <!-- Localization for 'settings' dialog -->		
 		<key name="chav1961.ksmgr.gui.settingsdialog">Application settings</key>
@@ -350,6 +353,8 @@
 <!-- Локализация ошибок, предупреждений и информации приложения --> 
 		<key name="error.asknewpassword.different.passwords">Пароли в полях различаются, введите их еще раз</key>
 		<key name="info.asknewpassword.identical.passwords">Пароли совпадают</key>
+		<key name="error.askchangepassword.different.passwords">Пароли в полях различаются, введите их еще раз</key>
+		<key name="info.askchangepassword.identical.passwords">Пароли совпадают</key>
 
 <!-- Локализация меню приложения --> 
 		<key name="menu.file">Файл</key>
@@ -527,13 +532,14 @@
 	
 <!-- Локализация для диалога 'change password password' -->		
 		<key name="chav1961.ksmgr.gui.changepassworddialog">Изменить пароль</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.tt">Изменить пароль открытого репозитария</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.password">Старый пароль</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.password.tt">Укажите прежний пароль репозитария</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.passwordretype">Повторите старый пароль</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.passwordretype.tt">Повторно укажите прежний пароль репозитария для проверки</key>
-		<key name="chav1961.ksmgr.gui.createkeystoredialog.newpassword">Новый пароль</key>
-		<key name="chav1961.ksmgr.gui.createkeystoredialog.newpassword.tt">Задайте новый пароль репозитария</key>
+		<key name="chav1961.ksmgr.gui.changepassworddialog.tt">Изменить пароль сушности</key>
+		<key name="chav1961.ksmgr.dialogs.askchangepassword.help">Изменить пароль сушности</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.oldpassword">Старый пароль</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.oldpassword.tt">Укажите прежний пароль сущности</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.password">Новый пароль</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.password.tt">Задайте новый пароль сущности</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.duplicate">Повторите новый пароль</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.duplicate.tt">Повторно задайте новыай пароль репозитария для проверки</key>
 	
 <!-- Локализация для диалога 'settings' -->		
 		<key name="chav1961.ksmgr.gui.settingsdialog">Настройки приложения</key>

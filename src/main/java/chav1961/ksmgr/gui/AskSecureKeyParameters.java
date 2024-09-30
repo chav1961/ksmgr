@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
@@ -37,6 +38,7 @@ import chav1961.purelib.ui.interfaces.UIFormManager;
 public class AskSecureKeyParameters implements FormManager<Object, AskSecureKeyParameters>,  UIFormManager<Object, AskSecureKeyParameters>, ModuleAccessor {
 	private static final String		KEY_SERVICE_TYPE = "SecretKeyFactory";
 	private static final String		RANDOM_SERVICE_TYPE = "SecurityRandom";
+	private static final String		SECRET_KEY_SERVICE = "AES";
 // see https://docs.oracle.com/en/java/javase/21/docs/specs/security/standard-names.html#securerandom-number-generation-algorithms	
 	private static final String[]	RANDOM_ALGORITHMS = {"NativePRNG", "NativePRNGBlocking", "NativePRNGNonBlocking", "PKCS11", "DRBG", "SHA1PRNG", "Windows-PRNG"};
 	
@@ -257,21 +259,22 @@ public class AskSecureKeyParameters implements FormManager<Object, AskSecureKeyP
 		CipherKeyLength.KEY128.allowUnnamedModuleAccess(unnamedModules);
 	}
 	
-	public SecretKey createSecretKey() throws InvalidKeySpecException, NoSuchAlgorithmException, UnsupportedEncodingException {
+	public SecretKey createSecretKey() throws InvalidKeySpecException, NoSuchAlgorithmException, UnsupportedEncodingException, NoSuchProviderException {
 		final SecretKey		key;
 		
 		if (usePassword) {
 			final byte[]		salt = currentSalt.getBytes(PureLibSettings.DEFAULT_CONTENT_ENCODING);
 		    final PBEKeySpec 	pbeKeySpec = new PBEKeySpec(password, salt, iterations, cipherKeyLength.getKeyLength());
+		    final SecretKey 	pbeKey = SecretKeyFactory.getInstance(keyAlgorithm, keyProvider).generateSecret(pbeKeySpec);
 		    
-		    key = SecretKeyFactory.getInstance(keyAlgorithm).generateSecret(pbeKeySpec);
+		    return new SecretKeySpec(pbeKey.getEncoded(), SECRET_KEY_SERVICE);		    
 		}
 		else {
 			final byte[]		secureRandomKeyBytes = new byte[cipherKeyLength.getKeyLength() / 8];
-			final SecureRandom 	secureRandom = SecureRandom.getInstance(securityRandomAlgorithm);
+			final SecureRandom 	secureRandom = SecureRandom.getInstance(securityRandomAlgorithm, securityRandomProvider);
 			
 		    secureRandom.nextBytes(secureRandomKeyBytes);
-		    key = new SecretKeySpec(secureRandomKeyBytes, keyAlgorithm);
+		    key = new SecretKeySpec(secureRandomKeyBytes, SECRET_KEY_SERVICE);
 		}
 		return key;
 	}

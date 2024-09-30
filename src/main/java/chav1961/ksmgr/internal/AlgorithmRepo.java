@@ -104,7 +104,7 @@ public class AlgorithmRepo {
 		}
 	}
 	
-	public boolean exists(final String service, final String provider, final String algorithm) {
+	public boolean exists(final String provider, final String service, final String algorithm) {
 		if (Utils.checkEmptyOrNullString(service)) {
 			throw new IllegalArgumentException("Service name can't be null or empty"); 
 		}
@@ -115,7 +115,7 @@ public class AlgorithmRepo {
 			throw new IllegalArgumentException("Algorithm name can't be null or empty"); 
 		}
 		else if (hasService(provider, service)) {
-			for (String item : getAlgorithms(service, provider)) {
+			for (String item : getAlgorithms(provider, service)) {
 				if (algorithm.equals(item)) {
 					return true;
 				}

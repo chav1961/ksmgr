@@ -20,6 +20,7 @@ import java.net.URISyntaxException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.LineBorder;
 
+import chav1961.ksmgr.gui.AskChangePassword;
 import chav1961.ksmgr.gui.AskNewPassword;
 import chav1961.ksmgr.gui.AskPassword;
 import chav1961.ksmgr.gui.AskSecureKeyParameters;
@@ -174,6 +176,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				
 				@Override
 				public void placeFileContent(final Point location, final Iterable<JFileItemDescriptor> content) {
+					System.err.println("Location: "+location+", desc="+content);
 				}
 
 				@Override
@@ -260,6 +263,15 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private void closeKeyStore() {
 		setCurrentPanel(new KSPlaceHolder(localizer));
 	}
+
+	@OnAction("action:/changePassword")
+	private void changePassword() {
+		final char[]	passwd = askChangePassword(new char[0]);
+		
+		if (passwd != null) {
+			
+		}
+	}
 	
 	@OnAction("action:/exit")
 	private void exitApplication() {
@@ -296,7 +308,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 						passwords.storePasswordFor(PasswordsRepo.KEY_STORE_ITEM_PREFIX+'.'+passwordId, password);
 						passwords.storePasswordFor(PasswordsRepo.SECRET_KEY_PREFIX+'.'+passwordId, askp.password);
 					}
-				} catch (InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException | UnsupportedEncodingException e) {
+				} catch (InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException | UnsupportedEncodingException | NoSuchProviderException e) {
 					getLogger().message(Severity.error, e.getLocalizedMessage());
 				}
 			}
@@ -462,6 +474,24 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			}
 			else {
 				return anp.password;
+			}
+		}
+		else {
+			return null;
+		}
+	}	
+
+	private char[] askChangePassword(final char[] oldPassword) {
+		final AskChangePassword	acp = new AskChangePassword(getLogger(), getLocalizer());
+
+		acp.oldPassword = oldPassword;
+		if (ask(acp, 250, 70)) {
+			if (!Arrays.equals(acp.password, acp.duplicate)) {
+				getLogger().message(Severity.error, localizer.getValue(AskNewPassword.ERROR_DIFFERENT_PASSWORDS));
+				return null;
+			}
+			else {
+				return acp.password;
 			}
 		}
 		else {
