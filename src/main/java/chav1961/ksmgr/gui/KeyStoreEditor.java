@@ -13,8 +13,11 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.ProtectionParameter;
@@ -29,6 +32,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -65,6 +69,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 	private final KeyStoreWrapper 		wrapper;
 	private final PasswordsRepo			repo;
 	private final JLabel				caption = new JLabel();
+	private final JButton				save = new JButton();
 	private final JList<AliasKeeper>	content = new JList<>();
 
 	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final SelectedWindows place, final KeyStoreWrapper wrapper, final PasswordsRepo repo) {
@@ -94,7 +99,12 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			this.wrapper = wrapper;
 			this.repo = repo;
 			
-			add(caption, BorderLayout.NORTH);
+			final JPanel	topPanel = new JPanel(new BorderLayout(3, 3));
+			
+			topPanel.add(caption, BorderLayout.CENTER);
+			topPanel.add(save, BorderLayout.EAST);
+			
+			add(topPanel, BorderLayout.NORTH);
 			add(new JScrollPane(content), BorderLayout.CENTER);
 			
 			content.addFocusListener(new FocusListener() {
@@ -119,7 +129,6 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 
 			DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(content, DnDConstants.ACTION_COPY, new DragGestureHandler(content));
 			
-			
 			fillContent(content, wrapper.keyStore);
 			fillLocalizedStrings();
 		}
@@ -143,6 +152,24 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 	public KeyStoreWrapper getKeyStoreWrapper() {
 		return wrapper;
 	}
+
+	public void addActionListener(final ActionListener listener) {
+		if (listener == null) {
+			throw new NullPointerException("Listener to add can't be null");
+		}
+		else {
+			save.addActionListener(listener);
+		}
+	}
+
+	public void removeActionListener(final ActionListener listener) {
+		if (listener == null) {
+			throw new NullPointerException("Listener to remove can't be null");
+		}
+		else {
+			save.removeActionListener(listener);
+		}
+	}
 	
 	public void addSelectionListener(final ListSelectionListener listener) {
 		if (listener == null) {
@@ -160,6 +187,14 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		else {
 			content.removeListSelectionListener(listener);
 		}
+	}
+	
+	public boolean hasAnySelection() {
+		return content.getSelectedIndex() != -1;
+	}
+	
+	public int getSelectionCount() {
+		return content.getSelectedValuesList().size();
 	}
 	
 	public int placeSecretKey(final String entryName, final SecretKey secretKey, final char[] password, final boolean testUniqueName) throws KeyStoreException {

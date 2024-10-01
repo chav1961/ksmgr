@@ -5,6 +5,8 @@
 		<key name="application.title">(c) 2020, A.V.Chernomyrdin, Key store manager V.R.=1.0</key>
 		<key name="application.help.title">About...</key>
 		<key name="application.help">uri(aboutApplication.cre)</key>
+		<key name="application.copy.file">Copy %1$s to %2$s?</key>
+		<key name="application.copy.file.title">Copy file(s)...</key>
 
 <!-- Localization for application menu --> 
 		<key name="menu.file">File</key>
@@ -151,6 +153,36 @@
 		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.certificate.tt">Entoty contains certificate</key>
 		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.unknown">Unknown</key>
 		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.unknown.tt">Unknown entity</key>
+		
+		<key name="chav1961.ksmgr.interfaces.fileformat.pem">PEM</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pem.tt">PEM</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pkcs_7">PKCS#7</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pkcs_7.tt">PKCS#7</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.der">DER</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.der.tt">DER</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pkcs_12">PKCS#12</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pkcs_12.tt">PKCS#12</key>
+
+		<key name="chav1961.ksmgr.interfaces.fileextension.pem">PEM</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.pem.tt">PEM</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.crt">CRT</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.crt.tt">CRT</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.cer">CER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.cer.tt">CER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.key">KEY</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.key.tt">KEY</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p7b">P7B</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p7b.tt">P7B</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p7c">P7C</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p7c.tt">P7C</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.der">DER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.der.tt">DER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.cerd">CER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.cerd.tt">CER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.pfx">PFX</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.pfx.tt">PFX</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p12">P12</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p12.tt">P12</key>
 
 <!-- Localization for placeholder --> 
 		<key name="chav1961.ksmgr.placeholder.text">To start editing, drag keystore file here</key>
@@ -303,6 +335,19 @@
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.alias">Alias name</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.alias.tt">Alias name for key in the key store</key>
 
+<!-- Localization for 'export key' dialog -->
+		<key name="chav1961.ksmgr.gui.askexportsecurekey">Export symmetric key</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.tt">Export symmetric key</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.help">Export symmetric key</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.format">Key file format</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.format.tt">Key file format</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.extension">Key file extension</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.extension.tt">Key file extension</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.password">Password</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.password.tt">Type password to store</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.passwordretype">Retype password</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.passwordretype.tt">Retype password to check</key>
+
 <!-- Localization for 'import key' dialog -->		
 		<key name="chav1961.ksmgr.gui.keyimportdialog">Import key</key>
 		<key name="chav1961.ksmgr.gui.keyimportdialog.tt">Import secret key</key>
@@ -351,6 +396,8 @@
 		<key name="application.title">(c) 2020, А.В.Черномырдин, Менеджер репозитариев ключей V.R.=1.0</key>
 		<key name="application.help.title">О программе...</key>
 		<key name="application.help">uri(aboutApplication.cre)</key>
+		<key name="application.copy.file">Скопировать %1$s в %2$s?</key>
+		<key name="application.copy.file.title">Копировать файл(ы)...</key>
 
 <!-- Локализация ошибок, предупреждений и информации приложения --> 
 		<key name="error.asknewpassword.different.passwords">Пароли в полях различаются, введите их еще раз</key>
@@ -497,6 +544,36 @@
 		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.certificate.tt">Сущность содержит сертификат</key>
 		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.unknown">Не определен</key>
 		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.unknown.tt">Неопределенная сущность</key>
+
+		<key name="chav1961.ksmgr.interfaces.fileformat.pem">PEM</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pem.tt">PEM</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pkcs_7">PKCS#7</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pkcs_7.tt">PKCS#7</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.der">DER</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.der.tt">DER</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pkcs_12">PKCS#12</key>
+		<key name="chav1961.ksmgr.interfaces.fileformat.pkcs_12.tt">PKCS#12</key>
+
+		<key name="chav1961.ksmgr.interfaces.fileextension.pem">PEM</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.pem.tt">PEM</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.crt">CRT</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.crt.tt">CRT</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.cer">CER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.cer.tt">CER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.key">KEY</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.key.tt">KEY</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p7b">P7B</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p7b.tt">P7B</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p7c">P7C</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p7c.tt">P7C</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.der">DER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.der.tt">DER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.cerd">CER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.cerd.tt">CER</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.pfx">PFX</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.pfx.tt">PFX</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p12">P12</key>
+		<key name="chav1961.ksmgr.interfaces.fileextension.p12.tt">P12</key>
 
 <!-- Локализация местоблюстителя --> 
 		<key name="chav1961.ksmgr.placeholder.text">Для начала редактирования перетащите файл репозитария сюда</key>
@@ -649,6 +726,19 @@
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.securityrandomalgorithm.tt">Алгоритм безопасного случайного</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.alias">Имя ключа</key>
 		<key name="chav1961.ksmgr.gui.asksecurekeyparameters.alias.tt">Имя алиаса в репозитарии ключей</key>
+
+<!-- Локализация для диалога 'export key' -->
+		<key name="chav1961.ksmgr.gui.askexportsecurekey">Экспорт симметричного ключа</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.tt">Экспорт симметричного ключа</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.help">Экспорт симметричного ключа</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.format">Формат файла ключа</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.format.tt">Формат файла ключа</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.extension">Расщирение файла ключа</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.extension.tt">Расщирение файла ключа</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.password">Пароль</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.password.tt">Введите пароль для сохранения</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.passwordretype">Повторите ароль</key>
+		<key name="chav1961.ksmgr.gui.askexportsecurekey.passwordretype.tt">Повторите пароль для контроля</key>
 
 <!-- Локализация для диалога 'import key' -->		
 		<key name="chav1961.ksmgr.gui.keyimportdialog">Импорт в репозитерий</key>

@@ -9,8 +9,11 @@ import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +42,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.LineBorder;
@@ -47,6 +51,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import chav1961.ksmgr.gui.AskChangePassword;
+import chav1961.ksmgr.gui.AskExportSecureKey;
 import chav1961.ksmgr.gui.AskNewPassword;
 import chav1961.ksmgr.gui.AskPassword;
 import chav1961.ksmgr.gui.AskSecureKeyParameters;
@@ -87,21 +92,26 @@ import chav1961.purelib.ui.swing.interfaces.OnAction;
 import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
 import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 import chav1961.purelib.ui.swing.useful.JFileTree;
+import chav1961.purelib.ui.swing.useful.JLocalizedOptionPane;
 import chav1961.purelib.ui.swing.useful.JPlaceHolder;
 import chav1961.purelib.ui.swing.useful.JStateString;
+import chav1961.purelib.ui.swing.useful.LocalizedFormatter;
 import chav1961.purelib.ui.swing.useful.interfaces.FileContentChangedEvent;
  
 public class Application extends JFrame implements LocaleChangeListener, LoggerFacadeOwner, LocalizerOwner, InputStreamGetter, OutputStreamGetter {
 	private static final long serialVersionUID = -1812854125768597438L;
 	public static final String				ARG_LOCAL_CONFIG = "localConfig";
 	public static final String				ARG_LOCAL_CONFIG_DEFAULT = ".ksmgr.config";
+	
 	public static final String				TITLE_APPLICATION = "application.title";
 	public static final String				HELP_ABOUT_APPLICATION = "application.help";
 	public static final String				TITLE_HELP_ABOUT_APPLICATION = "application.help.title";
+	public static final String				COPY_FILE_APPLICATION = "application.copy.file";
+	public static final String				TITLE_COPY_FILE_APPLICATION = "application.copy.file.title";
 
 	public static final String				KEYSTORE_ITEM_ID = "<keystore>";
 	
-	private static final String				MENU_FILE_LRU = "menu.main.file.lru";
+	private static final String				MENU_FILE_LRU = "menu.file.lru";
 	
 	private static final long 				FILE_LRU = 1L << 0;
 	private static final long 				FILE_SAVE = 1L << 1;
@@ -126,8 +136,10 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final KeyStoreEditor[]			ksList = new KeyStoreEditor[2];
 	private final AtomicInteger				unique = new AtomicInteger(1);
 	private final SettingsDialog			settings;
-	private final ListSelectionListener		leftListener = (e)->selectLeft(!((JList<?>)e.getSource()).getSelectionModel().isSelectionEmpty());
-	private final ListSelectionListener		rightListener = (e)->selectRight(!((JList<?>)e.getSource()).getSelectionModel().isSelectionEmpty());
+	private final ActionListener			leftActionListener = (e)->saveAs(SelectedWindows.LEFT);
+	private final ActionListener			rightActionListener = (e)->saveAs(SelectedWindows.RIGHT);
+	private final ListSelectionListener		leftSelectionListener = (e)->selectLeft(!((JList<?>)e.getSource()).getSelectionModel().isSelectionEmpty());
+	private final ListSelectionListener		rightSelectionListener = (e)->selectRight(!((JList<?>)e.getSource()).getSelectionModel().isSelectionEmpty());
 	private SelectedWindows					selected = SelectedWindows.BOTTOM; 
 	
 	public Application(final ContentMetadataInterface xda, final Localizer parent, final File props) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
@@ -166,9 +178,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			SwingUtils.assignExitMethod4MainWindow(this, ()->exitApplication());
 
 			selectCurrentPanel(SelectedWindows.LEFT);
-			setCurrentPanel(new KSPlaceHolder(localizer));
+			setCurrentPanel(new KSPlaceHolder(localizer, SelectedWindows.LEFT));
 			selectCurrentPanel(SelectedWindows.RIGHT);
-			setCurrentPanel(new KSPlaceHolder(localizer));
+			setCurrentPanel(new KSPlaceHolder(localizer, SelectedWindows.RIGHT));
 			totalSplit.setLeftComponent(topSplit);
 			totalSplit.setRightComponent(new JScrollPane(new JFileTree(this.state, this.root, true) {
 				private static final long serialVersionUID = 1L;
@@ -222,7 +234,6 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 	@Override
 	public OutputStream getOutputContent() throws IOException {
-		// TODO Auto-generated method stub
 		switch (selected) {
 			case BOTTOM	:
 				return OutputStream.nullOutputStream();
@@ -237,8 +248,54 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 	@Override
 	public InputStream getInputContent() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		switch (selected) {
+			case BOTTOM	:
+				return InputStream.nullInputStream();
+			case LEFT	:
+				if (ksList[0] != null) {
+					final KeyStoreWrapper	wrapper = ksList[0].getKeyStoreWrapper();
+					
+					try(final ByteArrayOutputStream	baos = new ByteArrayOutputStream()) {
+						final char[]	password = askPassword(PasswordsRepo.KEY_STORE_PREFIX+'.'+wrapper.entryId);
+						
+						if (password != null) {
+							wrapper.keyStore.store(baos, password);
+							return new ByteArrayInputStream(baos.toByteArray());
+						}
+						else {
+							return InputStream.nullInputStream();
+						}
+					} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
+						throw new IOException(e);
+					}
+				}
+				else {
+					return InputStream.nullInputStream();
+				}
+			case RIGHT	:
+				if (ksList[1] != null) {
+					final KeyStoreWrapper	wrapper = ksList[1].getKeyStoreWrapper();
+					
+					try(final ByteArrayOutputStream	baos = new ByteArrayOutputStream()) {
+						final char[]	password = askPassword(PasswordsRepo.KEY_STORE_PREFIX+'.'+wrapper.entryId);
+						
+						if (password != null) {
+							wrapper.keyStore.store(baos, password);
+							return new ByteArrayInputStream(baos.toByteArray());
+						}
+						else {
+							return InputStream.nullInputStream();
+						}
+					} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
+						throw new IOException(e);
+					}
+				}
+				else {
+					return InputStream.nullInputStream();
+				}
+			default :
+				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
+		}
 	}
 
 	@Override
@@ -270,11 +327,43 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private void newKeystorePKCS12() {
 		newKeystore("pkcs12");
 	}
-	
-	@OnAction("action:/closeKeystore")
-	private void closeKeyStore() {
+
+	@OnAction("action:/openKeyStore")
+	private void openKeyStore() {
+		final int		keyStoreId = unique.incrementAndGet();
+		final String	keyStoreString = PasswordsRepo.KEY_STORE_PREFIX+'.'+keyStoreId;
+		final char[]	passwd;
 		
-		setCurrentPanel(new KSPlaceHolder(localizer));
+		try {
+			if (fcm.openFile() && (passwd = askPassword(keyStoreString)) != null) {
+				loadKeyStore(fcm.getCurrentPathOfTheFile(), passwd, keyStoreId);
+			}
+		} catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
+			getLogger().message(Severity.error, e, "Error loading keystore: "+e.getLocalizedMessage());
+		}
+	}
+	
+	@OnAction("action:/saveKeyStore")
+	private void saveKeyStore() {
+		try {
+			fcm.saveFile();
+		} catch (IOException e) {
+			getLogger().message(Severity.error, e, "Error saving keystore: "+e.getLocalizedMessage());
+		}
+	}
+	
+	@OnAction("action:/saveKeyStoreAs")
+	private void saveKeyStoreAs() {
+		try {
+			fcm.saveFileAs();
+		} catch (IOException e) {
+			getLogger().message(Severity.error, e, "Error saving keystore: "+e.getLocalizedMessage());
+		}
+	}
+	
+	@OnAction("action:/closeKeyStore")
+	private void closeKeyStore() {
+		setCurrentPanel(new KSPlaceHolder(localizer, selected));
 	}
 
 	@OnAction("action:/changePassword")
@@ -321,6 +410,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 						passwords.storePasswordFor(PasswordsRepo.KEY_STORE_ITEM_PREFIX+'.'+passwordId, password);
 						passwords.storePasswordFor(PasswordsRepo.SECRET_KEY_PREFIX+'.'+passwordId, askp.password);
 					}
+					fcm.setModificationFlag();
 				} catch (InvalidKeySpecException | NoSuchAlgorithmException | KeyStoreException | UnsupportedEncodingException | NoSuchProviderException e) {
 					getLogger().message(Severity.error, e.getLocalizedMessage());
 				}
@@ -373,6 +463,34 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			} catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
 				getLogger().message(Severity.error, e, e.getLocalizedMessage());
 			}
+		}
+	}
+	
+	private void openKeystore(final String keyStorePath) {
+		final int		keyStoreId = unique.incrementAndGet();
+		final String	keyStoreString = PasswordsRepo.KEY_STORE_PREFIX+'.'+keyStoreId;
+		final char[]	passwd = askPassword(keyStoreString);
+		
+		if (passwd != null) {
+			try{
+				if (fcm.openFile(keyStorePath)) {
+					loadKeyStore(keyStorePath, passwd, keyStoreId);
+				}
+			} catch (IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {
+				getLogger().message(Severity.error, e, e.getLocalizedMessage());
+			}
+		}
+	}
+
+	private void loadKeyStore(final String keyStorePath, final char[] passwd, final int keyStoreId) throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+		final File				f = new File(keyStorePath);
+		final KeyStore			ks = KeyStore.getInstance(f, passwd);
+		final KeyStoreWrapper	wrapper = new KeyStoreWrapper(keyStoreId, f, ks);
+		final String			keyStoreString = PasswordsRepo.KEY_STORE_PREFIX+'.'+keyStoreId;
+		
+		setCurrentPanel(wrapper);
+		if (passwords.isKeepedPasswords()) {
+			passwords.storePasswordFor(keyStoreString, passwd);
 		}
 	}
 	
@@ -557,17 +675,21 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				throw new IllegalStateException("Current panel is not keystore keeper");
 			case LEFT	:
 				ksList[0] = editor;
-				editor.addSelectionListener(leftListener);
+				editor.addSelectionListener(leftSelectionListener);
+				editor.addActionListener(leftActionListener);
 				topSplit.setLeftComponent(editor);
 				editor.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.LEFT)));
 				emm.enableLeftRepo(true);
+				emm.setLeftFileNameDefined(wrapper.file != null);
 				break;
 			case RIGHT:
 				ksList[1] = editor;
-				editor.addSelectionListener(rightListener);
+				editor.addSelectionListener(rightSelectionListener);
+				editor.addActionListener(rightActionListener);
 				topSplit.setRightComponent(editor);
 				editor.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.RIGHT)));
 				emm.enableRightRepo(true);
+				emm.setRightFileNameDefined(wrapper.file != null);
 				break;
 			default :
 				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
@@ -583,7 +705,8 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			case LEFT	:
 				prev = ksList[0];
 				if (prev != null) {
-					prev.removeSelectionListener(leftListener);
+					prev.removeSelectionListener(leftSelectionListener);
+					prev.removeActionListener(leftActionListener);
 				}
 				ksList[0] = null;
 				topSplit.setLeftComponent(holder);
@@ -593,7 +716,8 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			case RIGHT:
 				prev = ksList[1]; 
 				if (prev != null) {
-					prev.removeSelectionListener(rightListener);
+					prev.removeSelectionListener(rightSelectionListener);
+					prev.removeActionListener(rightActionListener);
 				}
 				ksList[1] = null;
 				topSplit.setRightComponent(holder);
@@ -606,14 +730,26 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 
 	private void exportAlias(final JFileItemDescriptor target, final AliasDescriptor source) {
-		System.err.println("Entry: "+target+", desc="+source);
+		final AskExportSecureKey	aesk = new AskExportSecureKey(getLogger());
+		
+		if (ask(aesk, 150, 350)) {
+			System.err.println("Entry: "+target+", desc="+source);
+		}
 	}
-	
 	
 	private void copyFileContent(final JFileItemDescriptor target, final JFileItemDescriptor source) {
-		System.err.println("File: "+target+", desc="+source);
+		if (new JLocalizedOptionPane(getLocalizer()).confirm(this, 
+							new LocalizedFormatter(COPY_FILE_APPLICATION, source.getPath(), target.getPath()), 
+							TITLE_COPY_FILE_APPLICATION, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+			System.err.println("File: "+target+", desc="+source);
+		}
 	}
 
+	private void saveAs(final SelectedWindows left) {
+		// TODO Auto-generated method stub
+	}
+	
+	
 	private void selectLeft(final boolean selected) {
 		emm.setLeftRepoSelected(selected);
 	}
@@ -647,14 +783,17 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		} 
 	}
 	
-	private static class KSPlaceHolder extends JPlaceHolder {
+	private class KSPlaceHolder extends JPlaceHolder {
 		private static final String	PLACEHOLDER_TEXT = "chav1961.ksmgr.placeholder.text";
 		private static final String	PLACEHOLDER_TOOLTIP = "chav1961.ksmgr.placeholder.tt";
 		
 		private static final long serialVersionUID = 1L;
 		
-		public KSPlaceHolder(final Localizer localizer) {
+		private final SelectedWindows	selected;
+		
+		public KSPlaceHolder(final Localizer localizer, final SelectedWindows selected) {
 			super(localizer, PLACEHOLDER_TEXT, PLACEHOLDER_TOOLTIP, (tr, df)->tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor));
+			this.selected = selected;
 		}
 		
 		@Override
@@ -663,11 +802,13 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				try {
 					for(Object item : (List<?>)trans.getTransferData(DataFlavor.javaFileListFlavor)) {
 						if (item instanceof File) {
-							
+							selectCurrentPanel(selected);
+							openKeystore(((File)item).getAbsolutePath());
 							return true;
 						}
 						else if (item instanceof JFileItemDescriptor) {
-							
+							selectCurrentPanel(selected);
+							openKeystore(((JFileItemDescriptor)item).getPath());
 							return true;
 						}
 					}

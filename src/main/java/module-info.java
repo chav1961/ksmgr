@@ -1,8 +1,6 @@
 module chav1961.ksmgr {
 	requires transitive chav1961.purelib;
 	requires java.base;
-	requires bcprov.jdk15on;
-	requires bcpkix.jdk15on;
 	requires java.desktop;
 	
 	exports chav1961.ksmgr;
