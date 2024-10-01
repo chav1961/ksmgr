@@ -4,8 +4,8 @@ import java.util.function.Predicate;
 
 import javax.swing.JComponent;
 
-import chav1961.ksmgr.Application.SelectedWindows;
 import chav1961.ksmgr.gui.SettingsDialog;
+import chav1961.ksmgr.interfaces.SelectedWindows;
 import chav1961.purelib.basic.Utils;
 import chav1961.purelib.ui.swing.useful.JEnableMaskManipulator;
 
@@ -93,7 +93,7 @@ class MainMenuManager extends JEnableMaskManipulator {
 										new Template((m)->m.currentSelection == SelectedWindows.LEFT && m.leftRepo && m.leftRepoFileNameDefined || m.currentSelection == SelectedWindows.RIGHT && m.rightRepo && m.rightRepoFileNameDefined,
 												FILE_SAVE),
 										new Template((m)->m.currentSelection == SelectedWindows.LEFT && m.leftRepo && m.leftRepoSelected || m.currentSelection == SelectedWindows.RIGHT && m.rightRepo && m.rightRepoSelected,
-												EDIT | EDIT_COPY | EDIT_MOVE | EDIT_RENAME | EDIT_DELETE),
+												EDIT | EDIT_COPY | EDIT_MOVE | EDIT_RENAME | EDIT_DELETE | TASKS | TASKS_KEYS | TASKS_KEYS_EXPORT | TASKS_KEYS_IMPORT),
 										new Template((m)->m.currentSelection == SelectedWindows.LEFT && m.leftRepo && !m.leftRepoSelected || m.currentSelection == SelectedWindows.RIGHT && m.rightRepo && !m.rightRepoSelected,
 												TASKS | TASKS_KEYS | TASKS_KEYS_GENERATE | TASKS_KEYS_IMPORT),
 										new Template((m)->m.settings.keepPasswords && (m.currentSelection == SelectedWindows.LEFT && m.leftRepo || m.currentSelection == SelectedWindows.RIGHT && m.rightRepo),

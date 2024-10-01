@@ -4,20 +4,22 @@ import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.File;
-import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStore.Entry;
+import java.security.KeyStore.ProtectionParameter;
 import java.security.KeyStoreException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,9 +33,14 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
+import chav1961.ksmgr.interfaces.AliasDescriptor;
+import chav1961.ksmgr.interfaces.KeyStoreEntityType;
+import chav1961.ksmgr.interfaces.SelectedWindows;
 import chav1961.ksmgr.internal.KeyStoreWrapper;
 import chav1961.ksmgr.utils.PasswordsRepo;
 import chav1961.purelib.basic.Utils;
@@ -44,9 +51,6 @@ import chav1961.purelib.basic.interfaces.LoggerFacadeOwner;
 import chav1961.purelib.i18n.interfaces.Localizer;
 import chav1961.purelib.i18n.interfaces.Localizer.LocaleChangeListener;
 import chav1961.purelib.i18n.interfaces.LocalizerOwner;
-import chav1961.purelib.ui.swing.useful.DnDManager;
-import chav1961.purelib.ui.swing.useful.DnDManager.DnDInterface;
-import chav1961.purelib.ui.swing.useful.DnDManager.DnDMode;
 import chav1961.purelib.ui.swing.useful.FileTransferable;
 import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 
@@ -57,18 +61,22 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 
 	private final Localizer 			localizer;
 	private final LoggerFacade 			logger;
+	private final SelectedWindows		place;
 	private final KeyStoreWrapper 		wrapper;
 	private final PasswordsRepo			repo;
 	private final JLabel				caption = new JLabel();
 	private final JList<AliasKeeper>	content = new JList<>();
 
-	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final KeyStoreWrapper wrapper, final PasswordsRepo repo) {
+	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final SelectedWindows place, final KeyStoreWrapper wrapper, final PasswordsRepo repo) {
 		super(new BorderLayout());
 		if (localizer == null) {
 			throw new NullPointerException("Localizer can't be null");
 		}
 		else if (logger == null) {
 			throw new NullPointerException("Logger can't be null");
+		}
+		else if (place == null) {
+			throw new NullPointerException("Place can't be null");
 		}
 		else if (wrapper == null) {
 			throw new NullPointerException("Keystore wrapper can't be null");
@@ -82,6 +90,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			
 			this.localizer = localizer;
 			this.logger = logger;
+			this.place = place;
 			this.wrapper = wrapper;
 			this.repo = repo;
 			
@@ -103,12 +112,14 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 					}
 				}
 			});
-			
-			content.setDragEnabled(true);
 			content.setDropMode(DropMode.ON_OR_INSERT);
-			
 			content.setModel(new DefaultListModel<AliasKeeper>());
+			content.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 			content.setCellRenderer(this::getListCellRendererComponent);
+
+			DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(content, DnDConstants.ACTION_COPY, new DragGestureHandler(content));
+			
+			
 			fillContent(content, wrapper.keyStore);
 			fillLocalizedStrings();
 		}
@@ -133,6 +144,24 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		return wrapper;
 	}
 	
+	public void addSelectionListener(final ListSelectionListener listener) {
+		if (listener == null) {
+			throw new NullPointerException("Listener to add can't be null");
+		}
+		else {
+			content.addListSelectionListener(listener);
+		}
+	}
+
+	public void removeSelectionListener(final ListSelectionListener listener) {
+		if (listener == null) {
+			throw new NullPointerException("Listener to remove can't be null");
+		}
+		else {
+			content.removeListSelectionListener(listener);
+		}
+	}
+	
 	public int placeSecretKey(final String entryName, final SecretKey secretKey, final char[] password, final boolean testUniqueName) throws KeyStoreException {
 		if (Utils.checkEmptyOrNullString(entryName)) {
 			throw new IllegalArgumentException("Enry name to place can't be null or empty");
@@ -150,7 +179,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			final DefaultListModel<AliasKeeper>	model = (DefaultListModel<AliasKeeper>)content.getModel() ;
 			final KeyStore.SecretKeyEntry 		secret = new KeyStore.SecretKeyEntry(secretKey);
 			final KeyStore.ProtectionParameter	ppPassword = new KeyStore.PasswordProtection(password);
-			final AliasKeeper					item = new AliasKeeper(AliasType.KEY, entryName); 
+			final AliasKeeper					item = new AliasKeeper(KeyStoreEntityType.SECRET_KEY, entryName); 
 			
 			wrapper.keyStore.setEntry(entryName, secret, ppPassword);
 			model.addElement(item);
@@ -164,20 +193,20 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			final Enumeration<String> 	aliases = keyStore.aliases();
 			
 			while (aliases.hasMoreElements()) {
-				final String	item = aliases.nextElement();
-				final AliasType	type;
+				final String				item = aliases.nextElement();
+				final KeyStoreEntityType	type;
 				
 				if (keyStore.entryInstanceOf(item, KeyStore.SecretKeyEntry.class)) {
-					type = AliasType.KEY;
+					type = KeyStoreEntityType.SECRET_KEY;
 				}
 				else if (keyStore.entryInstanceOf(item, KeyStore.PrivateKeyEntry.class)) {
-					type = AliasType.KEY_PAIR;
+					type = KeyStoreEntityType.KEY_PAIR;
 				}
 				else if (keyStore.entryInstanceOf(item, KeyStore.TrustedCertificateEntry.class)) {
-					type = AliasType.CERTIFICATE;
+					type = KeyStoreEntityType.CERTIFICATE;
 				}
 				else {
-					type = AliasType.UNKNOWN;
+					type = KeyStoreEntityType.UNKNOWN;
 				}
 				model.addElement(new AliasKeeper(type, item));
 			}
@@ -191,8 +220,15 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		final JLabel	label = new JLabel(value.name, value.type.getIcon(), JLabel.LEADING);
 		final String	passwordId = AliasKeeper.PASSWD_PREFIX+"."+value.passwordId; 
 		
-		label.setForeground(repo.hasPasswordFor(passwordId) ? Color.RED : Color.blue);
-		label.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
+		label.setOpaque(true);
+		if (isSelected) {
+			label.setBackground(list.getSelectionBackground());
+			label.setForeground(repo.hasPasswordFor(passwordId) ? Color.RED : list.getSelectionForeground());
+		}
+		else {
+			label.setBackground(list.getBackground());
+			label.setForeground(repo.hasPasswordFor(passwordId) ? Color.RED : list.getForeground());
+		}
 		if (cellHasFocus) {
 			label.setBorder(new LineBorder(Color.BLUE));
 		}
@@ -214,40 +250,40 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		caption.setForeground(repo.hasPasswordFor(passwdId) ? Color.RED : Color.BLACK);
 	}
 
-	private static enum AliasType {
-		KEY("key.png"),
-		KEY_PAIR("keypair.png"),
-		CERTIFICATE("certificate.png"),
-		UNKNOWN("unknown.png");
-		
-		private final String	iconResourceName;
-		private final Icon		icon;
-		
-		private AliasType(final String name) {
-			this.iconResourceName = name;
-			this.icon = new ImageIcon(getClass().getResource(name));
-		}
-		
-		public String getIconResourceName() {
-			return iconResourceName;
-		}
-		
-		public Icon getIcon() {
-			return icon;
-		}
-	}
-	
 	private static class AliasKeeper {
 		private static final String			PASSWD_PREFIX = "alias";
 		private static final AtomicInteger	unique = new AtomicInteger(1);
 		
-		final AliasType		type;
-		final String		name;
-		final int			passwordId = unique.incrementAndGet();
+		final KeyStoreEntityType	type;
+		final String				name;
+		final int					passwordId = unique.incrementAndGet();
 		
-		private AliasKeeper(final AliasType type, final String name) {
+		private AliasKeeper(final KeyStoreEntityType type, final String name) {
 			this.type = type;
 			this.name = name;
 		}
 	}
+
+    private class DragGestureHandler implements DragGestureListener {
+        private final JList<AliasKeeper>	list;
+
+        private DragGestureHandler(final JList<AliasKeeper> list) {
+            this.list = list;
+        }
+
+        @Override
+        public void dragGestureRecognized(final DragGestureEvent dge) {
+            final AliasKeeper 		selectedValue = list.getSelectedValue();
+            final AliasDescriptor	desc = AliasDescriptor.of(place, wrapper, selectedValue.name, selectedValue.type);  
+            final Transferable 		t = new FileTransferable(new JFileItemDescriptor(selectedValue.name, "./", false, 0, new Date(0), desc));
+            
+            dge.getDragSource().startDrag(dge, null, t, new DragSourceListener() {
+				@Override public void dragEnter(DragSourceDragEvent dsde) {}
+				@Override public void dragOver(DragSourceDragEvent dsde) {}
+				@Override public void dropActionChanged(DragSourceDragEvent dsde) {}
+				@Override public void dragExit(DragSourceEvent dse) {}
+				@Override public void dragDropEnd(DragSourceDropEvent dsde) {}
+			});
+        }
+    }
 }

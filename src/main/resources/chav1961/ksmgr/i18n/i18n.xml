@@ -143,12 +143,14 @@
 		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa">SHA1withRSA</key>
 		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa.tt">SHA1withRSA algorithm</key>
 
-		<key name="chav1961.ksmgr.interfaces.importentitytype.secretkey">Secret key</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.secretkey.tt">File to import contains secret key</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.keypair">Key pair</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.keypair.tt">File to import contains key pair</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate">Certificate</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate.tt">File to import contains certificate</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.secretkey">Secret key</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.secretkey.tt">Entity contains secret key</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.keypair">Key pair</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.keypair.tt">Entity contains key pair</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.certificate">Certificate</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.certificate.tt">Entoty contains certificate</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.unknown">Unknown</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.unknown.tt">Unknown entity</key>
 
 <!-- Localization for placeholder --> 
 		<key name="chav1961.ksmgr.placeholder.text">To start editing, drag keystore file here</key>
@@ -487,12 +489,14 @@
 		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa">SHA1withRSA</key>
 		<key name="chav1961.ksmgr.interfaces.signaturealgorithm.sha1withrsa.tt">Алгоритм SHA1withRSA</key>
 
-		<key name="chav1961.ksmgr.interfaces.importentitytype.secretkey">Секретный ключ</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.secretkey.tt">Импортируемый файл содержит секретный ключ</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.keypair">Пара ключей</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.keypair.tt">Импортируемый файл содержит пару ключей</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate">Сертификат</key>
-		<key name="chav1961.ksmgr.interfaces.importentitytype.certificate.tt">Импортируемый файл содержит сертификат</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.secretkey">Секретный ключ</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.secretkey.tt">Сущность содержит секретный ключ</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.keypair">Пара ключей</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.keypair.tt">Сущность содержит пару ключей</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.certificate">Сертификат</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.certificate.tt">Сущность содержит сертификат</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.unknown">Не определен</key>
+		<key name="chav1961.ksmgr.interfaces.keystoreentitytype.unknown.tt">Неопределенная сущность</key>
 
 <!-- Локализация местоблюстителя --> 
 		<key name="chav1961.ksmgr.placeholder.text">Для начала редактирования перетащите файл репозитария сюда</key>

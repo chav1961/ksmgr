@@ -1,5 +1,6 @@
 package chav1961.ksmgr;
 
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -34,12 +35,16 @@ import javax.crypto.SecretKey;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
 import chav1961.ksmgr.gui.AskChangePassword;
 import chav1961.ksmgr.gui.AskNewPassword;
@@ -47,6 +52,8 @@ import chav1961.ksmgr.gui.AskPassword;
 import chav1961.ksmgr.gui.AskSecureKeyParameters;
 import chav1961.ksmgr.gui.KeyStoreEditor;
 import chav1961.ksmgr.gui.SettingsDialog;
+import chav1961.ksmgr.interfaces.AliasDescriptor;
+import chav1961.ksmgr.interfaces.SelectedWindows;
 import chav1961.ksmgr.internal.KeyStoreWrapper;
 import chav1961.ksmgr.utils.PasswordsRepo;
 import chav1961.purelib.basic.ArgParser;
@@ -101,12 +108,6 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private static final long 				FILE_SAVE_AS = 1L << 2;
 
 	
-	static enum SelectedWindows {
-		LEFT,
-		RIGHT,
-		BOTTOM
-	}
-	
 	private final ContentMetadataInterface 	app;
 	private final SubstitutableProperties	props;
 	private final File						propsLocation;
@@ -125,6 +126,8 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final KeyStoreEditor[]			ksList = new KeyStoreEditor[2];
 	private final AtomicInteger				unique = new AtomicInteger(1);
 	private final SettingsDialog			settings;
+	private final ListSelectionListener		leftListener = (e)->selectLeft(!((JList<?>)e.getSource()).getSelectionModel().isSelectionEmpty());
+	private final ListSelectionListener		rightListener = (e)->selectRight(!((JList<?>)e.getSource()).getSelectionModel().isSelectionEmpty());
 	private SelectedWindows					selected = SelectedWindows.BOTTOM; 
 	
 	public Application(final ContentMetadataInterface xda, final Localizer parent, final File props) throws NullPointerException, IllegalArgumentException, EnvironmentException, IOException, FlowException, SyntaxException, PreparationException, ContentException {
@@ -176,7 +179,16 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				
 				@Override
 				public void placeFileContent(final Point location, final Iterable<JFileItemDescriptor> content) {
-					System.err.println("Location: "+location+", desc="+content);
+					final TreePath	path = getPathForLocation(location.x, location.y);
+					
+					for(JFileItemDescriptor item : content) {
+						if (item.getCargo() != null) {
+							exportAlias((JFileItemDescriptor)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(), (AliasDescriptor)item.getCargo());
+						}
+						else {
+							copyFileContent((JFileItemDescriptor)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(), item);
+						}
+					}
 				}
 
 				@Override
@@ -261,6 +273,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	
 	@OnAction("action:/closeKeystore")
 	private void closeKeyStore() {
+		
 		setCurrentPanel(new KSPlaceHolder(localizer));
 	}
 
@@ -537,19 +550,21 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 	
 	private void setCurrentPanel(final KeyStoreWrapper wrapper) {
-		final KeyStoreEditor	editor = new KeyStoreEditor(getLocalizer(), getLogger(), wrapper, passwords);
+		final KeyStoreEditor	editor = new KeyStoreEditor(getLocalizer(), getLogger(), selected, wrapper, passwords);
 		
 		switch (selected) {
 			case BOTTOM	:
 				throw new IllegalStateException("Current panel is not keystore keeper");
 			case LEFT	:
 				ksList[0] = editor;
+				editor.addSelectionListener(leftListener);
 				topSplit.setLeftComponent(editor);
 				editor.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.LEFT)));
 				emm.enableLeftRepo(true);
 				break;
 			case RIGHT:
 				ksList[1] = editor;
+				editor.addSelectionListener(rightListener);
 				topSplit.setRightComponent(editor);
 				editor.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.RIGHT)));
 				emm.enableRightRepo(true);
@@ -560,16 +575,26 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 
 	private void setCurrentPanel(final KSPlaceHolder holder) {
+		KeyStoreEditor	prev;
+		
 		switch (selected) {
 			case BOTTOM	:
 				throw new IllegalStateException("Current panel is not keystore keeper");
 			case LEFT	:
+				prev = ksList[0];
+				if (prev != null) {
+					prev.removeSelectionListener(leftListener);
+				}
 				ksList[0] = null;
 				topSplit.setLeftComponent(holder);
 				holder.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.LEFT)));
 				emm.enableLeftRepo(false);
 				break;
 			case RIGHT:
+				prev = ksList[1]; 
+				if (prev != null) {
+					prev.removeSelectionListener(rightListener);
+				}
 				ksList[1] = null;
 				topSplit.setRightComponent(holder);
 				holder.addFocusListener(new SimpleFocusListener(()->selectCurrentPanel(SelectedWindows.RIGHT)));
@@ -578,6 +603,23 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			default :
 				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
 		}
+	}
+
+	private void exportAlias(final JFileItemDescriptor target, final AliasDescriptor source) {
+		System.err.println("Entry: "+target+", desc="+source);
+	}
+	
+	
+	private void copyFileContent(final JFileItemDescriptor target, final JFileItemDescriptor source) {
+		System.err.println("File: "+target+", desc="+source);
+	}
+
+	private void selectLeft(final boolean selected) {
+		emm.setLeftRepoSelected(selected);
+	}
+
+	private void selectRight(final boolean selected) {
+		emm.setRightRepoSelected(selected);
 	}
 	
 	private void fillLocalizedStrings() throws LocalizationException, IllegalArgumentException {
