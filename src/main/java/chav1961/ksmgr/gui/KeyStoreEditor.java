@@ -16,6 +16,7 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.KeyStore;
@@ -28,8 +29,10 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.crypto.SecretKey;
+import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
+import javax.swing.GrayFilter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -61,6 +64,7 @@ import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, LocalizerOwner, LocaleChangeListener {
 	private static final String			TITLE_NEW_FILE = "chav1961.ksmgr.gui.KeyStoreEditor.newFile";
 	private static final String			TITLE_NEW_FILE_TT = "chav1961.ksmgr.gui.KeyStoreEditor.newFile.tt";
+	private static final ImageIcon		ICON = new ImageIcon(KeyStoreEditor.class.getResource("save.png"));
 	private static final long 			serialVersionUID = 1L;
 
 	private final Localizer 			localizer;
@@ -69,8 +73,9 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 	private final KeyStoreWrapper 		wrapper;
 	private final PasswordsRepo			repo;
 	private final JLabel				caption = new JLabel();
-	private final JButton				save = new JButton();
+	private final JButton				save = new JButton(ICON);
 	private final JList<AliasKeeper>	content = new JList<>();
+	private boolean						isModified = false;
 
 	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final SelectedWindows place, final KeyStoreWrapper wrapper, final PasswordsRepo repo) {
 		super(new BorderLayout());
@@ -103,6 +108,8 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			
 			topPanel.add(caption, BorderLayout.CENTER);
 			topPanel.add(save, BorderLayout.EAST);
+			save.setBorderPainted(false);
+			save.setContentAreaFilled(false);
 			
 			add(topPanel, BorderLayout.NORTH);
 			add(new JScrollPane(content), BorderLayout.CENTER);
@@ -128,7 +135,8 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			content.setCellRenderer(this::getListCellRendererComponent);
 
 			DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(content, DnDConstants.ACTION_COPY, new DragGestureHandler(content));
-			
+
+			setModified(false);
 			fillContent(content, wrapper.keyStore);
 			fillLocalizedStrings();
 		}
@@ -197,6 +205,15 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		return content.getSelectedValuesList().size();
 	}
 	
+	public boolean isModified() {
+		return isModified;
+	}
+
+	public void setModified(final boolean modified) {
+		isModified = modified;
+		save.setEnabled(modified);
+	}
+	
 	public int placeSecretKey(final String entryName, final SecretKey secretKey, final char[] password, final boolean testUniqueName) throws KeyStoreException {
 		if (Utils.checkEmptyOrNullString(entryName)) {
 			throw new IllegalArgumentException("Enry name to place can't be null or empty");
@@ -218,6 +235,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			
 			wrapper.keyStore.setEntry(entryName, secret, ppPassword);
 			model.addElement(item);
+			setModified(true);
 			return item.passwordId;
 		}
 	}

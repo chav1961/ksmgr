@@ -745,8 +745,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		}
 	}
 
-	private void saveAs(final SelectedWindows left) {
-		// TODO Auto-generated method stub
+	private void saveAs(final SelectedWindows selected) {
+		selectCurrentPanel(selected);
+		saveKeyStore();
 	}
 	
 	
