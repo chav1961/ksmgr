@@ -7,6 +7,28 @@
 		<key name="application.help">uri(aboutApplication.cre)</key>
 		<key name="application.copy.file">Copy %1$s to %2$s?</key>
 		<key name="application.copy.file.title">Copy file(s)...</key>
+		<key name="application.new.password.for.keystore.title">for new key store</key>
+		<key name="application.new.password.for.symmetric.key.title">for new symmetric key</key>
+		<key name="application.get.password.for.keystore.title">for existent key store</key>
+		<key name="application.get.password.for.symmetric.key.title">for existent symmetric key</key>
+		<key name="application.change.password.for.keystore.title">for existent key store</key>
+		<key name="application.change.password.for.entry.title">for existent key store entry</key>
+		<key name="application.duplicaite.name.title">Duplicate entity name</key>
+		<key name="application.duplicaite.name.message">Name you type (%1$s) already exists! Old content will be placed with new one! Continue?</key>
+		<key name="application.change.password.for.rename.entry.title">for item to rename</key>
+		<key name="application.delete.names.title">Delete entries from key store</key>
+		<key name="application.delete.name.message">Entry (%1$s) will be deleted from key store. Continue?</key>
+		<key name="application.delete.names.message">(%1$d) entries will be deleted from key store. Continue?</key>
+
+<!-- Localization for completion messages --> 
+		<key name="application.completed.new.keystore">New key store repository created</key>		
+		<key name="application.completed.open.keystore">Key store repository opened</key>
+		<key name="application.completed.save.keystore">Key store repository saved</key>
+		<key name="application.completed.close.keystore">Key store repository closed</key>
+		<key name="application.completed.password.change">Password changed</key>
+		<key name="application.completed.rename.keystore.entity">Key store entity renamed</key>		
+		<key name="application.completed.delete.keystore.entity">Key store entity(ies) deleted</key>
+		<key name="application.completed.symmetric.key.create">New symmetric key created</key>
 
 <!-- Localization for application menu --> 
 		<key name="menu.file">File</key>
@@ -204,7 +226,7 @@
 		<key name="chav1961.ksmgr.gui.createkeystoredialog.passwordretype.tt">Retype password to check input</key>
 
 <!-- Localization for 'ask password' dialog -->		
-		<key name="chav1961.ksmgr.gui.askpassworddialog">Ask password</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog">Ask password (%1$s)</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.tt">Ask password for any entity</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password">Enter password</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password.tt">Type password here</key>
@@ -212,7 +234,7 @@
 		<key name="chav1961.ksmgr.gui.askpassworddialog.duplicate.tt">Retype password here</key>
 
 <!-- Локализация для диалога 'ask new password' -->		
-		<key name="chav1961.ksmgr.gui.asknewpassword">Create new password</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword">Create new password (%1$s)</key>
 		<key name="chav1961.ksmgr.gui.asknewpassword.tt">Create new password for entity</key>
 		<key name="chav1961.ksmgr.gui.asknewpassword.help">Create new password for entity</key>
 		<key name="chav1961.ksmgr.gui.asknewpassword.password">Type password</key>
@@ -221,9 +243,9 @@
 		<key name="chav1961.ksmgr.gui.asknewpassword.duplicate.tt">Retype password for checking input purpose (using copy/paste is not recommended)</key>
 		
 <!-- Localization for 'change password password' dialog -->
-		<key name="chav1961.ksmgr.gui.changepassworddialog">Change password</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.tt">Change password for entity opened</key>
-		<key name="chav1961.ksmgr.dialogs.askchangepassword.help">Change password for entity opened</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword">Change password (%1$s)</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.tt">Change password for entity opened</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.help">Change password for entity opened</key>
 		<key name="chav1961.ksmgr.gui.askchangepassword.oldpassword">Old password</key>
 		<key name="chav1961.ksmgr.gui.askchangepassword.oldpassword.tt">Type old password for entity</key>
 		<key name="chav1961.ksmgr.gui.askchangepassword.password">New password</key>
@@ -385,6 +407,13 @@
 		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentrandomseed">Random seed</key>
 		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentrandomseed.tt">Random seed for encryption</key>
 
+<!-- Localization for  'rename item' dialog-->		
+		<key name="chav1961.ksmgr.gui.askrenameitemdialog">Rename entity...</key>
+		<key name="chav1961.ksmgr.gui.askrenameitemdialog.tt">Rename entity...</key>
+		<key name="chav1961.ksmgr.dialogs.askrenameitemdialog.help">Rename entity....</key>
+		<key name="chav1961.ksmgr.gui.askrenameitemdialog.newname">New name</key>
+		<key name="chav1961.ksmgr.gui.askrenameitemdialog.newname.tt">Type new name for entity</key>
+
 <!-- Localization for KeyStoreViewer keys -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Confirm deletion...</key>
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.message">You wish to delete following entries in the repo:\n%1$s</key>
@@ -398,6 +427,28 @@
 		<key name="application.help">uri(aboutApplication.cre)</key>
 		<key name="application.copy.file">Скопировать %1$s в %2$s?</key>
 		<key name="application.copy.file.title">Копировать файл(ы)...</key>
+		<key name="application.new.password.for.keystore.title">для нового репозитария ключей</key>
+		<key name="application.new.password.for.symmetric.key.title">для нового симметричного ключа</key>
+		<key name="application.get.password.for.keystore.title">для существующего репозитария ключей</key>
+		<key name="application.get.password.for.symmetric.key.title">для существующего симметричного ключа</key>
+		<key name="application.change.password.for.keystore.title">для существующего репозитария ключей</key>
+		<key name="application.change.password.for.entry.title">для существующего ключа в репозитарии</key>
+		<key name="application.change.password.for.rename.entry.title">для переименования ключа</key>		
+		<key name="application.duplicaite.name.title">Дублированное имя!</key>
+		<key name="application.duplicaite.name.message">Имя, которое вы задали (%1$s), уже существует! Его содержимое будет затерто новой минформацией! Продолжить?</key>
+		<key name="application.delete.names.title">Удаление клчюей из репозитария</key>
+		<key name="application.delete.name.message">Ключ (%1$s) будет удален из репозитария. Продолжить?</key>
+		<key name="application.delete.names.message">(%1$d) ключей будет удалено из репозитария. Продолжить?</key>
+
+<!-- Локализация для подтверждающих сообщений --> 
+		<key name="application.completed.new.keystore">Новый репозитарий ключей создан</key>
+		<key name="application.completed.open.keystore">Репозитарий ключей загружен</key>
+		<key name="application.completed.save.keystore">Репозитарий ключей сохранен</key>
+		<key name="application.completed.close.keystore">Репозитарий ключей закрыт</key>
+		<key name="application.completed.password.change">Пароль изменен</key>
+		<key name="application.completed.rename.keystore.entity">Ключ репозитария переименован</key>		
+		<key name="application.completed.delete.keystore.entity">Ключ(и) репозитария удален(ы)</key>
+		<key name="application.completed.symmetric.key.create">Нвый симметричный ключ создан</key>
 
 <!-- Локализация ошибок, предупреждений и информации приложения --> 
 		<key name="error.asknewpassword.different.passwords">Пароли в полях различаются, введите их еще раз</key>
@@ -595,7 +646,7 @@
 		<key name="chav1961.ksmgr.gui.createkeystoredialog.passwordretype.tt">Повторно введите пароль для целей контроля</key>
 	
 <!-- Локализация для диалога 'ask password' -->		
-		<key name="chav1961.ksmgr.gui.askpassworddialog">Укажите пароль</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog">Укажите пароль (%1$s)</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.tt">Ввести пароль для сущности</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password">Введите пароль</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password.tt">Введите пароль</key>
@@ -603,7 +654,7 @@
 		<key name="chav1961.ksmgr.gui.askpassworddialog.duplicate.tt">Повторите пароль</key>
 
 <!-- Локализация для диалога 'ask new password' -->		
-		<key name="chav1961.ksmgr.gui.asknewpassword">Создайте пароль</key>
+		<key name="chav1961.ksmgr.gui.asknewpassword">Создайте пароль (%1$s)</key>
 		<key name="chav1961.ksmgr.gui.asknewpassword.tt">Создайте новый пароль для сущности</key>
 		<key name="chav1961.ksmgr.gui.asknewpassword.help">Создайте новый пароль для сущности</key>
 		<key name="chav1961.ksmgr.gui.asknewpassword.password">Введите пароль</key>
@@ -612,9 +663,9 @@
 		<key name="chav1961.ksmgr.gui.asknewpassword.duplicate.tt">Повторите пароль для проверки правильности ввода (не рекомендуется использовать копирование/вставку)</key>
 	
 <!-- Локализация для диалога 'change password password' -->		
-		<key name="chav1961.ksmgr.gui.changepassworddialog">Изменить пароль</key>
-		<key name="chav1961.ksmgr.gui.changepassworddialog.tt">Изменить пароль сушности</key>
-		<key name="chav1961.ksmgr.dialogs.askchangepassword.help">Изменить пароль сушности</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword">Изменить пароль (%1$s)</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.tt">Изменить пароль сушности</key>
+		<key name="chav1961.ksmgr.gui.askchangepassword.help">Изменить пароль сушности</key>
 		<key name="chav1961.ksmgr.gui.askchangepassword.oldpassword">Старый пароль</key>
 		<key name="chav1961.ksmgr.gui.askchangepassword.oldpassword.tt">Укажите прежний пароль сущности</key>
 		<key name="chav1961.ksmgr.gui.askchangepassword.password">Новый пароль</key>
@@ -775,6 +826,13 @@
 		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentsalt.tt">Соль шифра</key>
 		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentrandomseed">Random seed</key>
 		<key name="chav1961.ksmgr.gui.encryptfiledialog.currentrandomseed.tt">Random seed для шифрования</key>
+
+<!-- Локализация для диалога 'rename item'-->		
+		<key name="chav1961.ksmgr.gui.askrenameitemdialog">Переименовать сущность...</key>
+		<key name="chav1961.ksmgr.gui.askrenameitemdialog.tt">Переименовать сущность...</key>
+		<key name="chav1961.ksmgr.dialogs.askrenameitemdialog.help">Переименовать сущность....</key>
+		<key name="chav1961.ksmgr.gui.askrenameitemdialog.newname">Новое имя</key>
+		<key name="chav1961.ksmgr.gui.askrenameitemdialog.newname.tt">Задайте новое имя для сущности</key>
 	
 <!-- локализация для ключей KeyStoreViewer -->		
 		<key name="chav1961.ksmgr.internal.KeyStoreViewer.confirmdeletion.title">Подтвердить удаление...</key>

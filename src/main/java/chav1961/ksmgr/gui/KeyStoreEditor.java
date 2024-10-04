@@ -19,14 +19,22 @@ import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
+import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore.ProtectionParameter;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.ProtectionDomain;
+import java.security.UnrecoverableEntryException;
+import java.security.UnrecoverableKeyException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import javax.crypto.SecretKey;
 import javax.imageio.ImageIO;
@@ -77,6 +85,11 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 	private final JList<AliasKeeper>	content = new JList<>();
 	private boolean						isModified = false;
 
+	@FunctionalInterface
+	public static interface SelectedItemProcessor {
+		void process(String entryName, Entry entry, int passwordId);
+	}
+	
 	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final SelectedWindows place, final KeyStoreWrapper wrapper, final PasswordsRepo repo) {
 		super(new BorderLayout());
 		if (localizer == null) {
@@ -204,7 +217,131 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 	public int getSelectionCount() {
 		return content.getSelectedValuesList().size();
 	}
+
+	public boolean hasName(final String name) {
+		if (Utils.checkEmptyOrNullString(name)) {
+			throw new IllegalArgumentException("Item name can't be null or empty");
+		}
+		else {
+			try {
+				return getKeyStoreWrapper().keyStore.containsAlias(name);
+			} catch (KeyStoreException e) {
+				return false;
+			}
+		}
+	}
 	
+	public int getPasswordIdFor(final String name) {
+		if (Utils.checkEmptyOrNullString(name)) {
+			throw new IllegalArgumentException("Item name can't be null or empty");
+		}
+		else {
+			for(int index = 0; index < content.getModel().getSize(); index++) {
+				final AliasKeeper	item = content.getModel().getElementAt(index);
+				
+				if (item.name.equals(name)) {
+					return item.passwordId;
+				}
+			}
+			return -1;
+		}
+	}
+
+	public void changePassword(final String name, final char[] oldPassword, final char[] newPassword) throws KeyStoreException {
+		if (Utils.checkEmptyOrNullString(name)) {
+			throw new IllegalArgumentException("Entry name can't be null or empty");
+		}
+		else if (oldPassword == null || oldPassword.length == 0) {
+			throw new IllegalArgumentException("Old password can't be null or empty");
+		}
+		else if (newPassword == null || newPassword.length == 0) {
+			throw new IllegalArgumentException("New password can't be null or empty");
+		}
+		else {
+			try {
+				final ProtectionParameter	ppOld = new PasswordProtection(oldPassword);
+				final Entry	item = getKeyStoreWrapper().keyStore.getEntry(name, ppOld);
+				final ProtectionParameter	ppNew = new PasswordProtection(newPassword);
+				
+				getKeyStoreWrapper().keyStore.setEntry(name, item, ppNew);				
+			} catch (UnrecoverableEntryException | NoSuchAlgorithmException e) {
+				throw new KeyStoreException(e);
+			}
+		}
+	}
+	
+	public void rename(final String oldName, final char[] oldPassword, final String newName, final char[] newPassword) throws KeyStoreException {
+		if (Utils.checkEmptyOrNullString(oldName)) {
+			throw new IllegalArgumentException("Old name can't be null or empty");
+		}
+		else if (Utils.checkEmptyOrNullString(newName)) {
+			throw new IllegalArgumentException("New name can't be null or empty");
+		}
+		else if (!oldName.equals(newName)) {
+			try {
+				final ProtectionParameter	ppOld = new PasswordProtection(oldPassword);
+				final ProtectionParameter	ppNew = new PasswordProtection(oldPassword);
+				final Entry 	item = getKeyStoreWrapper().keyStore.getEntry(oldName, ppOld);
+				
+				if (hasName(newName)) {
+					delete(newName);
+				}
+				getKeyStoreWrapper().keyStore.setEntry(newName, item, ppNew);
+				for (int index = 0; index < content.getModel().getSize(); index++) {
+					final AliasKeeper	oldItem = content.getModel().getElementAt(index);
+
+					if (oldItem.name.equals(oldName)) {
+						final AliasKeeper	newItem = new AliasKeeper(oldItem.type, newName, oldItem.passwordId);
+						
+						((DefaultListModel<AliasKeeper>)content.getModel()).setElementAt(newItem, index);
+						break;
+					}
+				}
+			} catch (NoSuchAlgorithmException | UnrecoverableEntryException e) {
+				throw new KeyStoreException(e);
+			}
+		}
+	}
+
+	public void delete(final String oldName) throws KeyStoreException {
+		if (Utils.checkEmptyOrNullString(oldName)) {
+			throw new IllegalArgumentException("Old name can't be null or empty");
+		}
+		else if (hasName(oldName)) {
+			getKeyStoreWrapper().keyStore.deleteEntry(oldName);
+			for (int index = 0; index < content.getModel().getSize(); index++) {
+				final AliasKeeper	oldItem = content.getModel().getElementAt(index);
+
+				if (oldItem.name.equals(oldName)) {
+					((DefaultListModel<AliasKeeper>)content.getModel()).removeElementAt(index);
+					break;
+				}
+			}
+		}
+	}	
+	
+	public void forEach(final Consumer<String> callback) {
+		if (callback == null) {
+			throw new NullPointerException("Callback can't be null"); 
+		}
+		else {
+			for(int index = 0, maxIndex = content.getModel().getSize(); index < maxIndex; index++) {
+				callback.accept(content.getModel().getElementAt(index).name);
+			}
+		}
+	}	
+	
+	public void forEachSelected(final Consumer<String> callback) {
+		if (callback == null) {
+			throw new NullPointerException("Callback can't be null"); 
+		}
+		else if (!content.isSelectionEmpty()) {
+			for(int index : content.getSelectedIndices()) {
+				callback.accept(content.getModel().getElementAt(index).name);
+			}
+		}
+	}	
+
 	public boolean isModified() {
 		return isModified;
 	}
@@ -309,11 +446,16 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		
 		final KeyStoreEntityType	type;
 		final String				name;
-		final int					passwordId = unique.incrementAndGet();
+		final int					passwordId;
 		
 		private AliasKeeper(final KeyStoreEntityType type, final String name) {
+			this(type, name, unique.incrementAndGet());
+		}
+
+		private AliasKeeper(final KeyStoreEntityType type, final String name, final int passwordId) {
 			this.type = type;
 			this.name = name;
+			this.passwordId = passwordId;
 		}
 	}
 
