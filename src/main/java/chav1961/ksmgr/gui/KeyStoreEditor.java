@@ -16,9 +16,12 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
@@ -46,7 +49,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
@@ -66,37 +71,50 @@ import chav1961.purelib.basic.interfaces.LoggerFacadeOwner;
 import chav1961.purelib.i18n.interfaces.Localizer;
 import chav1961.purelib.i18n.interfaces.Localizer.LocaleChangeListener;
 import chav1961.purelib.i18n.interfaces.LocalizerOwner;
+import chav1961.purelib.model.interfaces.ContentMetadataInterface;
+import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.useful.FileTransferable;
+import chav1961.purelib.ui.swing.useful.JEnableMaskManipulator;
 import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 
 public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, LocalizerOwner, LocaleChangeListener {
-	private static final String			TITLE_NEW_FILE = "chav1961.ksmgr.gui.KeyStoreEditor.newFile";
-	private static final String			TITLE_NEW_FILE_TT = "chav1961.ksmgr.gui.KeyStoreEditor.newFile.tt";
-	private static final ImageIcon		ICON = new ImageIcon(KeyStoreEditor.class.getResource("save.png"));
-	private static final long 			serialVersionUID = 1L;
+	private static final String		TITLE_NEW_FILE = "chav1961.ksmgr.gui.KeyStoreEditor.newFile";
+	private static final String		TITLE_NEW_FILE_TT = "chav1961.ksmgr.gui.KeyStoreEditor.newFile.tt";
+	private static final ImageIcon	ICON = new ImageIcon(KeyStoreEditor.class.getResource("save.png"));
+	private static final long 		serialVersionUID = 1L;
 
-	private final Localizer 			localizer;
-	private final LoggerFacade 			logger;
-	private final SelectedWindows		place;
-	private final KeyStoreWrapper 		wrapper;
-	private final PasswordsRepo			repo;
-	private final JLabel				caption = new JLabel();
-	private final JButton				save = new JButton(ICON);
-	private final JList<AliasKeeper>	content = new JList<>();
-	private boolean						isModified = false;
+	private final Localizer 				localizer;
+	private final LoggerFacade 				logger;
+	private final ContentMetadataInterface	mdi;
+	private final JEnableMaskManipulator	emmParent;
+	private final JEnableMaskManipulator	emm;
+	private final SelectedWindows			place;
+	private final KeyStoreWrapper 			wrapper;
+	private final PasswordsRepo				repo;
+	private final JLabel					caption = new JLabel();
+	private final JButton					save = new JButton(ICON);
+	private final JList<AliasKeeper>		content = new JList<>();
+	private final JPopupMenu				popup;
+	private boolean							isModified = false;
 
 	@FunctionalInterface
 	public static interface SelectedItemProcessor {
 		void process(String entryName, Entry entry, int passwordId);
 	}
 	
-	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final SelectedWindows place, final KeyStoreWrapper wrapper, final PasswordsRepo repo) {
+	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final ContentMetadataInterface mdi, final JEnableMaskManipulator emmParent, final SelectedWindows place, final KeyStoreWrapper wrapper, final PasswordsRepo repo) {
 		super(new BorderLayout());
 		if (localizer == null) {
 			throw new NullPointerException("Localizer can't be null");
 		}
 		else if (logger == null) {
 			throw new NullPointerException("Logger can't be null");
+		}
+		else if (mdi == null) {
+			throw new NullPointerException("Metadata can't be null");
+		}
+		else if (emmParent == null) {
+			throw new NullPointerException("Parent menu manipulator can't be null");
 		}
 		else if (place == null) {
 			throw new NullPointerException("Place can't be null");
@@ -113,9 +131,13 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			
 			this.localizer = localizer;
 			this.logger = logger;
+			this.mdi = mdi;
+			this.emmParent = emmParent;
 			this.place = place;
 			this.wrapper = wrapper;
 			this.repo = repo;
+			this.popup = SwingUtils.toJComponent(mdi.byUIPath(URI.create("ui:/model/navigation.top.keystoreActions")), JPopupMenu.class);
+			this.emm = new JEnableMaskManipulator(emmParent, this.popup);
 			
 			final JPanel	topPanel = new JPanel(new BorderLayout(3, 3));
 			
@@ -139,6 +161,14 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 				public void focusGained(FocusEvent e) {
 					for(FocusListener item : KeyStoreEditor.this.getFocusListeners()) {
 						item.focusGained(e);
+					}
+				}
+			});
+			content.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(final MouseEvent e) {
+					if (e.getButton() == MouseEvent.BUTTON3) {
+						popup.show(content, e.getX(), e.getY());
 					}
 				}
 			});

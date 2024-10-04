@@ -76,10 +76,11 @@
 		</app:submenu>
 	</app:menu>
 	<app:keyset id="mainmenu.keyset">
-		<app:key code="N" ctrl="true" action="newKeyStore"/>
 		<app:key code="O" ctrl="true" action="openKeyStore"/>
 		<app:key code="S" ctrl="true" action="saveKeyStore"/>
 		<app:key code="Q" ctrl="true" action="exit"/>
+		<app:key code="ENTER" ctrl="true" action="rename"/>
+		<app:key code="DELETE" action="delete"/>
 		<app:key code="F1" action="helpOverview"/>
 	</app:keyset>
 	<app:menu id="desktopToolbar">
@@ -87,11 +88,9 @@
 		<app:item name="menu.tools.find" caption="menu.find" tooltip="menu.ttFind" icon="root://chav1961.calc.Application/chav1961/calc/find.png" action="find"/>
 	</app:menu>
 	<app:menu id="keystoreActions">
-		<app:submenuref name="popup.tasks.keypairs" ref="menu.tasks.keypairs">
-			<app:itemref name="popup.tasks.keypairs.export" ref="menu.tasks.keypairs.export"/>
-		</app:submenuref>
-		<app:submenuref name="popup.tasks.certificates" ref="menu.tasks.certificates">
-			<app:itemref name="popup.tasks.certificates.export" ref="menu.tasks.certificates.export"/>
+		<app:submenuref name="popup.tasks.keys" ref="menu.tasks.keys">
+			<app:itemref name="popup.tasks.keys.generate" ref="menu.tasks.keys.generate"/>
+			<app:itemref name="popup.tasks.keys.export" ref="menu.tasks.keys.export"/>
 		</app:submenuref>
 		<app:separator/>
 		<app:itemref name="popup.edit.copy" ref="menu.edit.copy"/>

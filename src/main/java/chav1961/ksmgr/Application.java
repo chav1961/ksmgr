@@ -160,6 +160,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final LRUPersistence			pers;
 	private final JFileContentManipulator	fcm;
 	private final KeyStoreEditor[]			ksList = new KeyStoreEditor[2];
+	private final int[]						ksListSupport;
 	private final AtomicInteger				unique = new AtomicInteger(1);
 	private final SettingsDialog			settings;
 	private final ActionListener			leftActionListener = (e)->saveAs(SelectedWindows.LEFT);
@@ -196,7 +197,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			this.fcm.addFileContentChangeListener((e)->processLRU(e));
 			this.fcm.setOwner(this);
 			this.fcm.setProgressIndicator(state);
-			this.fcm.appendNewFileSupport();
+			this.ksListSupport = new int[] {this.fcm.appendNewFileSupport(), this.fcm.appendNewFileSupport()}; 
 			
 			this.menu = SwingUtils.toJComponent(app.byUIPath(URI.create("ui:/model/navigation.top.mainmenu")), JMenuBar.class);
 			this.emm = new MainMenuManager(settings, menu);
@@ -481,7 +482,8 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 
 	@OnAction("action:/exit")
-	private void exitApplication() {
+	private void exitApplication() throws IOException {
+		fcm.close();
 		setVisible(false);
 		dispose();
 	}
@@ -804,7 +806,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		if (lastUsed.isEmpty()) {
 			emm.setEnableMaskOff(FILE_LRU);
 		}
-		else {
+		else if (this.menu != null) {
 			final JMenu	menu = (JMenu)SwingUtils.findComponentByName(this.menu, MENU_FILE_LRU);
 			
 			menu.removeAll();
@@ -928,9 +930,11 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				break;
 			case LEFT	:
 				((JComponent)topSplit.getLeftComponent()).setBorder(border);
+				fcm.setCurrentFileSupport(ksListSupport[0]);
 				break;
 			case RIGHT:
 				((JComponent)topSplit.getRightComponent()).setBorder(border);
+				fcm.setCurrentFileSupport(ksListSupport[1]);
 				break;
 			default :
 				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
@@ -939,7 +943,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 	
 	private void setCurrentPanel(final KeyStoreWrapper wrapper) {
-		final KeyStoreEditor	editor = new KeyStoreEditor(getLocalizer(), getLogger(), selected, wrapper, passwords);
+		final KeyStoreEditor	editor = new KeyStoreEditor(getLocalizer(), getLogger(), app, emm, selected, wrapper, passwords);
 		
 		switch (selected) {
 			case BOTTOM	:
