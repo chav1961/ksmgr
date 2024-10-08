@@ -1,7 +1,5 @@
 package chav1961.ksmgr.gui;
 
-import java.security.Provider;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +17,7 @@ import chav1961.purelib.ui.interfaces.RefreshMode;
 import chav1961.purelib.ui.interfaces.UIFormManager;
 
 @LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.gui.SettingsDialog/chav1961/ksmgr/i18n/i18n.xml")
-@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog",tooltip="chav1961.ksmgr.gui.settingsdialog.tt",help="chav1961.ksmgr.dialogs.settingsdialog.help")
+@LocaleResource(value="chav1961.ksmgr.gui.settingsdialog",tooltip="chav1961.ksmgr.gui.settingsdialog.tt",help="chav1961.ksmgr.gui.settingsdialog.help")
 public class SettingsDialog implements FormManager<Object, SettingsDialog>, ModuleAccessor, UIFormManager<Object, SettingsDialog> {
 	public static final String	SETTINGS_KEEP_PASSWORD = "keepPassword";
 	public static final String	SETTINGS_SILENTLY_SUBSTITUTE_PASSWORD = "silentlySubstitutePassword";

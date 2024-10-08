@@ -228,6 +228,7 @@
 <!-- Localization for 'ask password' dialog -->		
 		<key name="chav1961.ksmgr.gui.askpassworddialog">Ask password (%1$s)</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.tt">Ask password for any entity</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog.help">Ask password for any entity</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password">Enter password</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password.tt">Type password here</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.duplicate">Retype password</key>
@@ -648,6 +649,7 @@
 <!-- Локализация для диалога 'ask password' -->		
 		<key name="chav1961.ksmgr.gui.askpassworddialog">Укажите пароль (%1$s)</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.tt">Ввести пароль для сущности</key>
+		<key name="chav1961.ksmgr.gui.askpassworddialog.help">Ввести пароль для сущности</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password">Введите пароль</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.password.tt">Введите пароль</key>
 		<key name="chav1961.ksmgr.gui.askpassworddialog.duplicate">Повторите пароль</key>

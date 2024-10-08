@@ -6,7 +6,6 @@ import javax.swing.JComponent;
 
 import chav1961.ksmgr.gui.SettingsDialog;
 import chav1961.ksmgr.interfaces.SelectedWindows;
-import chav1961.purelib.basic.Utils;
 import chav1961.purelib.ui.swing.useful.JEnableMaskManipulator;
 
 class MainMenuManager extends JEnableMaskManipulator {

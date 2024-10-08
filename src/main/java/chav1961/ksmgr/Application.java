@@ -190,6 +190,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			localizer.addLocaleChangeListener(this);
 			this.state = new JStateString(this.localizer, 10);
 			this.settings = new SettingsDialog(state);
+
+			this.menu = SwingUtils.toJComponent(app.byUIPath(URI.create("ui:/model/navigation.top.mainmenu")), JMenuBar.class);
+			this.emm = new MainMenuManager(settings, menu);
 			
 			settings.loadSettings(this.props);			
 			this.pers = LRUPersistence.of(props, "LRU.item"); 
@@ -198,12 +201,10 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			this.fcm.setOwner(this);
 			this.fcm.setProgressIndicator(state);
 			this.ksListSupport = new int[] {this.fcm.appendNewFileSupport(), this.fcm.appendNewFileSupport()}; 
-			
-			this.menu = SwingUtils.toJComponent(app.byUIPath(URI.create("ui:/model/navigation.top.mainmenu")), JMenuBar.class);
-			this.emm = new MainMenuManager(settings, menu);
-			SwingUtils.assignActionListeners(menu, this);
-			SwingUtils.assignExitMethod4MainWindow(this, ()->exitApplication());
 
+			SwingUtils.assignActionListeners(menu, this, (e)->openKeystore(e));
+			SwingUtils.assignExitMethod4MainWindow(this, ()->exitApplication());
+			
 			selectCurrentPanel(SelectedWindows.LEFT);
 			setCurrentPanel(new KSPlaceHolder(localizer, SelectedWindows.LEFT));
 			selectCurrentPanel(SelectedWindows.RIGHT);
@@ -483,9 +484,13 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 	@OnAction("action:/exit")
 	private void exitApplication() throws IOException {
-		fcm.close();
-		setVisible(false);
-		dispose();
+		if (fcm.commit()) {
+			pers.saveLRU(lruFiles);
+			fcm.close();
+			setVisible(false);
+			dispose();
+			System.exit(0);
+		}
 	}
 
 	@OnAction("action:/rename")
@@ -905,7 +910,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	
 	private <T> boolean ask(final T instance, final int width, final int height, final String caption) {
 		try{final ContentMetadataInterface	mdi = ContentModelFactory.forAnnotatedClass(instance.getClass());
-			try(final AutoBuiltForm<T,?>	abf = new AutoBuiltForm<>(mdi, getLocalizer(), getLogger(), PureLibSettings.INTERNAL_LOADER, instance, (FormManager<Object,T>)instance)) {
+			try(final AutoBuiltForm<T,?>	abf = new AutoBuiltForm<>(mdi, getLocalizer(), getLogger(), PureLibSettings.INTERNAL_LOADER, instance, (FormManager<?,T>)instance)) {
 				
 				((ModuleAccessor)instance).allowUnnamedModuleAccess(abf.getUnnamedModules());
 				abf.setPreferredSize(new Dimension(width,height));

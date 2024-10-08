@@ -15,7 +15,7 @@ import chav1961.purelib.ui.interfaces.Format;
 import chav1961.purelib.ui.interfaces.RefreshMode;
 
 @LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.gui.AskChangePassword/chav1961/ksmgr/i18n/i18n.xml")
-@LocaleResource(value="chav1961.ksmgr.gui.askchangepassword",tooltip="chav1961.ksmgr.gui.askchangepassword.tt",help="chav1961.ksmgr.dialogs.askchangepassword.help")
+@LocaleResource(value="chav1961.ksmgr.gui.askchangepassword",tooltip="chav1961.ksmgr.gui.askchangepassword.tt",help="chav1961.ksmgr.gui.askchangepassword.help")
 public class AskChangePassword implements FormManager<Object, AskChangePassword>, ModuleAccessor {
 	public static final String	ERROR_DIFFERENT_PASSWORDS = "error.askchangepassword.different.passwords";
 	public static final String	INFO_IDENTICAL_PASSWORDS = "info.askchangepassword.identical.passwords";

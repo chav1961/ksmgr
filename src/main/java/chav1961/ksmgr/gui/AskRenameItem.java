@@ -11,7 +11,7 @@ import chav1961.purelib.ui.interfaces.Format;
 import chav1961.purelib.ui.interfaces.RefreshMode;
 
 @LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.gui.AskRenameItem/chav1961/ksmgr/i18n/i18n.xml")
-@LocaleResource(value="chav1961.ksmgr.gui.askrenameitemdialog",tooltip="chav1961.ksmgr.gui.askrenameitemdialog.tt",help="chav1961.ksmgr.dialogs.askrenameitemdialog.help")
+@LocaleResource(value="chav1961.ksmgr.gui.askrenameitemdialog",tooltip="chav1961.ksmgr.gui.askrenameitemdialog.tt",help="chav1961.ksmgr.gui.askrenameitemdialog.help")
 public class AskRenameItem implements FormManager<Object, AskRenameItem>, ModuleAccessor {
 	private final LoggerFacade	facade;
 	

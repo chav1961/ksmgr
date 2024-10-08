@@ -12,7 +12,7 @@ import chav1961.purelib.ui.interfaces.Format;
 import chav1961.purelib.ui.interfaces.RefreshMode;
 
 @LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.gui.AskPassword/chav1961/ksmgr/i18n/i18n.xml")
-@LocaleResource(value="chav1961.ksmgr.gui.askpassworddialog",tooltip="chav1961.ksmgr.gui.askpassworddialog.tt",help="chav1961.ksmgr.dialogs.askpassworddialog.help")
+@LocaleResource(value="chav1961.ksmgr.gui.askpassworddialog",tooltip="chav1961.ksmgr.gui.askpassworddialog.tt",help="chav1961.ksmgr.gui.askpassworddialog.help")
 public class AskPassword implements FormManager<Object, AskPassword>, ModuleAccessor {
 	private final LoggerFacade	facade;
 	
