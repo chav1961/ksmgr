@@ -4,6 +4,7 @@ package chav1961.ksmgr.gui;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Base64;
 
 import javax.crypto.SecretKey;
 
@@ -23,6 +24,9 @@ import chav1961.purelib.ui.interfaces.RefreshMode;
 @LocaleResourceLocation("i18n:xml:root://chav1961.ksmgr.gui.AskExportSecureKey/chav1961/ksmgr/i18n/i18n.xml")
 @LocaleResource(value="chav1961.ksmgr.gui.askexportsecurekey",tooltip="chav1961.ksmgr.gui.askexportsecurekey.tt",help="chav1961.ksmgr.gui.askexportsecurekey.help")
 public class AskExportSecureKey implements FormManager<Object, AskExportSecureKey>,  ModuleAccessor {
+	private static final byte[]		BEGIN_MARKER = "".getBytes();
+	private static final byte[]		END_MARKER = "".getBytes();
+	
 	private final LoggerFacade 		facade;
 
 	@LocaleResource(value="chav1961.ksmgr.gui.askexportsecurekey.format",tooltip="chav1961.ksmgr.gui.askexportsecurekey.format.tt")
@@ -83,7 +87,22 @@ public class AskExportSecureKey implements FormManager<Object, AskExportSecureKe
 	}
 
 	public void exportKey(final SecretKey key, final OutputStream os) throws IOException {
-		
+		switch (fileFormat) {
+			case DER		:
+				break;
+			case PEM		:
+				os.write(BEGIN_MARKER);
+				os.write(Base64.getEncoder().encode(key.getEncoded()));
+				os.write(END_MARKER);
+				os.flush();
+				break;
+			case PKCS_12	:
+				break;
+			case PKCS_7		:
+				break;
+			default:
+				throw new UnsupportedOperationException("File format ["+fileFormat+"] is not supported yet");
+		}
 	}
 }
 
