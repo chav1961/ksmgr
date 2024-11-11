@@ -22,9 +22,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyStore;
+import java.security.KeyStore.Entry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
@@ -33,8 +35,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import javax.crypto.SecretKey;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,6 +47,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.border.LineBorder;
@@ -113,6 +118,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	public static final String				TITLE_NEW_PASSWORD_FOR_KEYSTORE_APPLICATION = "application.new.password.for.keystore.title";
 	public static final String				TITLE_NEW_PASSWORD_FOR_SYMMETRIC_KEY_APPLICATION = "application.new.password.for.symmetric.key.title";
 	public static final String				TITLE_GET_PASSWORD_FOR_KEYSTORE_APPLICATION = "application.get.password.for.keystore.title";
+	public static final String				TITLE_GET_PASSWORD_FOR_SOURCE_KEYSTORE_APPLICATION = "application.get.password.for.source.keystore.title";
+	public static final String				TITLE_GET_PASSWORD_FOR_SOURCE_KEYSTORE_ITEM_APPLICATION = "application.get.password.for.source.keystore.item.title";
+	public static final String				TITLE_GET_PASSWORD_FOR_TARGET_KEYSTORE_APPLICATION = "application.get.password.for.target.keystore.title";
 	public static final String				TITLE_GET_PASSWORD_FOR_SYMMETRIC_KEY_APPLICATION = "application.get.password.for.symmetric.key.title";
 	public static final String				TITLE_CHANGE_PASSWORD_FOR_KEYSTORE_APPLICATION = "application.change.password.for.keystore.title";
 	public static final String				TITLE_CHANGE_PASSWORD_FOR_KEYSTORE_ENTRY_APPLICATION = "application.change.password.for.entry.title";
@@ -121,6 +129,10 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	public static final String				TITLE_DELETE_NAMES_MESSAGE = "application.delete.names.title";
 	public static final String				DELETE_NAME_MESSAGE = "application.delete.name.message";
 	public static final String				DELETE_NAMES_MESSAGE = "application.delete.names.message";
+
+	public static final String				TITLE_REPLACE_NAME_MESSAGE = "application.replace.name.title";
+	public static final String				REPLACE_NAME_TEXT_MESSAGE = "application.replace.name.text.message";
+	public static final String				REPLACE_NAME_FORALL_MESSAGE = "application.replace.name.forall.message";
 	
 	public static final String				TITLE_DUPLICATE_NAME_MESSAGE = "application.duplicaite.name.title";
 	public static final String				DUPLICATE_NAME_MESSAGE = "application.duplicaite.name.message";
@@ -133,6 +145,8 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	public static final String				COMPLETED_RENAME_KEYSTORE_ENTITY = "application.completed.rename.keystore.entity";
 	public static final String				COMPLETED_DELETE_KEYSTORE_ENTITY = "application.completed.delete.keystore.entity";
 	public static final String				COMPLETED_SYMMETRIC_KEY_CREATE = "application.completed.symmetric.key.create";
+	public static final String				COMPLETED_ITEM_COPY = "application.completed.item.copy";
+	public static final String				COMPLETED_ITEM_MOVE = "application.completed.item.move";
 	
 	
 	public static final String				KEYSTORE_ITEM_ID = "<keystore>";
@@ -221,12 +235,14 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				public void placeFileContent(final Point location, final Iterable<JFileItemDescriptor> content) {
 					final TreePath	path = getPathForLocation(location.x, location.y);
 					
-					for(JFileItemDescriptor item : content) {
-						if (item.getCargo() != null) {
-							exportAlias((JFileItemDescriptor)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(), (AliasDescriptor)item.getCargo());
-						}
-						else {
-							copyFileContent((JFileItemDescriptor)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(), item);
+					if (path != null) {
+						for(JFileItemDescriptor item : content) {
+							if (item.getCargo() != null) {
+								exportAlias((JFileItemDescriptor)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(), (AliasDescriptor)item.getCargo());
+							}
+							else {
+								copyFileContent((JFileItemDescriptor)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject(), item);
+							}
 						}
 					}
 				}
@@ -488,11 +504,52 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			pers.saveLRU(lruFiles);
 			fcm.close();
 			setVisible(false);
+			passwords.close();
 			dispose();
 			System.exit(0);
 		}
 	}
 
+	@OnAction("action:/copy")
+	private void copyItem() {
+		switch (selected) {
+			case BOTTOM	:
+				break;
+			case LEFT	:
+				if (ksList[0].hasAnySelection() && ksList[1] != null) {
+					ksList[0].forEachSelected(new GroupCopy(0,1));
+				}
+				break;
+			case RIGHT	:
+				if (ksList[1].hasAnySelection() && ksList[0] != null) {
+					ksList[1].forEachSelected(new GroupCopy(1,0));
+				}
+				break;
+			default :
+				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
+		}
+	}	
+
+	@OnAction("action:/move")
+	private void moveItem() {
+		switch (selected) {
+			case BOTTOM	:
+				break;
+			case LEFT	:
+				if (ksList[0].hasAnySelection() && ksList[1] != null) {
+					ksList[0].forEachSelected(new GroupMove(0,1));
+				}
+				break;
+			case RIGHT	:
+				if (ksList[1].hasAnySelection() && ksList[0] != null) {
+					ksList[1].forEachSelected(new GroupMove(1,0));
+				}
+				break;
+			default :
+				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
+		}
+	}	
+	
 	@OnAction("action:/rename")
 	private void renameItem() {
 		final AskRenameItem	ari = new AskRenameItem(getLogger());
@@ -509,7 +566,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 						ari.newName = itemName;					
 						if (ask(ari,250,70)) {
 							if (!ksList[0].hasName(ari.newName) || new JLocalizedOptionPane(getLocalizer()).confirm(this, new LocalizedFormatter(DUPLICATE_NAME_MESSAGE, ari.newName), TITLE_DUPLICATE_NAME_MESSAGE, JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-								askPasswordAndRename(ksList[0], itemName, ari.newName);
+								askPasswordAndRename(ksList[0], itemName, ari.newName, ksListSupport[0]);
 							}
 						}
 					}
@@ -521,7 +578,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 						ari.newName = itemName;					
 						if (ask(ari,250,70)) {
 							if (!ksList[1].hasName(ari.newName) || new JLocalizedOptionPane(getLocalizer()).confirm(this, new LocalizedFormatter(DUPLICATE_NAME_MESSAGE, ari.newName), TITLE_DUPLICATE_NAME_MESSAGE, JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-								askPasswordAndRename(ksList[1], itemName, ari.newName);
+								askPasswordAndRename(ksList[1], itemName, ari.newName, ksListSupport[1]);
 							}
 						}
 					}
@@ -549,6 +606,8 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 								final String	passwordKey = PasswordsRepo.KEY_STORE_ITEM_PREFIX+'.'+ksList[0].getPasswordIdFor(item);
 								
 								ksList[0].delete(item);
+								fcm.setCurrentFileSupport(ksListSupport[0]);
+								fcm.setModificationFlag();
 								if (passwords.isKeepedPasswords()) {
 									passwords.deletePasswordFor(passwordKey);
 								}
@@ -566,6 +625,8 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 								final String	passwordKey = PasswordsRepo.KEY_STORE_ITEM_PREFIX+'.'+ksList[1].getPasswordIdFor(item);
 								
 								ksList[1].delete(item);
+								fcm.setCurrentFileSupport(ksListSupport[1]);
+								fcm.setModificationFlag();
 								if (passwords.isKeepedPasswords()) {
 									passwords.deletePasswordFor(passwordKey);
 								}
@@ -582,7 +643,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		}
 	}
 	
-	private void askPasswordAndRename(final KeyStoreEditor editor, final String oldName, final String newName) throws KeyStoreException {
+	private void askPasswordAndRename(final KeyStoreEditor editor, final String oldName, final String newName, final int partNumber) throws KeyStoreException {
 		final AskChangePassword	acp = new AskChangePassword(getLogger(), getLocalizer());
 		final String	passwordKey = PasswordsRepo.KEY_STORE_ITEM_PREFIX+'.'+editor.getPasswordIdFor(oldName);
 		
@@ -598,11 +659,19 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				getLogger().message(Severity.error, localizer.getValue(AskNewPassword.ERROR_DIFFERENT_PASSWORDS));
 			}
 			else {
-				editor.rename(oldName, acp.oldPassword, newName, acp.password);
-				if (passwords.isKeepedPasswords()) {
-					passwords.storePasswordFor(passwordKey, acp.password);
+				final int	oldSelection = fcm.getCurrentFileSupport();
+				
+				try {
+					editor.rename(oldName, acp.oldPassword, newName, acp.password);
+					fcm.setCurrentFileSupport(partNumber);
+					fcm.setModificationFlag();
+					if (passwords.isKeepedPasswords()) {
+						passwords.storePasswordFor(passwordKey, acp.password);
+					}
+					getLogger().message(Severity.info, COMPLETED_RENAME_KEYSTORE_ENTITY);
+				} finally {
+					fcm.setCurrentFileSupport(oldSelection);
 				}
-				getLogger().message(Severity.info, COMPLETED_RENAME_KEYSTORE_ENTITY);				
 			}
 		}
 	}
@@ -848,7 +917,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 		}
 	}
 
-	private char[] askPassword(final String passwordId, final String caption) {
+	private char[] askPassword(final String passwordId, final String caption, final Object... parameters) {
 		final AskPassword	ap = new AskPassword(getLogger());
 
 		if (passwords.isKeepedPasswords() && passwords.hasPasswordFor(passwordId)) {
@@ -858,7 +927,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			}
 		}
 		
-		if (ask(ap, 450, 50, caption)) {
+		if (ask(ap, 450, 50, getLocalizer().getValue(caption, parameters))) {
 			if (passwords.isKeepedPasswords()) {
 				passwords.storePasswordFor(passwordId, ap.password);
 			}
@@ -921,7 +990,22 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			return false;
 		} 
 	}
+	
+	private ReplacementAction askReplacement(final String item, final String container) {
+		final JPanel	panel = new JPanel(new BorderLayout());
+		final JCheckBox	useForAll = new JCheckBox(getLocalizer().getValue(REPLACE_NAME_FORALL_MESSAGE));
 
+		panel.add(new JLabel(getLocalizer().getValue(REPLACE_NAME_TEXT_MESSAGE, item, container)), BorderLayout.CENTER);
+		panel.add(useForAll, BorderLayout.SOUTH);
+		
+		if (new JLocalizedOptionPane(getLocalizer()).confirm(this, panel, TITLE_REPLACE_NAME_MESSAGE, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+			return useForAll.isSelected() ? ReplacementAction.REPLACE_ALL : ReplacementAction.REPLACE;
+		}
+		else {
+			return ReplacementAction.CANCEL;
+		}
+	}
+	
 	private void selectCurrentPanel(final SelectedWindows window) {
 		final LineBorder	border = new LineBorder(Color.BLUE);
 		
@@ -948,7 +1032,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	}
 	
 	private void setCurrentPanel(final KeyStoreWrapper wrapper) {
-		final KeyStoreEditor	editor = new KeyStoreEditor(getLocalizer(), getLogger(), app, emm, selected, wrapper, passwords);
+		final KeyStoreEditor	editor = new KeyStoreEditor(getLocalizer(), getLogger(), app, emm, selected, wrapper, passwords, (i,s)->drapDrop(i,s));
 		
 		switch (selected) {
 			case BOTTOM	:
@@ -975,6 +1059,17 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				break;
 			default :
 				throw new UnsupportedOperationException("Selected window ["+selected+"] is not supported yet");
+		}
+	}
+
+	private void drapDrop(final int keyStoreId, final String keyStoreAlias) {
+		if ((ksList[0] instanceof KeyStoreEditor) && (ksList[1] instanceof KeyStoreEditor) ) {
+			if (ksList[0].getKeyStoreWrapper().entryId == keyStoreId) {
+				new GroupCopy(0, 1).accept(keyStoreAlias);
+			}
+			else if (ksList[1].getKeyStoreWrapper().entryId == keyStoreId) {
+				new GroupCopy(1, 0).accept(keyStoreAlias);
+			}
 		}
 	}
 
@@ -1057,6 +1152,28 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			application.setVisible(true);
 		}
 	}
+
+	private static enum ReplacementAction {
+		REPLACE(true, false),
+		REPLACE_ALL(true, true),
+		CANCEL(false, false);
+		
+		private final boolean	confirmReplacement;
+		private final boolean	acceptForAllReplacements;
+		
+		private ReplacementAction(final boolean confirmReplacement, final boolean acceptForAllReplacements) {
+			this.confirmReplacement = confirmReplacement;
+			this.acceptForAllReplacements = acceptForAllReplacements;
+		}
+		
+		public boolean isReplacementConfirms() {
+			return confirmReplacement;
+		}
+
+		public boolean isAllReplacementsConfirms() {
+			return acceptForAllReplacements;
+		}
+	}
 	
 	private static class ApplicationArgParser extends ArgParser {
 		private static final ArgParser.AbstractArg[]	KEYS = {
@@ -1122,6 +1239,198 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 		@Override
 		public void focusLost(final FocusEvent e) {
+		}
+	}
+	
+	private class GroupCopy implements Consumer<String> {
+		private final int			from;
+		private final int			to;
+		private final String		fromKeyStoreString;
+		private final String		toKeyStoreString;
+		private char[]		fromPasswd = null;
+		private char[]		toPasswd = null;
+		private boolean		replaceAlways = false;
+		private boolean		cancelCopy = false;
+
+		GroupCopy(final int from, final int to) {
+			this.from = from; 
+			this.to = to; 
+			this.fromKeyStoreString = PasswordsRepo.KEY_STORE_PREFIX+'.'+ksList[from].getKeyStoreWrapper().entryId;
+			this.toKeyStoreString = PasswordsRepo.KEY_STORE_PREFIX+'.'+ksList[to].getKeyStoreWrapper().entryId;
+		}
+
+		@Override
+		public void accept(final String item2copy) {
+			if (!cancelCopy) {
+				if (fromPasswd == null) {
+					fromPasswd = askPassword(fromKeyStoreString, TITLE_GET_PASSWORD_FOR_SOURCE_KEYSTORE_APPLICATION);
+					if (fromPasswd == null) {
+						cancelCopy = true;
+						return;
+					}
+				}
+				if (toPasswd == null) {
+					toPasswd = askPassword(toKeyStoreString, TITLE_GET_PASSWORD_FOR_TARGET_KEYSTORE_APPLICATION);
+					if (toPasswd == null) {
+						cancelCopy = true;
+						return;
+					}
+				}
+				final String	passwordKey = PasswordsRepo.KEY_STORE_ITEM_PREFIX+'.'+ksList[from].getPasswordIdFor(item2copy);
+				final char[]	itemPassword = askPassword(passwordKey, TITLE_GET_PASSWORD_FOR_SOURCE_KEYSTORE_ITEM_APPLICATION);
+
+				if (itemPassword == null) {
+					cancelCopy = true;
+					return;
+				}
+				try {
+					final Entry entry = ksList[from].getKeyStoreWrapper().keyStore.getEntry(item2copy, new KeyStore.PasswordProtection(itemPassword));
+
+					if (ksList[to].hasName(item2copy)) {
+						if (replaceAlways) {
+							storeItem(item2copy, entry, itemPassword);
+						}
+						else {
+							final String	containerName = ksList[to].getKeyStoreWrapper().file != null ? ksList[to].getKeyStoreWrapper().file.getName() : "new keystore";  
+							
+							switch (askReplacement(containerName, item2copy)) {
+								case CANCEL			:
+									break;
+								case REPLACE		:
+									storeItem(item2copy, entry, itemPassword);
+									break;
+								case REPLACE_ALL	:
+									replaceAlways = true;
+									storeItem(item2copy, entry, itemPassword);
+									break;
+								default :
+									throw new UnsupportedOperationException("Replacement type is not supported yet");
+							}
+						}
+					}
+					else {
+						storeItem(item2copy, entry, itemPassword);
+					}
+				} catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+					getLogger().message(Severity.error, e, e.getLocalizedMessage());
+					cancelCopy = true;
+					return;
+				}
+			}
+		}
+
+		private void storeItem(final String alias, final Entry entry, final char[] password) throws KeyStoreException {
+			final int	oldSelection = fcm.getCurrentFileSupport();
+			
+			try {
+				ksList[to].insert(alias, entry, password);
+				fcm.setCurrentFileSupport(ksListSupport[to]);
+				fcm.setModificationFlag();
+				if (passwords.isKeepedPasswords()) {
+					passwords.storePasswordFor(ksList[to].getPasswordIdFor(alias), password);
+				}
+				getLogger().message(Severity.info, COMPLETED_ITEM_COPY);
+			} finally {
+				fcm.setCurrentFileSupport(oldSelection);
+			}
+		}
+	}
+
+	private class GroupMove implements Consumer<String> {
+		private final int			from;
+		private final int			to;
+		private final String		fromKeyStoreString;
+		private final String		toKeyStoreString;
+		private char[]		fromPasswd = null;
+		private char[]		toPasswd = null;
+		private boolean		replaceAlways = false;
+		private boolean		cancelCopy = false;
+
+		GroupMove(final int from, final int to) {
+			this.from = from; 
+			this.to = to; 
+			this.fromKeyStoreString = PasswordsRepo.KEY_STORE_PREFIX+'.'+ksList[from].getKeyStoreWrapper().entryId;
+			this.toKeyStoreString = PasswordsRepo.KEY_STORE_PREFIX+'.'+ksList[to].getKeyStoreWrapper().entryId;
+		}
+
+		@Override
+		public void accept(final String item2copy) {
+			if (!cancelCopy) {
+				if (fromPasswd == null) {
+					fromPasswd = askPassword(fromKeyStoreString, TITLE_GET_PASSWORD_FOR_SOURCE_KEYSTORE_APPLICATION);
+					if (fromPasswd == null) {
+						cancelCopy = true;
+						return;
+					}
+				}
+				if (toPasswd == null) {
+					toPasswd = askPassword(toKeyStoreString, TITLE_GET_PASSWORD_FOR_TARGET_KEYSTORE_APPLICATION);
+					if (toPasswd == null) {
+						cancelCopy = true;
+						return;
+					}
+				}
+				final String	passwordKey = PasswordsRepo.KEY_STORE_ITEM_PREFIX+'.'+ksList[from].getPasswordIdFor(item2copy);
+				final char[]	itemPassword = askPassword(passwordKey, TITLE_GET_PASSWORD_FOR_SOURCE_KEYSTORE_ITEM_APPLICATION);
+
+				if (itemPassword == null) {
+					cancelCopy = true;
+					return;
+				}
+				try {
+					final Entry entry = ksList[from].getKeyStoreWrapper().keyStore.getEntry(item2copy, new KeyStore.PasswordProtection(itemPassword));
+
+					if (ksList[to].hasName(item2copy)) {
+						if (replaceAlways) {
+							storeAndDeleteItem(item2copy, entry, itemPassword);
+						}
+						else {
+							final String	containerName = ksList[to].getKeyStoreWrapper().file != null ? ksList[to].getKeyStoreWrapper().file.getName() : "new keystore";  
+							
+							switch (askReplacement(containerName, item2copy)) {
+								case CANCEL			:
+									break;
+								case REPLACE		:
+									storeAndDeleteItem(item2copy, entry, itemPassword);
+									break;
+								case REPLACE_ALL	:
+									replaceAlways = true;
+									storeAndDeleteItem(item2copy, entry, itemPassword);
+									break;
+								default :
+									throw new UnsupportedOperationException("Replacement type is not supported yet");
+							}
+						}
+					}
+					else {
+						storeAndDeleteItem(item2copy, entry, itemPassword);
+					}
+				} catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException e) {
+					getLogger().message(Severity.error, e, e.getLocalizedMessage());
+					cancelCopy = true;
+					return;
+				}
+			}
+		}
+
+		private void storeAndDeleteItem(final String alias, final Entry entry, final char[] password) throws KeyStoreException {
+			final int	oldSelection = fcm.getCurrentFileSupport();
+			
+			try {
+				ksList[to].insert(alias, entry, password);
+				if (passwords.isKeepedPasswords()) {
+					passwords.storePasswordFor(ksList[to].getPasswordIdFor(alias), password);
+					passwords.deletePasswordFor(ksList[from].getPasswordIdFor(alias));
+				}
+				ksList[from].delete(alias);
+				fcm.setCurrentFileSupport(ksListSupport[to]);
+				fcm.setModificationFlag();
+				fcm.setCurrentFileSupport(ksListSupport[from]);
+				fcm.setModificationFlag();
+				getLogger().message(Severity.info, COMPLETED_ITEM_MOVE);
+			} finally {
+				fcm.setCurrentFileSupport(oldSelection);
+			}
 		}
 	}
 }

@@ -10,6 +10,9 @@
 		<key name="application.new.password.for.keystore.title">for new key store</key>
 		<key name="application.new.password.for.symmetric.key.title">for new symmetric key</key>
 		<key name="application.get.password.for.keystore.title">for existent key store</key>
+		<key name="application.get.password.for.source.keystore.title">for source key store</key>
+		<key name="application.get.password.for.source.keystore.item.title">for item in the source key store</key>
+		<key name="application.get.password.for.target.keystore.title">for target key store</key>
 		<key name="application.get.password.for.symmetric.key.title">for existent symmetric key</key>
 		<key name="application.change.password.for.keystore.title">for existent key store</key>
 		<key name="application.change.password.for.entry.title">for existent key store entry</key>
@@ -19,6 +22,9 @@
 		<key name="application.delete.names.title">Delete entries from key store</key>
 		<key name="application.delete.name.message">Entry (%1$s) will be deleted from key store. Continue?</key>
 		<key name="application.delete.names.message">(%1$d) entries will be deleted from key store. Continue?</key>
+		<key name="application.replace.name.title">Replace entries in the target container</key>
+		<key name="application.replace.name.text.message">Target [%2$s] already contains item [%1$s]. Replace it?</key>
+		<key name="application.replace.name.forall.message">Use this answer for all replacements</key>
 
 <!-- Localization for completion messages --> 
 		<key name="application.completed.new.keystore">New key store repository created</key>		
@@ -29,6 +35,8 @@
 		<key name="application.completed.rename.keystore.entity">Key store entity renamed</key>		
 		<key name="application.completed.delete.keystore.entity">Key store entity(ies) deleted</key>
 		<key name="application.completed.symmetric.key.create">New symmetric key created</key>
+		<key name="application.completed.item.copy">Item(s) copied</key>
+		<key name="application.completed.item.move">Item(s) moved</key>
 
 <!-- Localization for application menu --> 
 		<key name="menu.file">File</key>
@@ -431,6 +439,9 @@
 		<key name="application.new.password.for.keystore.title">для нового репозитария ключей</key>
 		<key name="application.new.password.for.symmetric.key.title">для нового симметричного ключа</key>
 		<key name="application.get.password.for.keystore.title">для существующего репозитария ключей</key>
+		<key name="application.get.password.for.source.keystore.title">для исходного репозитария ключей</key>
+		<key name="application.get.password.for.source.keystore.item.title">для элемента исходного репозитария ключей</key>
+		<key name="application.get.password.for.target.keystore.title">для принимающего репозитария ключей</key>
 		<key name="application.get.password.for.symmetric.key.title">для существующего симметричного ключа</key>
 		<key name="application.change.password.for.keystore.title">для существующего репозитария ключей</key>
 		<key name="application.change.password.for.entry.title">для существующего ключа в репозитарии</key>
@@ -440,6 +451,9 @@
 		<key name="application.delete.names.title">Удаление клчюей из репозитария</key>
 		<key name="application.delete.name.message">Ключ (%1$s) будет удален из репозитария. Продолжить?</key>
 		<key name="application.delete.names.message">(%1$d) ключей будет удалено из репозитария. Продолжить?</key>
+		<key name="application.replace.name.title">Замена элементов приемника</key>
+		<key name="application.replace.name.text.message">Приемник [%2$s] уже содержит имя [%1$s]. Заменить его?</key>
+		<key name="application.replace.name.forall.message">делать так для всех одинаковых имен</key>
 
 <!-- Локализация для подтверждающих сообщений --> 
 		<key name="application.completed.new.keystore">Новый репозитарий ключей создан</key>
@@ -450,6 +464,8 @@
 		<key name="application.completed.rename.keystore.entity">Ключ репозитария переименован</key>		
 		<key name="application.completed.delete.keystore.entity">Ключ(и) репозитария удален(ы)</key>
 		<key name="application.completed.symmetric.key.create">Нвый симметричный ключ создан</key>
+		<key name="application.completed.item.copy">Элемент(ы) скопирован(ы)</key>
+		<key name="application.completed.item.move">Элемент(ы) перенесен(ы)</key>
 
 <!-- Локализация ошибок, предупреждений и информации приложения --> 
 		<key name="error.asknewpassword.different.passwords">Пароли в полях различаются, введите их еще раз</key>

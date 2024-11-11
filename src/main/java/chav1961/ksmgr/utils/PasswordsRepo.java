@@ -1,9 +1,13 @@
 package chav1961.ksmgr.utils;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
-public class PasswordsRepo {
+public class PasswordsRepo implements Closeable {
 	public static final String		KEY_STORE_PREFIX = "KeyStore";
 	public static final String		KEY_STORE_ITEM_PREFIX = "KeyStoreItem";
 	public static final String		SECRET_KEY_PREFIX = "SecretKey";
@@ -13,6 +17,13 @@ public class PasswordsRepo {
 	
 	public PasswordsRepo(final boolean keepPasswords) {
 		this.keepPasswords = keepPasswords;
+	}
+
+	@Override
+	public void close() throws IOException {
+		for (Entry<String, char[]> item : passwords.entrySet()) {
+			Arrays.fill(item.getValue(), ' ');
+		}
 	}
 	
 	public boolean isKeepedPasswords() {
@@ -68,4 +79,5 @@ public class PasswordsRepo {
 			passwords.remove(item.toLowerCase());
 		}
 	}
+
 }

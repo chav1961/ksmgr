@@ -4,7 +4,9 @@ import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -13,49 +15,46 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.URI;
-import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStore.Entry;
 import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStore.ProtectionParameter;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.ProtectionDomain;
 import java.security.UnrecoverableEntryException;
-import java.security.UnrecoverableKeyException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.crypto.SecretKey;
-import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
-import javax.swing.GrayFilter;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
-import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import chav1961.ksmgr.interfaces.AliasDescriptor;
@@ -76,6 +75,7 @@ import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.useful.FileTransferable;
 import chav1961.purelib.ui.swing.useful.JEnableMaskManipulator;
 import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
+import chav1961.purelib.ui.swing.useful.MultiContentTransferable;
 
 public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, LocalizerOwner, LocaleChangeListener {
 	private static final String		TITLE_NEW_FILE = "chav1961.ksmgr.gui.KeyStoreEditor.newFile";
@@ -91,6 +91,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 	private final SelectedWindows			place;
 	private final KeyStoreWrapper 			wrapper;
 	private final PasswordsRepo				repo;
+	private final BiConsumer<Integer, String>	dropAliasCallback;
 	private final JLabel					caption = new JLabel();
 	private final JButton					save = new JButton(ICON);
 	private final JList<AliasKeeper>		content = new JList<>();
@@ -102,7 +103,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		void process(String entryName, Entry entry, int passwordId);
 	}
 	
-	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final ContentMetadataInterface mdi, final JEnableMaskManipulator emmParent, final SelectedWindows place, final KeyStoreWrapper wrapper, final PasswordsRepo repo) {
+	public KeyStoreEditor(final Localizer localizer, final LoggerFacade logger, final ContentMetadataInterface mdi, final JEnableMaskManipulator emmParent, final SelectedWindows place, final KeyStoreWrapper wrapper, final PasswordsRepo repo, final BiConsumer<Integer,String> dropAliasCallback) {
 		super(new BorderLayout());
 		if (localizer == null) {
 			throw new NullPointerException("Localizer can't be null");
@@ -136,6 +137,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			this.place = place;
 			this.wrapper = wrapper;
 			this.repo = repo;
+			this.dropAliasCallback = dropAliasCallback;
 			this.popup = SwingUtils.toJComponent(mdi.byUIPath(URI.create("ui:/model/navigation.top.keystoreActions")), JPopupMenu.class);
 			this.emm = new JEnableMaskManipulator(emmParent, this.popup);
 			
@@ -178,7 +180,8 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			content.setCellRenderer(this::getListCellRendererComponent);
 
 			DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(content, DnDConstants.ACTION_COPY, new DragGestureHandler(content));
-
+            new DropTarget(this, DnDConstants.ACTION_COPY, new DropTargetHandler(), true);
+			
 			setModified(false);
 			fillContent(content, wrapper.keyStore);
 			fillLocalizedStrings();
@@ -261,7 +264,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 		}
 	}
 	
-	public int getPasswordIdFor(final String name) {
+	public String getPasswordIdFor(final String name) {
 		if (Utils.checkEmptyOrNullString(name)) {
 			throw new IllegalArgumentException("Item name can't be null or empty");
 		}
@@ -270,13 +273,47 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 				final AliasKeeper	item = content.getModel().getElementAt(index);
 				
 				if (item.name.equals(name)) {
-					return item.passwordId;
+					return AliasKeeper.PASSWD_PREFIX+"."+item.passwordId;
 				}
 			}
-			return -1;
+			return null;
 		}
 	}
 
+	public void insert(final String newName, final Entry entry, final char[] password) throws KeyStoreException {
+		if (Utils.checkEmptyOrNullString(newName)) {
+			throw new IllegalArgumentException("New name can't be null or empty");
+		}
+		else if (entry == null) {
+			throw new NullPointerException("Entry to add can't be null");
+		}
+		else if (password == null) {
+			throw new NullPointerException("Password can't be null");
+		}
+		else {
+			final DefaultListModel<AliasKeeper>	model = (DefaultListModel<AliasKeeper>)content.getModel();
+			final KeyStoreEntityType	type;
+		
+			if (entry instanceof KeyStore.SecretKeyEntry) {
+				type = KeyStoreEntityType.SECRET_KEY;
+			}
+			else if (entry instanceof KeyStore.PrivateKeyEntry) {
+				type = KeyStoreEntityType.KEY_PAIR;
+			}
+			else if (entry instanceof KeyStore.TrustedCertificateEntry) {
+				type = KeyStoreEntityType.CERTIFICATE;
+			}
+			else {
+				type = KeyStoreEntityType.UNKNOWN;
+			}
+			final AliasKeeper	newAlias = new AliasKeeper(type, newName);
+
+			getKeyStoreWrapper().keyStore.setEntry(newName, entry, new KeyStore.PasswordProtection(password));
+			model.addElement(newAlias);
+			setModified(true);
+		}
+	}	
+	
 	public void changePassword(final String name, final char[] oldPassword, final char[] newPassword) throws KeyStoreException {
 		if (Utils.checkEmptyOrNullString(name)) {
 			throw new IllegalArgumentException("Entry name can't be null or empty");
@@ -294,6 +331,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 				final ProtectionParameter	ppNew = new PasswordProtection(newPassword);
 				
 				getKeyStoreWrapper().keyStore.setEntry(name, item, ppNew);				
+				setModified(true);
 			} catch (UnrecoverableEntryException | NoSuchAlgorithmException e) {
 				throw new KeyStoreException(e);
 			}
@@ -327,6 +365,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 						break;
 					}
 				}
+				setModified(true);
 			} catch (NoSuchAlgorithmException | UnrecoverableEntryException e) {
 				throw new KeyStoreException(e);
 			}
@@ -344,6 +383,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 
 				if (oldItem.name.equals(oldName)) {
 					((DefaultListModel<AliasKeeper>)content.getModel()).removeElementAt(index);
+					setModified(true);
 					break;
 				}
 			}
@@ -395,7 +435,7 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 			throw new KeyStoreException("Duplicate alias name ["+entryName+"] to place secret key");
 		}
 		else {
-			final DefaultListModel<AliasKeeper>	model = (DefaultListModel<AliasKeeper>)content.getModel() ;
+			final DefaultListModel<AliasKeeper>	model = (DefaultListModel<AliasKeeper>)content.getModel();
 			final KeyStore.SecretKeyEntry 		secret = new KeyStore.SecretKeyEntry(secretKey);
 			final KeyStore.ProtectionParameter	ppPassword = new KeyStore.PasswordProtection(password);
 			final AliasKeeper					item = new AliasKeeper(KeyStoreEntityType.SECRET_KEY, entryName); 
@@ -500,9 +540,10 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
         public void dragGestureRecognized(final DragGestureEvent dge) {
             final AliasKeeper 		selectedValue = list.getSelectedValue();
             final AliasDescriptor	desc = AliasDescriptor.of(place, wrapper, selectedValue.name, selectedValue.type);  
-            final Transferable 		t = new FileTransferable(new JFileItemDescriptor(selectedValue.name, "./", false, 0, new Date(0), desc));
+            final Transferable 		t1 = new FileTransferable(new JFileItemDescriptor(selectedValue.name, "./", false, 0, new Date(0), desc));
+            final Transferable 		t2 = new AliasTransferable(getKeyStoreWrapper().entryId, selectedValue.name);
             
-            dge.getDragSource().startDrag(dge, null, t, new DragSourceListener() {
+            dge.getDragSource().startDrag(dge, null, new MultiContentTransferable(t1, t2), new DragSourceListener() {
 				@Override public void dragEnter(DragSourceDragEvent dsde) {}
 				@Override public void dragOver(DragSourceDragEvent dsde) {}
 				@Override public void dropActionChanged(DragSourceDragEvent dsde) {}
@@ -510,5 +551,69 @@ public class KeyStoreEditor extends JPanel implements LoggerFacadeOwner, Localiz
 				@Override public void dragDropEnd(DragSourceDropEvent dsde) {}
 			});
         }
+    }
+    
+    private class DropTargetHandler implements DropTargetListener {
+    	public void dragEnter(final DropTargetDragEvent dtde) {
+        	if (dtde.getTransferable().isDataFlavorSupported(DataFlavor.javaFileListFlavor) || dtde.getTransferable().isDataFlavorSupported(AliasTransferable.aliasFlavor)) {
+                dtde.acceptDrag(DnDConstants.ACTION_COPY);
+        	}
+        	else {
+                dtde.rejectDrag();
+        	}
+        }
+
+        public void dragOver(final DropTargetDragEvent dtde) {
+        }
+
+        public void dragExit(final DropTargetEvent dte) {
+        }
+
+        public void dropActionChanged(final DropTargetDragEvent dtde) {
+        }
+
+        public void drop(final DropTargetDropEvent dtde) {
+        	if (dtde.getTransferable().isDataFlavorSupported(AliasTransferable.aliasFlavor)) {
+        		try {
+					final AliasTransferable	src = (AliasTransferable)dtde.getTransferable().getTransferData(AliasTransferable.aliasFlavor);
+					
+		        	dropAliasCallback.accept(src.keyStoreId, src.aliasName);
+		        	dtde.acceptDrop(DnDConstants.ACTION_COPY);
+				} catch (UnsupportedFlavorException | IOException e) {
+	    		    dtde.rejectDrop();
+				}
+        	}
+        	else {
+    		    dtde.rejectDrop();
+        	}
+        }
+    }
+
+    private static class AliasTransferable implements Transferable, Serializable {
+		private static final long serialVersionUID = 7027105273890381468L;
+		private static final DataFlavor	aliasFlavor = new DataFlavor(AliasTransferable.class, "AliasKeeper"); 
+		
+    	private final int				keyStoreId;
+    	private final String			aliasName;
+
+		private AliasTransferable(final int keyStoreId, final String aliasName) {
+			this.keyStoreId = keyStoreId;
+			this.aliasName = aliasName;
+		}
+
+		@Override
+		public DataFlavor[] getTransferDataFlavors() {
+			return new DataFlavor[] {aliasFlavor};
+		}
+
+		@Override
+		public boolean isDataFlavorSupported(final DataFlavor flavor) {
+			return flavor.equals(aliasFlavor);
+		}
+
+		@Override
+		public Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+			return isDataFlavorSupported(flavor) ? this : null;
+		}
     }
 }
