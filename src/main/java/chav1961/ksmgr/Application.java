@@ -2,6 +2,7 @@ package chav1961.ksmgr;
 
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -95,6 +96,7 @@ import chav1961.purelib.ui.interfaces.LRUPersistence;
 import chav1961.purelib.ui.swing.AutoBuiltForm;
 import chav1961.purelib.ui.swing.SwingUtils;
 import chav1961.purelib.ui.swing.interfaces.OnAction;
+import chav1961.purelib.ui.swing.useful.JCreoleHelpWindow;
 import chav1961.purelib.ui.swing.useful.JFileContentManipulator;
 import chav1961.purelib.ui.swing.useful.JFileItemDescriptor;
 import chav1961.purelib.ui.swing.useful.JFileTree;
@@ -153,6 +155,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	
 	private static final String				MENU_FILE_LRU = "menu.file.lru";
 	
+	private static final String				CARD_WORKBENCH = "workbench";
+	private static final String				CARD_HELP = "help";
+	
 	private static final long 				FILE_LRU = 1L << 0;
 	private static final long 				FILE_SAVE = 1L << 1;
 	private static final long 				FILE_SAVE_AS = 1L << 2;
@@ -168,6 +173,9 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private final MainMenuManager			emm;
 	private final JSplitPane				topSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JLabel(), new JLabel());
 	private final JSplitPane				totalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JLabel(), new JLabel());
+	private final JCreoleHelpWindow			help;
+	private final CardLayout				cardLayout = new CardLayout();
+	private final JPanel					card = new JPanel(cardLayout);
 	private final FileSystemInterface		root = FileSystemInterface.Factory.newInstance(URI.create(FileSystemInterface.FILESYSTEM_URI_SCHEME+":file:/"));
 	private final PasswordsRepo				passwords = new PasswordsRepo(false);
 	private final List<String>				lruFiles = new ArrayList<>();
@@ -207,6 +215,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 
 			this.menu = SwingUtils.toJComponent(app.byUIPath(URI.create("ui:/model/navigation.top.mainmenu")), JMenuBar.class);
 			this.emm = new MainMenuManager(settings, menu);
+			this.help = new JCreoleHelpWindow(localizer, "application.help");
 			
 			settings.loadSettings(this.props);			
 			this.pers = LRUPersistence.of(props, "LRU.item"); 
@@ -253,8 +262,14 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 			}));			
 			selectCurrentPanel(SelectedWindows.BOTTOM);
 			
+			SwingUtils.assignActionKey(help, SwingUtils.KS_EXIT, (e)->{cardLayout.show(card, CARD_WORKBENCH);}, SwingUtils.ACTION_EXIT);
+			
+			card.add(totalSplit, CARD_WORKBENCH);
+			card.add(new JScrollPane(help), CARD_HELP);
+			cardLayout.show(card, CARD_WORKBENCH);
+			
 			getContentPane().add(menu, BorderLayout.NORTH);
-			getContentPane().add(totalSplit, BorderLayout.CENTER);
+			getContentPane().add(card, BorderLayout.CENTER);
 			getContentPane().add(state, BorderLayout.SOUTH);
 			SwingUtils.centerMainWindow(this, 0.75f);
 			
@@ -730,6 +745,12 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 				getLogger().message(Severity.error, e.getLocalizedMessage());
 			}
 		}
+	}
+
+	@OnAction("action:/helpOverview")
+	private void showOverview() {
+		cardLayout.show(card, CARD_HELP);
+		help.requestFocusInWindow();
 	}
 	
 	@OnAction("action:/helpAbout")
