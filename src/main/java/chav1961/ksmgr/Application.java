@@ -1132,7 +1132,7 @@ public class Application extends JFrame implements LocaleChangeListener, LoggerF
 	private void exportAlias(final JFileItemDescriptor target, final AliasDescriptor source) {
 		final AskExportSecureKey	aesk = new AskExportSecureKey(getLogger());
 		
-		if (ask(aesk, 150, 350)) {
+		if (ask(aesk, 350, 150)) {
 			System.err.println("Entry: "+target+", desc="+source);
 		}
 	}
